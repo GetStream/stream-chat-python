@@ -9,6 +9,7 @@ cache: pip
 install:
   - pip install black
   - pip install pycodestyle
+  - pip install codecov
 script:
   - echo $STREAM_KEY
   - python setup.py test
