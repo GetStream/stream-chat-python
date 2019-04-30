@@ -13,8 +13,8 @@ install:
 script:
   - echo $STREAM_KEY
   - python setup.py test
+  - black stream_chat
+  - pycodestyle --ignore=E501,E225,W293 stream_chat
+  - python setup.py install
 after_script:
-  - "black stream_chat"
-  - "pycodestyle --ignore=E501,E225,W293 stream_chat"
-  - "python setup.py install"
   - "codecov"
