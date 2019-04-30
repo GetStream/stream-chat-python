@@ -2,7 +2,9 @@
 
 [![Build Status](https://travis-ci.com/GetStream/stream-chat-python.svg?token=WystDPP9vxKnwsd8NwW1&branch=master)](https://travis-ci.com/GetStream/stream-chat-python) [![codecov](https://codecov.io/gh/GetStream/stream-chat-python/branch/master/graph/badge.svg?token=DM7rr9M7Kl)](https://codecov.io/gh/GetStream/stream-chat-python) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat)
 
-stream-chat-python is the official Python client for Stream chat.
+stream-chat-python is the official Python client for [Stream chat](https://getstream.io/chat/) a service for building chat applications.
+
+You can sign up for a Stream account at https://getstream.io/chat/get_started/.
 
 ### Installation
 
@@ -16,6 +18,43 @@ stream-python supports:
 pip install stream-chat
 ```
 
+### Documentation
+
+[Official API docs](https://getstream.io/chat/docs/)  
+
+### How to build a chat app with Python tutorial
+
+TODO: add a sample Python chat program
+
+### Supported features
+
+- Chat channels 
+- Messages
+- Chat channel types 
+- User management 
+- Moderation API 
+- Push configuration 
+- User devices 
+- User search
+- Channel search
+
+### Quickstart
+
+```python
+chat = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+
+# add a user
+chat.update_user({"id": "chuck", "name": "Chuck"})
+
+# create a channel about kung-fu
+channel = chat.channel("messaging", "kung-fu")
+channel.create("chuck")
+
+# add a first message to the channel
+channel.send_message({"text": "AMA about kung-fu"})
+
+```
+
 ### Contributing
 
 First, make sure you can run the test suite. Tests are run via py.test
@@ -27,7 +66,7 @@ STREAM_KEY=my_api_key STREAM_SECRET=my_api_secret py.test stream_chat/ -v
 Install black and pycodestyle
 
 ```
-pip install pycodestyle
+pip install black
 pip install pycodestyle
 ```
 
