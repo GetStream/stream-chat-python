@@ -19,7 +19,6 @@ pip install stream-chat
 ### Documentation
 
 [Official API docs](https://getstream.io/chat/docs/)  
-[Python Client API reference](https://stream-chat-python.readthedocs.io/en/latest/)  
 
 ### Contributing
 
