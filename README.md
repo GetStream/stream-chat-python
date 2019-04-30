@@ -31,7 +31,7 @@ STREAM_KEY=my_api_key STREAM_SECRET=my_api_secret py.test stream_chat/ -v
 Install black and pycodestyle
 
 ```
-pip install pycodestyle
+pip install black
 pip install pycodestyle
 ```
 
