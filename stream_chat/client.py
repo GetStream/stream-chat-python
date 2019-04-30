@@ -25,7 +25,7 @@ def get_default_header():
     return base_headers
 
 
-class Client(object):
+class StreamChat(object):
     def __init__(self, api_key, api_secret, timeout=6.0, **options):
         self.api_key = api_key
         self.api_secret = api_secret

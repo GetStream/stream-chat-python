@@ -1,7 +1,7 @@
 import uuid
 
 import pytest
-from stream_chat.client import Client
+from stream_chat import StreamChat
 import os
 
 
@@ -21,7 +21,7 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture(scope="module")
 def client():
-    return Client(
+    return StreamChat(
         api_key=os.environ["STREAM_KEY"],
         api_secret=os.environ["STREAM_SECRET"],
         timeout=10,
