@@ -38,6 +38,23 @@ TODO: add a sample Python chat program
 - User search
 - Channel search
 
+### Quickstart
+
+```python
+chat = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+
+# add a user
+chat.update_user({"id": "chuck", "name": "Chuck"})
+
+# create a channel about kung-fu
+channel = chat.channel("messaging", "kung-fu")
+channel.create("chuck")
+
+# add a first message to the channel
+channel.send_message({"text": "AMA about kung-fu"})
+
+```
+
 ### Contributing
 
 First, make sure you can run the test suite. Tests are run via py.test
