@@ -20,6 +20,19 @@ pip install stream-chat
 
 [Official API docs](https://getstream.io/chat/docs/)  
 
+### How to build a chat app with Python tutorial
+
+TODO: add a sample Python chat program
+
+### Supported features
+
+- Chat channels and messages 
+- Chat channel types 
+- User management 
+- Moderation API 
+- Push configuration 
+- User devices 
+
 ### Contributing
 
 First, make sure you can run the test suite. Tests are run via py.test
