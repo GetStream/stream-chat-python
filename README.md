@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/GetStream/stream-chat-python.svg?token=WystDPP9vxKnwsd8NwW1&branch=master)](https://travis-ci.com/GetStream/stream-chat-python) [![codecov](https://codecov.io/gh/GetStream/stream-chat-python/branch/master/graph/badge.svg?token=DM7rr9M7Kl)](https://codecov.io/gh/GetStream/stream-chat-python) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat)
 
-stream-chat-python is the official Python client for Stream chat.
+stream-chat-python is the official Python client for [Stream chat](https://getstream.io/chat/).
 
 ### Installation
 
@@ -15,6 +15,11 @@ stream-python supports:
 ```bash
 pip install stream-chat
 ```
+
+### Documentation
+
+[Official API docs](https://getstream.io/chat/docs/)  
+[Python Client API reference](https://stream-chat-python.readthedocs.io/en/latest/)  
 
 ### Contributing
 
