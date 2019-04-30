@@ -1,0 +1,20 @@
+language: python
+python:
+  - 3.6
+  - 3.7
+
+cache: pip
+
+install:
+  - pip install black
+  - pip install pycodestyle
+
+script:
+  - echo $STREAM_KEY
+  - python setup.py test
+
+after_script:
+  - "black stream_chat"
+  - "pycodestyle --ignore=E501,E225,W293 stream_chat"
+  - "python setup.py install"
+  - "codecov"
