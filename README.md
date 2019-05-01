@@ -8,7 +8,7 @@ You can sign up for a Stream account at https://getstream.io/chat/get_started/.
 
 ### Installation
 
-stream-python supports:
+stream-chat-python supports:
 
 - Python (3.4, 3.5, 3.6, 3.7)
 
