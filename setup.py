@@ -1,9 +1,7 @@
 import sys
 
-from stream_chat import __version__, __maintainer__, __email__, __license__
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
-
 
 install_requires = [
     "pycryptodomex==3.4.7",
@@ -14,6 +12,9 @@ install_requires = [
 long_description = open("README.md", "r").read()
 tests_require = ["pytest==4.4.1", "pytest-cov", "codecov"]
 
+about = {}
+with open("stream_chat/__pkg__.py") as fp:
+    exec(fp.read(), about)
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -32,14 +33,13 @@ class PyTest(TestCommand):
 setup(
     name="stream-chat",
     cmdclass={"test": PyTest},
-    version=__version__,
-    author=__maintainer__,
-    author_email=__email__,
+    version=about["__version__"],
+    author=about["__maintainer__"],
+    author_email=about["__email__"],
     url="http://github.com/GetStream/chat-py",
     description="Client for Stream Chat.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license=__license__,
     packages=find_packages(),
     zip_safe=False,
     install_requires=install_requires,
