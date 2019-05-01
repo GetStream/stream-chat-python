@@ -4,7 +4,7 @@ from json import JSONDecodeError
 import requests
 import six
 
-from stream_chat import __version__
+from stream_chat.__pkg__ import __version__
 from stream_chat.channel import Channel
 import jwt
 import hmac
