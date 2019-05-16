@@ -63,6 +63,13 @@ class TestClient(object):
         client.ban_user(random_user["id"])
         client.unban_user(random_user["id"])
 
+    def test_flag_user(self, client, random_user):
+        client.flag_user(random_user["id"])
+
+    def test_unflag_user(self, client, random_user):
+        client.flag_user(random_user["id"])
+        client.unflag_user(random_user["id"])
+
     def test_mark_all_read(self, client, random_user):
         client.mark_all_read(random_user["id"])
 
@@ -85,6 +92,17 @@ class TestClient(object):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id)
+
+    def test_flag_message(self, client, channel, random_user):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        client.flag_message(msg_id)
+
+    def test_unflag_message(self, client, channel, random_user):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        client.flag_message(msg_id)
+        client.unflag_message(msg_id)
 
     def test_query_users_young_hobbits(self, client, fellowship_of_the_ring):
         response = client.query_users({"race": {"$eq": "Hobbit"}}, {"age": -1})
