@@ -10,7 +10,7 @@ install_requires = [
     "six>=1.8.0",
 ]
 long_description = open("README.md", "r").read()
-tests_require = ["pytest==4.4.1", "pytest-cov", "codecov"]
+tests_require = ["pytest", "pytest-cov", "codecov"]
 
 about = {}
 with open("stream_chat/__pkg__.py") as fp:
