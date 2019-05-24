@@ -25,11 +25,11 @@ class PyTest(TestCommand):
     def run_tests(self):
         # import here, cause outside the eggs aren't loaded
         import pytest
-        pytest_cmd = ["stream_chat/", "-v", "--cov=stream_chat/"]
+        pytest_cmd = ["stream_chat/", "-v"]
 
         try:
             import pytest_cov
-            pytest_cmd += ["--cov-report=html",  "--cov-report=annotate"]
+            pytest_cmd += ["--cov=stream_chat/", "--cov-report=html",  "--cov-report=annotate"]
         except ImportError:
             pass
         
