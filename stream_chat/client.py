@@ -1,5 +1,4 @@
 import json
-from json import JSONDecodeError
 
 import requests
 import six
@@ -43,7 +42,7 @@ class StreamChat(object):
     def _parse_response(self, response):
         try:
             parsed_result = json.loads(response.text) if response.text else {}
-        except JSONDecodeError:
+        except ValueError:
             raise StreamAPIException(response)
         if response.status_code >= 399:
             raise StreamAPIException(response)
@@ -59,7 +58,7 @@ class StreamChat(object):
         headers["Authorization"] = self.auth_token
         headers["stream-auth-type"] = "jwt"
 
-        url = "%s/%s" % (self.base_url, relative_url)
+        url = "{}/{}".format(self.base_url, relative_url)
 
         if method.__name__ in ["post", "put", "patch"]:
             serialized = json.dumps(data)
@@ -107,13 +106,13 @@ class StreamChat(object):
         return self.update_users([user])
 
     def delete_user(self, user_id, **options):
-        return self.delete(f"users/{user_id}", options)
+        return self.delete("users/{}".format(user_id), options)
 
     def deactivate_user(self, user_id, **options):
-        return self.post(f"users/{user_id}/deactivate", options)
+        return self.post("users/{}/deactivate".format(user_id), options)
 
     def export_user(self, user_id, **options):
-        return self.get(f"users/{user_id}/export", options)
+        return self.get("users/{}/export".format(user_id), options)
 
     def ban_user(self, target_id, **options):
         data = dict(target_user_id=target_id)
@@ -174,10 +173,10 @@ class StreamChat(object):
     def update_message(self, message):
         if message.get("id") is None:
             raise ValueError("message must have an id")
-        return self.post(f"messages/{message['id']}", data={"message": message})
+        return self.post("messages/{}".format(message['id']), data={"message": message})
 
     def delete_message(self, message_id):
-        return self.delete(f"messages/{message_id}")
+        return self.delete("messages/{}".format(message_id))
 
     def query_users(self, filter_conditions, sort=None, **options):
         sort_fields = []
@@ -202,13 +201,13 @@ class StreamChat(object):
         return self.post("channeltypes", data=data)
 
     def get_channel_type(self, channel_type):
-        return self.get(f"channeltypes/{channel_type}")
+        return self.get("channeltypes/{}".format(channel_type))
 
     def list_channel_types(self):
         return self.get("channeltypes")
 
     def update_channel_type(self, channel_type, **settings):
-        return self.put(f"channeltypes/{channel_type}", **settings)
+        return self.put("channeltypes/{}".format(channel_type), **settings)
 
     def delete_channel_type(self, channel_type):
         """
@@ -217,7 +216,7 @@ class StreamChat(object):
         :param channel_type: the channel type
         :return:
         """
-        return self.delete(f"channeltypes/{channel_type}")
+        return self.delete("channeltypes/{}".format(channel_type))
 
     def channel(self, channel_type, channel_id=None, data=None):
         """

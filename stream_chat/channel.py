@@ -14,7 +14,7 @@ class Channel(object):
     def url(self):
         if self.id is None:
             raise StreamChannelException("channel does not have an id")
-        return f"channels/{self.channel_type}/{self.id}"
+        return "channels/{}/{}".format(self.channel_type, self.id)
 
     def send_message(self, message, user_id):
         """
@@ -25,7 +25,7 @@ class Channel(object):
         :return: the Server Response
         """
         payload = {"message": add_user_id(message, user_id)}
-        return self.client.post(f"{self.url}/message", data=payload)
+        return self.client.post("{}/message".format(self.url), data=payload)
 
     def send_event(self, event, user_id):
         """
@@ -36,7 +36,7 @@ class Channel(object):
         :return: the Server Response
         """
         payload = {"event": add_user_id(event, user_id)}
-        return self.client.post(f"{self.url}/event", data=payload)
+        return self.client.post("{}/event".format(self.url), data=payload)
 
     def send_reaction(self, message_id, reaction, user_id):
         """
@@ -48,7 +48,7 @@ class Channel(object):
         :return: the Server Response
         """
         payload = {"reaction": add_user_id(reaction, user_id)}
-        return self.client.post(f"messages/{message_id}/reaction", data=payload)
+        return self.client.post("messages/{}/reaction".format(message_id), data=payload)
 
     def delete_reaction(self, message_id, reaction_type, user_id):
         """
@@ -60,7 +60,7 @@ class Channel(object):
         :return: the Server Response
         """
         return self.client.delete(
-            f"messages/{message_id}/reaction/{reaction_type}",
+            "messages/{}/reaction/{}".format(message_id, reaction_type),
             params={"user_id": user_id},
         )
 
@@ -84,11 +84,11 @@ class Channel(object):
         payload = {"state": True, "data": self.custom_data}
         payload.update(options)
 
-        url = f"channels/{self.channel_type}"
+        url = "channels/{}".format(self.channel_type)
         if self.id is not None:
-            url = f"{url}/{self.id}"
+            url = "{}/{}".format(url, self.id)
 
-        state = self.client.post(f"{url}/query", data=payload)
+        state = self.client.post("{}/query".format(url), data=payload)
 
         if self.id is None:
             self.id = state["channel"]["id"]
@@ -120,7 +120,7 @@ class Channel(object):
 
         :return: The server response
         """
-        return self.client.post(f"{self.url}/truncate")
+        return self.client.post("{}/truncate".format(self.url))
 
     def add_members(self, user_ids):
         """
@@ -167,7 +167,7 @@ class Channel(object):
         :return: The server response
         """
         payload = add_user_id(data, user_id)
-        return self.client.post(f"{self.url}/read", data=payload)
+        return self.client.post("{}/read".format(self.url), data=payload)
 
     def get_replies(self, parent_id, **options):
         """
@@ -177,17 +177,17 @@ class Channel(object):
         :param options: Pagination params, ie {limit:10, idlte: 10}
         :return: A response with a list of messages
         """
-        return self.client.get(f"messages/{parent_id}/replies", params=options)
+        return self.client.get("messages/{}/replies".format(parent_id), params=options)
 
     def get_reactions(self, message_id, **options):
         """
         List the reactions, supports pagination
 
-        :param message_id: Tthe message id
+        :param message_id: The message id
         :param options: Pagination params, ie {"limit":10, "idlte": 10}
         :return: A response with a list of reactions
         """
-        return self.client.get(f"messages/{message_id}/reactions", params=options)
+        return self.client.get("messages/{}/reactions".format(message_id), params=options)
 
     def ban_user(self, user_id, **options):
         """
