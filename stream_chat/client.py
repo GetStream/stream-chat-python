@@ -1,5 +1,4 @@
 import json
-from json import JSONDecodeError
 
 import requests
 import six
@@ -43,7 +42,7 @@ class StreamChat(object):
     def _parse_response(self, response):
         try:
             parsed_result = json.loads(response.text) if response.text else {}
-        except JSONDecodeError:
+        except ValueError:
             raise StreamAPIException(response)
         if response.status_code >= 399:
             raise StreamAPIException(response)
