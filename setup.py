@@ -10,7 +10,7 @@ install_requires = [
     "six>=1.8.0",
 ]
 long_description = open("README.md", "r").read()
-tests_require = ["pytest", "pytest-cov", "codecov"]
+tests_require = ["pytest"]
 
 about = {}
 with open("stream_chat/__pkg__.py") as fp:
@@ -25,8 +25,14 @@ class PyTest(TestCommand):
     def run_tests(self):
         # import here, cause outside the eggs aren't loaded
         import pytest
+        pytest_cmd = ["stream_chat/", "-v", "--cov=stream_chat/"]
 
-        errno = pytest.main(["stream_chat/", "-v", "--cov=stream_chat/", "--cov-report=html",  "--cov-report=annotate"])
+        try:
+            import pytest_cov
+        except ImportError:
+            pytest_cmd += ["--cov-report=html",  "--cov-report=annotate"]
+        
+        errno = pytest.main(pytest_cmd)
         sys.exit(errno)
 
 
