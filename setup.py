@@ -3,9 +3,15 @@ import sys
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
+requests = "requests>=2.3.0,<3"
+
+# python 2.7.9 does not support SNI
+if sys.version_info < (2, 7, 9):
+    requests = "requests[security]>=2.4.1,<3"
+
 install_requires = [
     "pycryptodomex==3.8.1",
-    "requests>=2.3.0,<3",
+    requests,
     "pyjwt==1.7.1",
     "six>=1.8.0",
 ]
