@@ -9,14 +9,14 @@ matrix:
       sudo: true
 cache: pip
 install:
-  - pip install black
-  - pip install pycodestyle
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install black; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install pycodestyle; fi
   - pip install codecov
 script:
   - echo $STREAM_KEY
   - python setup.py test
-  - black stream_chat
-  - pycodestyle --ignore=E501,E225,W293 stream_chat
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then black stream_chat; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pycodestyle --ignore=E501,E225,W293 stream_chat; fi
   - python setup.py install
 after_script:
   - "codecov"
