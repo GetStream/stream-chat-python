@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
 install_requires = [
-    "pycryptodomex==3.4.7",
+    "pycryptodomex==3.8.1",
     "requests>=2.3.0,<3",
     "pyjwt==1.7.1",
     "six>=1.8.0",
