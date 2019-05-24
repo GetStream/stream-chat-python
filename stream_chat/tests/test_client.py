@@ -1,6 +1,8 @@
 import jwt
 import pytest
 import uuid
+from stream_chat import StreamChat
+from stream_chat.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental
@@ -11,6 +13,11 @@ class TestClient(object):
         assert response["mute"]["target"]["id"] == random_users[0]["id"]
         assert response["mute"]["user"]["id"] == random_users[1]["id"]
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])
+
+    def test_auth_exception(self):
+        client = StreamChat(api_key="bad", api_secret="guy")
+        with pytest.raises(StreamAPIException):
+            client.get_channel_type("team")
 
     def test_get_channel_types(self, client):
         response = client.get_channel_type("team")

@@ -1,4 +1,3 @@
-import json
 from json import JSONDecodeError
 
 
@@ -23,6 +22,6 @@ class StreamAPIException(Exception):
 
     def __str__(self):
         if self.json_response:
-            return f"StreamChat error code {self.error_code}: {self.error_message}"
+            return "StreamChat error code {}: {}".format(self.error_code, self.error_message)
         else:
-            return f"StreamChat error HTTP code: {self.response.status_code}"
+            return "StreamChat error HTTP code: {}".format(self.response.status_code)
