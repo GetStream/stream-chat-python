@@ -48,7 +48,7 @@ def random_users(client):
 @pytest.fixture(scope="function")
 def channel(client, random_user):
     channel = client.channel(
-        "messaging", f"{uuid.uuid4()}", {"test": True, "language": "python"}
+        "messaging", str(uuid.uuid4()), {"test": True, "language": "python"}
     )
     channel.create(random_user["id"])
     return channel
