@@ -53,6 +53,7 @@ setup(
     extras_require={"test": tests_require},
     tests_require=tests_require,
     include_package_data=True,
+    python_requires=">=3.4",
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
