@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.com/GetStream/stream-chat-python.svg?token=WystDPP9vxKnwsd8NwW1&branch=master)](https://travis-ci.com/GetStream/stream-chat-python) [![codecov](https://codecov.io/gh/GetStream/stream-chat-python/branch/master/graph/badge.svg?token=DM7rr9M7Kl)](https://codecov.io/gh/GetStream/stream-chat-python) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat)
 
-stream-chat-python is the official Python client for [Stream chat](https://getstream.io/chat/) a service for building chat applications.
+the official Python API client for [Stream chat](https://getstream.io/chat/) a service for building chat applications.
 
 You can sign up for a Stream account at https://getstream.io/chat/get_started/.
+
+You can use this library to access chat API endpoints server-side, for the client-side integrations (web and mobile) have a look at the Javascript, iOS and Android SDK libraries (https://getstream.io/chat/).
 
 ### Installation
 
@@ -24,7 +26,7 @@ pip install stream-chat
 
 ### How to build a chat app with Python tutorial
 
-TODO: add a sample Python chat program
+[Chat with Python, Django and React](https://github.com/GetStream/python-chat-example)
 
 ### Supported features
 
