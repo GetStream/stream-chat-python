@@ -29,8 +29,9 @@ class PyTest(TestCommand):
 
         try:
             import pytest_cov
-        except ImportError:
             pytest_cmd += ["--cov-report=html",  "--cov-report=annotate"]
+        except ImportError:
+            pass
         
         errno = pytest.main(pytest_cmd)
         sys.exit(errno)
