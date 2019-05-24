@@ -1,6 +1,3 @@
-from json import JSONDecodeError
-
-
 class StreamChannelException(Exception):
     pass
 
@@ -17,7 +14,7 @@ class StreamAPIException(Exception):
                 "message", "unknown"
             )
             self.json_response = True
-        except JSONDecodeError:
+        except ValueError:
             pass
 
     def __str__(self):
