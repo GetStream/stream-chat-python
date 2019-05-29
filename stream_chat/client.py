@@ -122,7 +122,7 @@ class StreamChat(object):
     def unban_user(self, target_id, **options):
         params = dict(target_user_id=target_id)
         params.update(options)
-        return self.delete("moderation/ban", params)
+        return self.delete("moderation/unban", params)
 
     def mute_user(self, target_id, user_id):
         """
