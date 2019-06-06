@@ -3,12 +3,13 @@ import pytest
 
 @pytest.mark.incremental
 class TestChannel(object):
-    def test_ban_user(self, channel, random_user):
-        channel.ban_user(random_user["id"])
+    def test_ban_user(self, channel, random_user, server_user):
+        channel.ban_user(random_user["id"], user_id=server_user["id"])
         channel.ban_user(
             random_user["id"],
             timeout=3600,
             reason="offensive language is not allowed here",
+            user_id=server_user["id"],
         )
         channel.unban_user(random_user["id"])
 

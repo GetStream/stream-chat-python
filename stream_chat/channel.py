@@ -189,7 +189,7 @@ class Channel(object):
         """
         return self.client.get("messages/{}/reactions".format(message_id), params=options)
 
-    def ban_user(self, user_id, **options):
+    def ban_user(self, target_id, **options):
         """
         Bans a user from this channel
 
@@ -198,17 +198,19 @@ class Channel(object):
         :return: The server response
         """
         return self.client.ban_user(
-            user_id, type=self.channel_type, id=self.id, **options
+            target_id, type=self.channel_type, id=self.id, **options
         )
 
-    def unban_user(self, user_id):
+    def unban_user(self, target_id, **options):
         """
         Removes the ban for a user on this channel
 
         :param user_id: the ID of the user to unban
         :return: The server response
         """
-        return self.client.unban_user(user_id, type=self.channel_type, id=self.id)
+        return self.client.unban_user(
+            target_id, type=self.channel_type, id=self.id, **options
+        )
 
     def accept_invite(self, user_id):
         raise NotImplementedError

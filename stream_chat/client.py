@@ -124,6 +124,26 @@ class StreamChat(object):
         params.update(options)
         return self.delete("moderation/ban", params)
 
+    def flag_message(self, target_id, **options):
+        data = dict(target_message_id=target_id)
+        data.update(options)
+        return self.post("moderation/flag", data=data)
+
+    def unflag_message(self, target_id, **options):
+        data = dict(target_message_id=target_id)
+        data.update(options)
+        return self.post("moderation/unflag", data=data)
+
+    def flag_user(self, target_id, **options):
+        data = dict(target_user_id=target_id)
+        data.update(options)
+        return self.post("moderation/flag", data=data)
+
+    def unflag_user(self, target_id, **options):
+        data = dict(target_user_id=target_id)
+        data.update(options)
+        return self.post("moderation/unflag", data=data)
+
     def mute_user(self, target_id, user_id):
         """
         Create a mute

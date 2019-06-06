@@ -38,6 +38,15 @@ def random_user(client):
 
 
 @pytest.fixture(scope="function")
+def server_user(client):
+    user = {"id": str(uuid.uuid4())}
+    response = client.update_user(user)
+    assert "users" in response
+    assert user["id"] in response["users"]
+    return user
+
+
+@pytest.fixture(scope="function")
 def random_users(client):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
