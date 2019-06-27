@@ -109,7 +109,7 @@ class StreamChat(object):
         return self.delete("users/{}".format(user_id), options)
 
     def deactivate_user(self, user_id, **options):
-        return self.post("users/{}/deactivate".format(user_id), options)
+        return self.post("users/{}/deactivate".format(user_id), data=options)
 
     def export_user(self, user_id, **options):
         return self.get("users/{}/export".format(user_id), options)
