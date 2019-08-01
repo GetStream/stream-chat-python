@@ -207,7 +207,7 @@ class StreamChat(object):
         return self.get("channeltypes")
 
     def update_channel_type(self, channel_type, **settings):
-        return self.put("channeltypes/{}".format(channel_type), **settings)
+        return self.put("channeltypes/{}".format(channel_type), data=settings)
 
     def delete_channel_type(self, channel_type):
         """

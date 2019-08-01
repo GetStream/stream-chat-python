@@ -27,6 +27,11 @@ class TestClient(object):
         response = client.list_channel_types()
         assert "channel_types" in response
 
+    def test_update_channel_type(self, client):
+        response = client.update_channel_type("team", commands=["ban", "unban"])
+        assert "commands" in response
+        assert response["commands"] == ["ban", "unban"]
+
     def test_create_token(self, client):
         token = client.create_token("tommaso")
         payload = jwt.decode(token, client.api_secret, algorithm="HS256")
