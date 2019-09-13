@@ -63,6 +63,14 @@ class TestClient(object):
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
+    def test_reactivate_user(self, client, random_user):
+        response = client.deactivate_user(random_user["id"])
+        assert "user" in response
+        assert random_user["id"] == response["user"]["id"]
+        response = client.reactivate_user(random_user["id"])
+        assert "user" in response
+        assert random_user["id"] == response["user"]["id"]
+
     def test_export_user(self, client, fellowship_of_the_ring):
         response = client.export_user("gandalf")
         assert "user" in response
@@ -104,6 +112,9 @@ class TestClient(object):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id)
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        resp = client.delete_message(msg_id, hard=True)
 
     def test_flag_message(self, client, channel, random_user, server_user):
         msg_id = str(uuid.uuid4())
@@ -140,3 +151,22 @@ class TestClient(object):
         client.add_device(str(uuid.uuid4()), "apn", random_user["id"])
         response = client.get_devices(random_user["id"])
         assert len(response["devices"]) == 1
+
+    def test_search(self, client, channel, random_user):
+        query = "supercalifragilisticexpialidocious"
+        channel.send_message({"text": f"How many syllables are there in {query}?"}, random_user['id'])
+        channel.send_message({"text": "Does 'cious' count as one or two?"}, random_user['id'])
+        response = client.search(
+            {"type": "messaging"},
+            query,
+            **{"limit": 2, "offset": 0}
+        )
+        # searches all channels so make sure at least one is found
+        assert len(response['results']) >= 1
+        assert query in response['results'][0]['message']['text']
+        response = client.search(
+            {"type": "messaging"},
+            "cious",
+            **{"limit": 12, "offset": 0})
+        for message in response['results']:
+            assert query not in message['message']['text']

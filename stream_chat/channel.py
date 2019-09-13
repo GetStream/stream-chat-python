@@ -218,17 +218,17 @@ class Channel(object):
     def reject_invite(self, user_id):
         raise NotImplementedError
 
-    def send_file(self):
-        raise NotImplementedError
+    def send_file(self, url, name, user, content_type=None):
+        return self.client.send_file(f"{self.url}/file", url, name, user, content_type=content_type)
 
-    def send_image(self):
-        raise NotImplementedError
+    def send_image(self, url, name, user, content_type=None):
+        return self.client.send_file(f"{self.url}/image", url, name, user, content_type=content_type)
 
-    def delete_file(self):
-        raise NotImplementedError
+    def delete_file(self, url):
+        return self.client.delete(f"{self.url}/file", {"url": url})
 
-    def delete_image(self):
-        raise NotImplementedError
+    def delete_image(self, url):
+        return self.client.delete(f"{self.url}/image", {"url": url})
 
 
 def add_user_id(payload, user_id):

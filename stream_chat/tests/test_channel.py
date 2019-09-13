@@ -120,3 +120,15 @@ class TestChannel(object):
         assert len(response["reactions"]) == 1
 
         assert response["reactions"][0]["count"] == 42
+
+    def test_send_and_delete_file(self, channel, random_user):
+        url = "https://getstream.io/blog/wp-content/themes/stream-theme-wordpress_2018-05-24_10-41/assets/images/stream_logo.png";
+        resp = channel.send_file(url, "logo.png", random_user)
+        assert "logo.png" in resp['file']
+        resp = channel.delete_file(resp['file'])
+
+    def test_send_and_delete_image(self, channel, random_user):
+        url = "https://getstream.io/blog/wp-content/themes/stream-theme-wordpress_2018-05-24_10-41/assets/images/stream_logo.png";
+        resp = channel.send_image(url, "logo.png", random_user, content_type="image/png")
+        assert "logo.png" in resp['file']
+        # resp = channel.delete_image(resp['file'])

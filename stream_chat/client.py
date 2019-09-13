@@ -1,14 +1,15 @@
+from urllib.parse import urlparse
+import hmac
+import hashlib
 import json
+import urllib
 
+import jwt
 import requests
 import six
 
 from stream_chat.__pkg__ import __version__
 from stream_chat.channel import Channel
-import jwt
-import hmac
-import hashlib
-
 from stream_chat.exceptions import StreamAPIException
 
 
@@ -178,8 +179,8 @@ class StreamChat(object):
             raise ValueError("message must have an id")
         return self.post("messages/{}".format(message['id']), data={"message": message})
 
-    def delete_message(self, message_id):
-        return self.delete("messages/{}".format(message_id))
+    def delete_message(self, message_id, **options):
+        return self.delete("messages/{}".format(message_id), options)
 
     def query_users(self, filter_conditions, sort=None, **options):
         sort_fields = []
@@ -189,7 +190,7 @@ class StreamChat(object):
         params.update({"filter_conditions": filter_conditions, "sort": sort_fields})
         return self.get("users", params={"payload": json.dumps(params)})
 
-    def query_channels(self, filter_conditions, sort, **options):
+    def query_channels(self, filter_conditions, sort=None, **options):
         params = {"state": True, "watch": False, "presence": False}
         sort_fields = []
         if sort is not None:
@@ -281,4 +282,26 @@ class StreamChat(object):
         return signature == x_signature
 
     def search(self, filter_conditions, query, **options):
-        raise NotImplementedError
+        params = options.copy()
+        params.update({"filter_conditions": filter_conditions, "query": query})
+        return self.get("search", params={"payload": json.dumps(params)})
+
+    def send_file(self, uri, url, name, user, content_type=None):
+        headers = {}
+        headers["Authorization"] = self.auth_token
+        headers["stream-auth-type"] = "jwt"
+        headers["X-Stream-Client"]: get_user_agent()
+        parts = urlparse(url)
+        if parts[0] == '':
+            url = f"file://{url}"
+        if content_type:
+            file_tuple = (name, urllib.request.urlopen(url), content_type)
+        else:
+            file_tuple = (name, urllib.request.urlopen(url), content_type)
+        response = requests.post(
+            "{}/{}".format(self.base_url, uri),
+            params=self.get_default_params(),
+            data={"user": json.dumps(user)},
+            files={"file": file_tuple},
+            headers=headers)
+        return self._parse_response(response)
