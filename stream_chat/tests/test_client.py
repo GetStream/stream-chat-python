@@ -134,7 +134,7 @@ class TestClient(object):
 
     def test_query_channels_members_in(self, client, fellowship_of_the_ring):
         response = client.query_channels({"members": {"$in": ["gimli"]}}, {"id": 1})
-        assert respons == {}
+        assert response == {}
         assert len(response["channels"]) == 1
         assert response["channels"][0]["channel"]["id"] == "fellowship-of-the-ring"
         assert len(response["channels"][0]["members"]) == 9
