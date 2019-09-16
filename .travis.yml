@@ -2,23 +2,21 @@ language: python
 dist: xenial
 matrix:
   include:
-    - python: 2.7
-    - python: 3.4
     - python: 3.5
     - python: 3.6
     - python: 3.7
       sudo: true
 cache: pip
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install black; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install pycodestyle; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install pytest-cov; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install codecov; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install black; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install pycodestyle; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install pytest-cov; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install codecov; fi
 script:
   - echo $STREAM_KEY
   - python setup.py test
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then black stream_chat; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pycodestyle --ignore=E501,E225,W293 stream_chat; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then black stream_chat; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pycodestyle --ignore=E501,E225,W293 stream_chat; fi
   - python setup.py install
 after_script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then codecov; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then codecov; fi
