@@ -219,16 +219,16 @@ class Channel(object):
         raise NotImplementedError
 
     def send_file(self, url, name, user, content_type=None):
-        return self.client.send_file(f"{self.url}/file", url, name, user, content_type=content_type)
+        return self.client.send_file("{}/file".format(self.url), url, name, user, content_type=content_type)
 
     def send_image(self, url, name, user, content_type=None):
-        return self.client.send_file(f"{self.url}/image", url, name, user, content_type=content_type)
+        return self.client.send_file("{}/image".format(self.url), url, name, user, content_type=content_type)
 
     def delete_file(self, url):
-        return self.client.delete(f"{self.url}/file", {"url": url})
+        return self.client.delete("{}/file".format(self.url), {"url": url})
 
     def delete_image(self, url):
-        return self.client.delete(f"{self.url}/image", {"url": url})
+        return self.client.delete("{}/image".format(self.url), {"url": url})
 
 
 def add_user_id(payload, user_id):

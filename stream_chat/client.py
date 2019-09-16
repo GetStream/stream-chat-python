@@ -293,7 +293,7 @@ class StreamChat(object):
         headers["X-Stream-Client"] = get_user_agent()
         parts = urlparse(url)
         if parts[0] == '':
-            url = f"file://{url}"
+            url = "file://" + url
         if content_type:
             file_tuple = (name, urllib.request.urlopen(url), content_type)
         else:
