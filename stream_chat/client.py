@@ -290,7 +290,7 @@ class StreamChat(object):
         headers = {}
         headers["Authorization"] = self.auth_token
         headers["stream-auth-type"] = "jwt"
-        headers["X-Stream-Client"]: get_user_agent()
+        headers["X-Stream-Client"] = get_user_agent()
         parts = urlparse(url)
         if parts[0] == '':
             url = f"file://{url}"
