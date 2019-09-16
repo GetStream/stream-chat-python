@@ -5,10 +5,6 @@ from setuptools.command.test import test as TestCommand
 
 requests = "requests>=2.3.0,<3"
 
-# python 2.7.9 does not support SNI
-if sys.version_info < (2, 7, 9):
-    requests = "requests[security]>=2.4.1,<3"
-
 install_requires = [
     "pycryptodomex==3.8.1",
     requests,
@@ -59,7 +55,7 @@ setup(
     extras_require={"test": tests_require},
     tests_require=tests_require,
     include_package_data=True,
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*', 
+    python_requires='>=3.5',
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
@@ -68,7 +64,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
