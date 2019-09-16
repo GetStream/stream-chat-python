@@ -3,13 +3,13 @@ import sys
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
 
-requests = "requests>=2.3.0,<3"
+requests = "requests>=2.22.0,<3"
 
 install_requires = [
     "pycryptodomex==3.8.1",
     requests,
     "pyjwt==1.7.1",
-    "six>=1.8.0",
+    "six>=1.12.0",
 ]
 long_description = open("README.md", "r").read()
 tests_require = ["pytest"]
