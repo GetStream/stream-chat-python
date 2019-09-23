@@ -230,6 +230,12 @@ class Channel(object):
     def delete_image(self, url):
         return self.client.delete("{}/image".format(self.url), {"url": url})
 
+    def hide(self, user_id):
+        return self.client.post("{}/hide".format(self.url), data={"user_id": user_id})
+
+    def show(self, user_id):
+        return self.client.post("{}/show".format(self.url), data={"user_id": user_id})
+
 
 def add_user_id(payload, user_id):
     payload = payload.copy()
