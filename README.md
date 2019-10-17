@@ -47,7 +47,7 @@ channel = chat.channel("messaging", "kung-fu")
 channel.create("chuck")
 
 # add a first message to the channel
-channel.send_message({"text": "AMA about kung-fu"})
+channel.send_message({"text": "AMA about kung-fu"}, "chuck")
 
 ```
 
