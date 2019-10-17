@@ -66,7 +66,7 @@ class TestClient(object):
 
         assert "users" in response
         assert user_id in response["users"]
-        assert response["users"][user_id] == "updated"
+        assert response["users"][user_id]["field"] == "updated"
 
     def test_delete_user(self, client, random_user):
         response = client.delete_user(random_user["id"])
