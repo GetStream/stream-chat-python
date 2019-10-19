@@ -53,6 +53,21 @@ class TestClient(object):
         assert "users" in response
         assert user["id"] in response["users"]
 
+    def test_update_user_partial(self, client):
+        user_id = str(uuid.uuid4())
+        client.update_user({"id": user_id, "field": "value"})
+        
+        response = client.update_user_partial({
+            "id": user_id,
+            "set": {
+                "field": "updated"
+            }
+        })
+
+        assert "users" in response
+        assert user_id in response["users"]
+        assert response["users"][user_id]["field"] == "updated"
+
     def test_delete_user(self, client, random_user):
         response = client.delete_user(random_user["id"])
         assert "user" in response

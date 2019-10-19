@@ -106,6 +106,12 @@ class StreamChat(object):
     def update_user(self, user):
         return self.update_users([user])
 
+    def update_users_partial(self, updates):
+        return self.patch("users", data={"users": updates})
+
+    def update_user_partial(self, update):
+        return self.update_users_partial([update])
+        
     def delete_user(self, user_id, **options):
         return self.delete("users/{}".format(user_id), options)
 
