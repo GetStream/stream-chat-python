@@ -120,3 +120,44 @@ class TestChannel(object):
         assert len(response["reactions"]) == 1
 
         assert response["reactions"][0]["count"] == 42
+
+    def test_send_and_delete_file(self, channel, random_user):
+        url = "https://getstream.io/blog/wp-content/themes/stream-theme-wordpress_2018-05-24_10-41/assets/images/stream_logo.png";
+        resp = channel.send_file(url, "logo.png", random_user)
+        assert "logo.png" in resp['file']
+        resp = channel.delete_file(resp['file'])
+
+    def test_send_and_delete_image(self, channel, random_user):
+        url = "https://getstream.io/blog/wp-content/themes/stream-theme-wordpress_2018-05-24_10-41/assets/images/stream_logo.png";
+        resp = channel.send_image(url, "logo.png", random_user, content_type="image/png")
+        assert "logo.png" in resp['file']
+        # resp = channel.delete_image(resp['file'])
+
+    def test_channel_hide_show(self, client, channel, random_users):
+        # setup
+        channel.add_members([u['id'] for u in random_users])
+        # verify
+        response = client.query_channels({"id": channel.id})
+        assert len(response['channels']) == 1
+        response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
+        assert len(response['channels']) == 1
+        # hide
+        channel.hide(random_users[0]['id'])
+        response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
+        assert len(response['channels']) == 0
+        # search hidden channels
+        response = client.query_channels({"id": channel.id, "hidden": True}, user_id=random_users[0]['id'])
+        assert len(response['channels']) == 1
+        # unhide
+        channel.show(random_users[0]['id'])
+        response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
+        assert len(response['channels']) == 1
+        # hide again
+        channel.hide(random_users[0]['id'])
+        response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
+        assert len(response['channels']) == 0
+        # send message
+        msg = channel.send_message({"text": "hi"}, random_users[1]["id"])
+        # channel should be listed now
+        response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
+        assert len(response['channels']) == 1
