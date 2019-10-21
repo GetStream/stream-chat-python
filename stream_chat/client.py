@@ -95,7 +95,7 @@ class StreamChat(object):
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
 
     def update_app_settings(self, **settings):
-        return self.patch("app", **settings)
+        return self.patch("app", data=settings)
 
     def get_app_settings(self):
         return self.get("app")
