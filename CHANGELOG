@@ -1,3 +1,6 @@
+## Oct 21th, 2019 - 1.0.1
+- Fixed app update method parameter passing
+
 ## Oct 19th, 2019 - 1.0.0
 
 - Added support for user partial update endpoint
