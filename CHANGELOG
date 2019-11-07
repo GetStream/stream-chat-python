@@ -1,3 +1,6 @@
+## Nov 7, 2019 - 1.0.2
+- Bump crypto requirements
+
 ## Oct 21th, 2019 - 1.0.1
 - Fixed app update method parameter passing
 
