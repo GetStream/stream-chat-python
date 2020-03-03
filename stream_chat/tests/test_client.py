@@ -135,7 +135,7 @@ class TestClient(object):
         client.delete_message(msg_id)
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
-        resp = client.delete_message(msg_id, hard=True)
+        client.delete_message(msg_id, hard=True)
 
     def test_flag_message(self, client, channel, random_user, server_user):
         msg_id = str(uuid.uuid4())
