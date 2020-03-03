@@ -1,3 +1,6 @@
+## Mar 3, 2020 - 1.1.
+- Add support for client.get_message
+
 ## Nov 7, 2019 - 1.0.2
 - Bump crypto requirements
 
