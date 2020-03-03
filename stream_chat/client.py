@@ -188,6 +188,9 @@ class StreamChat(object):
     def delete_message(self, message_id, **options):
         return self.delete("messages/{}".format(message_id), options)
 
+    def get_message(self, message_id):
+        return self.get("messages/{}".format(message_id))
+
     def query_users(self, filter_conditions, sort=None, **options):
         sort_fields = []
         if sort is not None:
