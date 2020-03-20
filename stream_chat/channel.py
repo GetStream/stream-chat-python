@@ -212,11 +212,19 @@ class Channel(object):
             target_id, type=self.channel_type, id=self.id, **options
         )
 
-    def accept_invite(self, user_id):
-        raise NotImplementedError
+    def accept_invite(self, user_id, **data):
+        payload = add_user_id(data, user_id)
+        payload['accept_invite'] = True
+        response = self.client.post(self.url, data=payload)
+        self.custom_data = response['channel']
+        return response
 
-    def reject_invite(self, user_id):
-        raise NotImplementedError
+    def reject_invite(self, user_id, **data):
+        payload = add_user_id(data, user_id)
+        payload['reject_invite'] = True
+        response = self.client.post(self.url, data=payload)
+        self.custom_data = response['channel']
+        return response
 
     def send_file(self, url, name, user, content_type=None):
         return self.client.send_file("{}/file".format(self.url), url, name, user, content_type=content_type)

@@ -1,4 +1,8 @@
+import uuid
+
 import pytest
+
+from stream_chat.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental
@@ -157,7 +161,37 @@ class TestChannel(object):
         response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
         assert len(response['channels']) == 0
         # send message
-        msg = channel.send_message({"text": "hi"}, random_users[1]["id"])
+        channel.send_message({"text": "hi"}, random_users[1]["id"])
         # channel should be listed now
         response = client.query_channels({"id": channel.id}, user_id=random_users[0]['id'])
         assert len(response['channels']) == 1
+
+    def test_invites(self, client, channel):
+        members = ["john", "paul", "george", "pete", "ringo", "eric"]
+        client.update_users([{"id": m} for m in members])
+        channel = client.channel(
+            "team", "beatles-" + str(uuid.uuid4()), {
+                "members": members,
+                "invites": ["ringo", "eric"]
+            })
+        channel.create("john")
+        # accept the invite when not a member
+        with pytest.raises(StreamAPIException):
+            accept = channel.accept_invite("brian")
+        # accept the invite when a member
+        accept = channel.accept_invite("ringo")
+        for m in accept['members']:
+            if m['user_id'] == 'ringo':
+                assert m['invited'] is True
+                assert "invite_accepted_at" in m
+        # cannot accept again
+        with pytest.raises(StreamAPIException):
+            _ = channel.accept_invite("ringo")
+        reject = channel.reject_invite("eric")
+        for m in reject['members']:
+            if m['user_id'] == 'eric':
+                assert m['invited'] is True
+                assert "invite_rejected_at" in m
+        # cannot accept again
+        with pytest.raises(StreamAPIException):
+            reject = channel.reject_invite("eric")
