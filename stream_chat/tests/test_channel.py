@@ -177,7 +177,7 @@ class TestChannel(object):
         channel.create("john")
         # accept the invite when not a member
         with pytest.raises(StreamAPIException):
-            accept = channel.accept_invite("brian")
+            channel.accept_invite("brian")
         # accept the invite when a member
         accept = channel.accept_invite("ringo")
         for m in accept['members']:
@@ -186,12 +186,12 @@ class TestChannel(object):
                 assert "invite_accepted_at" in m
         # cannot accept again
         with pytest.raises(StreamAPIException):
-            _ = channel.accept_invite("ringo")
+            channel.accept_invite("ringo")
         reject = channel.reject_invite("eric")
         for m in reject['members']:
             if m['user_id'] == 'eric':
                 assert m['invited'] is True
                 assert "invite_rejected_at" in m
-        # cannot accept again
+        # cannot reject again
         with pytest.raises(StreamAPIException):
             reject = channel.reject_invite("eric")
