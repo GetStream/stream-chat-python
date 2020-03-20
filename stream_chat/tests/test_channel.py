@@ -126,13 +126,13 @@ class TestChannel(object):
         assert response["reactions"][0]["count"] == 42
 
     def test_send_and_delete_file(self, channel, random_user):
-        url = " https://homepages.cae.wisc.edu/~ece533/images/lena.png"
+        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
         resp = channel.send_file(url, "lena.png", random_user)
         assert "lena.png" in resp['file']
         resp = channel.delete_file(resp['file'])
 
     def test_send_and_delete_image(self, channel, random_user):
-        url = " https://homepages.cae.wisc.edu/~ece533/images/lena.png"
+        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
         resp = channel.send_image(url, "lena.png", random_user, content_type="image/png")
         assert "lena.png" in resp['file']
         # resp = channel.delete_image(resp['file'])
