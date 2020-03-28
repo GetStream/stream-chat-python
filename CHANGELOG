@@ -1,3 +1,9 @@
+## Mar 29, 2020 - 1.2.0
+- Add support for invites
+
+## Mar 29, 2020 - 1.1.1
+- Fix client.create_token: returns a string now
+
 ## Mar 3, 2020 - 1.1.
 - Add support for client.get_message
 
