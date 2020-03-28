@@ -92,7 +92,7 @@ class StreamChat(object):
         payload = {"user_id": user_id}
         if exp is not None:
             payload["exp"] = exp
-        return jwt.encode(payload, self.api_secret, algorithm="HS256")
+        return jwt.encode(payload, self.api_secret, algorithm="HS256").decode()
 
     def update_app_settings(self, **settings):
         return self.patch("app", data=settings)

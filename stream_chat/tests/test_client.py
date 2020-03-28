@@ -43,6 +43,7 @@ class TestClient(object):
 
     def test_create_token(self, client):
         token = client.create_token("tommaso")
+        assert type(token) is str
         payload = jwt.decode(token, client.api_secret, algorithms=["HS256"])
         assert payload.get("user_id") == "tommaso"
 
