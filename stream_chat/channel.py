@@ -131,6 +131,15 @@ class Channel(object):
         """
         return self.client.post(self.url, data={"add_members": user_ids})
 
+    def invite_members(self, user_ids):
+        """
+        invite members to the channel
+
+        :param user_ids: user IDs to invite
+        :return:
+        """
+        return self.client.post(self.url, data={"invites": user_ids})
+
     def add_moderators(self, user_ids):
         """
         Adds moderators to the channel
