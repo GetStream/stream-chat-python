@@ -92,7 +92,7 @@ class StreamChat(object):
         payload = {"user_id": user_id}
         if exp is not None:
             payload["exp"] = exp
-        return jwt.encode(payload, self.api_secret, algorithm="HS256")
+        return jwt.encode(payload, self.api_secret, algorithm="HS256").decode()
 
     def update_app_settings(self, **settings):
         return self.patch("app", data=settings)
@@ -187,6 +187,9 @@ class StreamChat(object):
 
     def delete_message(self, message_id, **options):
         return self.delete("messages/{}".format(message_id), options)
+
+    def get_message(self, message_id):
+        return self.get("messages/{}".format(message_id))
 
     def query_users(self, filter_conditions, sort=None, **options):
         sort_fields = []

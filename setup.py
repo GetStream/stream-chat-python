@@ -6,7 +6,7 @@ from setuptools.command.test import test as TestCommand
 requests = "requests>=2.22.0,<3"
 
 install_requires = [
-    "pycryptodomex==3.8.1",
+    "pycryptodomex>=3.8.1,<4",
     requests,
     "pyjwt==1.7.1",
     "six>=1.12.0",

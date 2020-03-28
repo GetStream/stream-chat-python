@@ -14,6 +14,15 @@ class TestClient(object):
         assert response["mute"]["user"]["id"] == random_users[1]["id"]
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
+    def test_get_message(self, client, channel, random_user):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        client.delete_message(msg_id)
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        message = client.get_message(msg_id)
+        assert message["message"]["id"] == msg_id
+
     def test_auth_exception(self):
         client = StreamChat(api_key="bad", api_secret="guy")
         with pytest.raises(StreamAPIException):
@@ -34,6 +43,7 @@ class TestClient(object):
 
     def test_create_token(self, client):
         token = client.create_token("tommaso")
+        assert type(token) is str
         payload = jwt.decode(token, client.api_secret, algorithms=["HS256"])
         assert payload.get("user_id") == "tommaso"
 
@@ -56,13 +66,10 @@ class TestClient(object):
     def test_update_user_partial(self, client):
         user_id = str(uuid.uuid4())
         client.update_user({"id": user_id, "field": "value"})
-        
-        response = client.update_user_partial({
-            "id": user_id,
-            "set": {
-                "field": "updated"
-            }
-        })
+
+        response = client.update_user_partial(
+            {"id": user_id, "set": {"field": "updated"}}
+        )
 
         assert "users" in response
         assert user_id in response["users"]
@@ -129,7 +136,7 @@ class TestClient(object):
         client.delete_message(msg_id)
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
-        resp = client.delete_message(msg_id, hard=True)
+        client.delete_message(msg_id, hard=True)
 
     def test_flag_message(self, client, channel, random_user, server_user):
         msg_id = str(uuid.uuid4())
@@ -163,26 +170,27 @@ class TestClient(object):
 
     def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
-        channel.send_message({"text": "How many syllables are there in {}?".format(query)}, random_user['id'])
-        channel.send_message({"text": "Does 'cious' count as one or two?"}, random_user['id'])
+        channel.send_message(
+            {"text": "How many syllables are there in {}?".format(query)},
+            random_user["id"],
+        )
+        channel.send_message(
+            {"text": "Does 'cious' count as one or two?"}, random_user["id"]
+        )
         response = client.search(
-            {"type": "messaging"},
-            query,
-            **{"limit": 2, "offset": 0}
+            {"type": "messaging"}, query, **{"limit": 2, "offset": 0}
         )
         # searches all channels so make sure at least one is found
-        assert len(response['results']) >= 1
-        assert query in response['results'][0]['message']['text']
+        assert len(response["results"]) >= 1
+        assert query in response["results"][0]["message"]["text"]
         response = client.search(
-            {"type": "messaging"},
-            "cious",
-            **{"limit": 12, "offset": 0})
-        for message in response['results']:
-            assert query not in message['message']['text']
+            {"type": "messaging"}, "cious", **{"limit": 12, "offset": 0}
+        )
+        for message in response["results"]:
+            assert query not in message["message"]["text"]
 
     def test_query_channels_members_in(self, client, fellowship_of_the_ring):
         response = client.query_channels({"members": {"$in": ["gimli"]}}, {"id": 1})
         assert len(response["channels"]) == 1
         assert response["channels"][0]["channel"]["id"] == "fellowship-of-the-ring"
         assert len(response["channels"][0]["members"]) == 9
-
