@@ -31,7 +31,9 @@ class StreamChat(object):
         self.api_secret = api_secret
         self.timeout = timeout
         self.options = options
-        self.base_url = "https://chat-us-east-1.stream-io-api.com"
+        self.base_url = options.get(
+            "base_url", "https://chat-us-east-1.stream-io-api.com"
+        )
         self.auth_token = jwt.encode(
             {"server": True}, self.api_secret, algorithm="HS256"
         )
@@ -111,7 +113,7 @@ class StreamChat(object):
 
     def update_user_partial(self, update):
         return self.update_users_partial([update])
-        
+
     def delete_user(self, user_id, **options):
         return self.delete("users/{}".format(user_id), options)
 
@@ -183,7 +185,7 @@ class StreamChat(object):
     def update_message(self, message):
         if message.get("id") is None:
             raise ValueError("message must have an id")
-        return self.post("messages/{}".format(message['id']), data={"message": message})
+        return self.post("messages/{}".format(message["id"]), data={"message": message})
 
     def delete_message(self, message_id, **options):
         return self.delete("messages/{}".format(message_id), options)
@@ -301,7 +303,7 @@ class StreamChat(object):
         headers["stream-auth-type"] = "jwt"
         headers["X-Stream-Client"] = get_user_agent()
         parts = urlparse(url)
-        if parts[0] == '':
+        if parts[0] == "":
             url = "file://" + url
         if content_type:
             file_tuple = (name, urllib.request.urlopen(url), content_type)
@@ -312,5 +314,6 @@ class StreamChat(object):
             params=self.get_default_params(),
             data={"user": json.dumps(user)},
             files={"file": file_tuple},
-            headers=headers)
+            headers=headers,
+        )
         return self._parse_response(response)
