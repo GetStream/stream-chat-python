@@ -1,3 +1,9 @@
+## Apr 17, 2020 - 1.2.2
+- Fix version number
+
+## Apr 17, 2020 - 1.2.1
+- Allow to override client.base_url
+
 ## Mar 29, 2020 - 1.2.0
 - Add support for invites
 
