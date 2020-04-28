@@ -196,7 +196,9 @@ class Channel(object):
         :param options: Pagination params, ie {"limit":10, "idlte": 10}
         :return: A response with a list of reactions
         """
-        return self.client.get("messages/{}/reactions".format(message_id), params=options)
+        return self.client.get(
+            "messages/{}/reactions".format(message_id), params=options
+        )
 
     def ban_user(self, target_id, **options):
         """
@@ -223,23 +225,27 @@ class Channel(object):
 
     def accept_invite(self, user_id, **data):
         payload = add_user_id(data, user_id)
-        payload['accept_invite'] = True
+        payload["accept_invite"] = True
         response = self.client.post(self.url, data=payload)
-        self.custom_data = response['channel']
+        self.custom_data = response["channel"]
         return response
 
     def reject_invite(self, user_id, **data):
         payload = add_user_id(data, user_id)
-        payload['reject_invite'] = True
+        payload["reject_invite"] = True
         response = self.client.post(self.url, data=payload)
-        self.custom_data = response['channel']
+        self.custom_data = response["channel"]
         return response
 
     def send_file(self, url, name, user, content_type=None):
-        return self.client.send_file("{}/file".format(self.url), url, name, user, content_type=content_type)
+        return self.client.send_file(
+            "{}/file".format(self.url), url, name, user, content_type=content_type
+        )
 
     def send_image(self, url, name, user, content_type=None):
-        return self.client.send_file("{}/image".format(self.url), url, name, user, content_type=content_type)
+        return self.client.send_file(
+            "{}/image".format(self.url), url, name, user, content_type=content_type
+        )
 
     def delete_file(self, url):
         return self.client.delete("{}/file".format(self.url), {"url": url})

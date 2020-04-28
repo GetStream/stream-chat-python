@@ -18,10 +18,10 @@ def pytest_runtest_setup(item):
         if previousfailed is not None:
             pytest.xfail("previous test failed (%s)" % previousfailed.name)
 
+
 def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "incremental: mark test incremental"
-    )
+    config.addinivalue_line("markers", "incremental: mark test incremental")
+
 
 @pytest.fixture(scope="module")
 def client():
