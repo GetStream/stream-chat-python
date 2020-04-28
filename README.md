@@ -1,4 +1,4 @@
-# stream-chat-python 
+# stream-chat-python
 
 [![Build Status](https://travis-ci.com/GetStream/stream-chat-python.svg?token=WystDPP9vxKnwsd8NwW1&branch=master)](https://travis-ci.com/GetStream/stream-chat-python) [![codecov](https://codecov.io/gh/GetStream/stream-chat-python/branch/master/graph/badge.svg?token=DM7rr9M7Kl)](https://codecov.io/gh/GetStream/stream-chat-python) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stream-chat.svg)
 
@@ -16,7 +16,7 @@ pip install stream-chat
 
 ### Documentation
 
-[Official API docs](https://getstream.io/chat/docs/)  
+[Official API docs](https://getstream.io/chat/docs/)
 
 ### How to build a chat app with Python tutorial
 
@@ -24,13 +24,13 @@ pip install stream-chat
 
 ### Supported features
 
-- Chat channels 
+- Chat channels
 - Messages
-- Chat channel types 
-- User management 
-- Moderation API 
-- Push configuration 
-- User devices 
+- Chat channel types
+- User management
+- Moderation API
+- Push configuration
+- User devices
 - User search
 - Channel search
 
