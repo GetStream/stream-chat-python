@@ -6,7 +6,6 @@ import urllib
 
 import jwt
 import requests
-import six
 
 from stream_chat.__pkg__ import __version__
 from stream_chat.channel import Channel
@@ -286,9 +285,7 @@ class StreamChat(object):
         :return: bool
         """
         signature = hmac.new(
-            key=six.b(self.api_secret),
-            msg=six.b(request_body),
-            digestmod=hashlib.sha256,
+            key=self.api_secret.encode(), msg=request_body, digestmod=hashlib.sha256
         ).hexdigest()
         return signature == x_signature
 

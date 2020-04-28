@@ -5,18 +5,14 @@ from setuptools.command.test import test as TestCommand
 
 requests = "requests>=2.22.0,<3"
 
-install_requires = [
-    "pycryptodomex>=3.8.1,<4",
-    requests,
-    "pyjwt==1.7.1",
-    "six>=1.12.0",
-]
+install_requires = ["pycryptodomex>=3.8.1,<4", requests, "pyjwt==1.7.1"]
 long_description = open("README.md", "r").read()
 tests_require = ["pytest"]
 
 about = {}
 with open("stream_chat/__pkg__.py") as fp:
     exec(fp.read(), about)
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -27,14 +23,20 @@ class PyTest(TestCommand):
     def run_tests(self):
         # import here, cause outside the eggs aren't loaded
         import pytest
+
         pytest_cmd = ["stream_chat/", "-v"]
 
         try:
             import pytest_cov
-            pytest_cmd += ["--cov=stream_chat/", "--cov-report=html",  "--cov-report=annotate"]
+
+            pytest_cmd += [
+                "--cov=stream_chat/",
+                "--cov-report=html",
+                "--cov-report=annotate",
+            ]
         except ImportError:
             pass
-        
+
         errno = pytest.main(pytest_cmd)
         sys.exit(errno)
 
@@ -55,7 +57,7 @@ setup(
     extras_require={"test": tests_require},
     tests_require=tests_require,
     include_package_data=True,
-    python_requires='>=3.5',
+    python_requires=">=3.5",
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
