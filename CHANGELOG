@@ -1,5 +1,6 @@
 ## Apr 28, 2020 - 1.3.0
 - Drop six dependency
+  - `verify_webhook` is affected and expects bytes for body parameter
 - Add 3.8 support
 
 ## Apr 17, 2020 - 1.2.2
