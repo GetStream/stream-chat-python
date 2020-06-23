@@ -147,6 +147,13 @@ class TestChannel(object):
         assert "lena.png" in resp["file"]
         # resp = channel.delete_image(resp['file'])
 
+    def test_send_image_with_bot_blocked(self, channel, random_user):
+        # following url blocks bots and we set a generic header to skip it
+        # but it can start failing again, see initial discussion here: https://github.com/GetStream/stream-chat-python/pull/30#discussion_r444209891
+        url = "https://api.twilio.com/2010-04-01/Accounts/AC3e136e1a00279f4dadcb10a9f1a1e8a3/Messages/MM547edf6f4846a30231c3033fa20f8419/Media/ME498020f8fe0b0ba2ff83ac99e4782e02"
+        resp = channel.send_image(url, "js.png", random_user, content_type="image/png")
+        assert "js.png" in resp["file"]
+
     def test_channel_hide_show(self, client, channel, random_users):
         # setup
         channel.add_members([u["id"] for u in random_users])

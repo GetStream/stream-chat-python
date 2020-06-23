@@ -3,6 +3,7 @@ import hmac
 import hashlib
 import json
 import urllib
+from urllib.request import Request, urlopen
 
 import jwt
 import requests
@@ -302,15 +303,12 @@ class StreamChat(object):
         parts = urlparse(url)
         if parts[0] == "":
             url = "file://" + url
-        if content_type:
-            file_tuple = (name, urllib.request.urlopen(url), content_type)
-        else:
-            file_tuple = (name, urllib.request.urlopen(url), content_type)
+        content = urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0"})).read()
         response = requests.post(
             "{}/{}".format(self.base_url, uri),
             params=self.get_default_params(),
             data={"user": json.dumps(user)},
-            files={"file": file_tuple},
+            files={"file": (name, content, content_type)},
             headers=headers,
         )
         return self._parse_response(response)

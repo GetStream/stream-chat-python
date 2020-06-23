@@ -1,3 +1,6 @@
+## June 23, 2020 - 1.3.1
+- Set a generic user agent for file/image get to prevent bot detection
+
 ## Apr 28, 2020 - 1.3.0
 - Drop six dependency
   - `verify_webhook` is affected and expects bytes for body parameter
