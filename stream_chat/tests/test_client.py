@@ -16,7 +16,9 @@ class TestClient(object):
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
     def test_mute_user_with_timeout(self, client, random_users):
-        response = client.mute_user(random_users[0]["id"], random_users[1]["id"], timeout=10)
+        response = client.mute_user(
+            random_users[0]["id"], random_users[1]["id"], timeout=10
+        )
         assert "mute" in response
         assert "expires" in response["mute"]
         assert response["mute"]["target"]["id"] == random_users[0]["id"]
