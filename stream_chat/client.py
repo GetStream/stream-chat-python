@@ -165,8 +165,7 @@ class StreamChat(object):
         :param options: additional mute options
         :return:
         """
-        data = dict(target_id=target_id, user_id=user_id)
-        data.update(options)
+        data = dict(target_id=target_id, user_id=user_id, **options)
         return self.post("moderation/mute", data=data)
 
     def unmute_user(self, target_id, user_id):
