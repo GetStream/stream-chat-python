@@ -10,6 +10,17 @@ class TestClient(object):
     def test_mute_user(self, client, random_users):
         response = client.mute_user(random_users[0]["id"], random_users[1]["id"])
         assert "mute" in response
+        assert "expires" not in response["mute"]
+        assert response["mute"]["target"]["id"] == random_users[0]["id"]
+        assert response["mute"]["user"]["id"] == random_users[1]["id"]
+        client.unmute_user(random_users[0]["id"], random_users[1]["id"])
+
+    def test_mute_user_with_timeout(self, client, random_users):
+        response = client.mute_user(
+            random_users[0]["id"], random_users[1]["id"], timeout=10
+        )
+        assert "mute" in response
+        assert "expires" in response["mute"]
         assert response["mute"]["target"]["id"] == random_users[0]["id"]
         assert response["mute"]["user"]["id"] == random_users[1]["id"]
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])

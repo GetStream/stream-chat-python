@@ -156,15 +156,16 @@ class StreamChat(object):
         data.update(options)
         return self.post("moderation/unflag", data=data)
 
-    def mute_user(self, target_id, user_id):
+    def mute_user(self, target_id, user_id, **options):
         """
         Create a mute
 
         :param target_id: the user getting muted
         :param user_id: the user muting the target
+        :param options: additional mute options
         :return:
         """
-        data = dict(target_id=target_id, user_id=user_id)
+        data = dict(target_id=target_id, user_id=user_id, **options)
         return self.post("moderation/mute", data=data)
 
     def unmute_user(self, target_id, user_id):
