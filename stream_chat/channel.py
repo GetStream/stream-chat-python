@@ -71,7 +71,7 @@ class Channel(object):
         :param user_id: the ID of the user creating this channel
         :return:
         """
-        self.custom_data["created_by"] = dict(id=user_id)
+        self.custom_data["created_by"] = {'id': user_id}
         return self.query(watch=False, state=False, presence=False)
 
     def query(self, **options):
@@ -262,5 +262,5 @@ class Channel(object):
 
 def add_user_id(payload, user_id):
     payload = payload.copy()
-    payload.update(dict(user=dict(id=user_id)))
+    payload.update({'user': {'id': user_id}})
     return payload

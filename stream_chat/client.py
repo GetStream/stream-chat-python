@@ -40,7 +40,7 @@ class StreamChat(object):
         self.session = requests.Session()
 
     def get_default_params(self):
-        return dict(api_key=self.api_key)
+        return {'api_key': self.api_key}
 
     def _parse_response(self, response):
         try:
@@ -127,32 +127,32 @@ class StreamChat(object):
         return self.get("users/{}/export".format(user_id), options)
 
     def ban_user(self, target_id, **options):
-        data = dict(target_user_id=target_id)
+        data = {'target_user_id': target_id}
         data.update(options)
         return self.post("moderation/ban", data=data)
 
     def unban_user(self, target_id, **options):
-        params = dict(target_user_id=target_id)
+        params = {'target_user_id': target_id}
         params.update(options)
         return self.delete("moderation/ban", params)
 
     def flag_message(self, target_id, **options):
-        data = dict(target_message_id=target_id)
+        data = {'target_message_id': target_id}
         data.update(options)
         return self.post("moderation/flag", data=data)
 
     def unflag_message(self, target_id, **options):
-        data = dict(target_message_id=target_id)
+        data = {'target_message_id': target_id}
         data.update(options)
         return self.post("moderation/unflag", data=data)
 
     def flag_user(self, target_id, **options):
-        data = dict(target_user_id=target_id)
+        data = {'target_user_id': target_id}
         data.update(options)
         return self.post("moderation/flag", data=data)
 
     def unflag_user(self, target_id, **options):
-        data = dict(target_user_id=target_id)
+        data = {'target_user_id': target_id}
         data.update(options)
         return self.post("moderation/unflag", data=data)
 
@@ -177,7 +177,7 @@ class StreamChat(object):
         :return:
         """
 
-        data = dict(target_id=target_id, user_id=user_id)
+        data = {'target_id': target_id, 'user_id': user_id}
         return self.post("moderation/unmute", data=data)
 
     def mark_all_read(self, user_id):
