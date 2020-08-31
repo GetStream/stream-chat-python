@@ -40,7 +40,7 @@ class StreamChat(object):
         self.session = requests.Session()
 
     def get_default_params(self):
-        return {'api_key': self.api_key}
+        return {"api_key": self.api_key}
 
     def _parse_response(self, response):
         try:
@@ -127,33 +127,27 @@ class StreamChat(object):
         return self.get("users/{}/export".format(user_id), options)
 
     def ban_user(self, target_id, **options):
-        data = {'target_user_id': target_id}
-        data.update(options)
+        data = {"target_user_id": target_id, **options}
         return self.post("moderation/ban", data=data)
 
     def unban_user(self, target_id, **options):
-        params = {'target_user_id': target_id}
-        params.update(options)
+        params = {"target_user_id": target_id, **options}
         return self.delete("moderation/ban", params)
 
     def flag_message(self, target_id, **options):
-        data = {'target_message_id': target_id}
-        data.update(options)
+        data = {"target_message_id": target_id, **options}
         return self.post("moderation/flag", data=data)
 
     def unflag_message(self, target_id, **options):
-        data = {'target_message_id': target_id}
-        data.update(options)
+        data = {"target_message_id": target_id, **options}
         return self.post("moderation/unflag", data=data)
 
     def flag_user(self, target_id, **options):
-        data = {'target_user_id': target_id}
-        data.update(options)
+        data = {"target_user_id": target_id, **options}
         return self.post("moderation/flag", data=data)
 
     def unflag_user(self, target_id, **options):
-        data = {'target_user_id': target_id}
-        data.update(options)
+        data = {"target_user_id": target_id, **options}
         return self.post("moderation/unflag", data=data)
 
     def mute_user(self, target_id, user_id, **options):
@@ -165,7 +159,7 @@ class StreamChat(object):
         :param options: additional mute options
         :return:
         """
-        data = dict(target_id=target_id, user_id=user_id, **options)
+        data = {"target_id": target_id, "user_id": user_id, **options}
         return self.post("moderation/mute", data=data)
 
     def unmute_user(self, target_id, user_id):
@@ -177,7 +171,7 @@ class StreamChat(object):
         :return:
         """
 
-        data = {'target_id': target_id, 'user_id': user_id}
+        data = {"target_id": target_id, "user_id": user_id}
         return self.post("moderation/unmute", data=data)
 
     def mark_all_read(self, user_id):
@@ -292,8 +286,7 @@ class StreamChat(object):
         return signature == x_signature
 
     def search(self, filter_conditions, query, **options):
-        params = options.copy()
-        params.update({"filter_conditions": filter_conditions, "query": query})
+        params = {**options, "filter_conditions": filter_conditions, "query": query}
         return self.get("search", params={"payload": json.dumps(params)})
 
     def send_file(self, uri, url, name, user, content_type=None):

@@ -71,7 +71,7 @@ class Channel(object):
         :param user_id: the ID of the user creating this channel
         :return:
         """
-        self.custom_data["created_by"] = {'id': user_id}
+        self.custom_data["created_by"] = {"id": user_id}
         return self.query(watch=False, state=False, presence=False)
 
     def query(self, **options):
@@ -81,8 +81,7 @@ class Channel(object):
         :param options: the query options, check docs on https://getstream.io/chat/docs/
         :return: Returns a query response
         """
-        payload = {"state": True, "data": self.custom_data}
-        payload.update(options)
+        payload = {"state": True, "data": self.custom_data, **options}
 
         url = "channels/{}".format(self.channel_type)
         if self.id is not None:
@@ -261,6 +260,4 @@ class Channel(object):
 
 
 def add_user_id(payload, user_id):
-    payload = payload.copy()
-    payload.update({'user': {'id': user_id}})
-    return payload
+    return {**payload, "user": {"id": user_id}}
