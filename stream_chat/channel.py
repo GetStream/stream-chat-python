@@ -1,3 +1,5 @@
+import json
+
 from stream_chat.exceptions import StreamChannelException
 
 
@@ -93,6 +95,32 @@ class Channel(object):
             self.id = state["channel"]["id"]
 
         return state
+
+    def query_members(self, filter_conditions, sort=None, **options):
+        """
+        Query the API for this channel to filter, sort and paginate its members efficiently.
+
+        :param filter_conditions: filters, checks docs on https://getstream.io/chat/docs/
+        :param sort: sorting field and direction slice, check docs on https://getstream.io/chat/docs/
+        :param options: pagination or members based channel searching details
+        :return: Returns members response
+
+        eg.
+        channel.query_members(filter_conditions={"name": "tommaso"},
+                              sort=[{"field": "created_at", "direction": -1}],
+                              offset=0,
+                              limit=10)
+        """
+
+        payload = {
+            "id": self.id,
+            "type": self.channel_type,
+            "filter_conditions": filter_conditions,
+            "sort": sort or [],
+            **options,
+        }
+        response = self.client.get("members", params={"payload": json.dumps(payload)})
+        return response["members"]
 
     def update(self, channel_data, update_message=None):
         """

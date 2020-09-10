@@ -224,3 +224,20 @@ class TestChannel(object):
         # cannot reject again
         with pytest.raises(StreamAPIException):
             reject = channel.reject_invite("eric")
+
+    def test_query_members(self, client, channel):
+        members = ["paul", "george", "john", "jessica", "john2"]
+        client.update_users([{"id": m, "name": m} for m in members])
+        for member in members:
+            channel.add_members([member])
+
+        response = channel.query_members(
+            filter_conditions={"name": {"$autocomplete": "j"}},
+            sort=[{"field": "created_at", "direction": 1}],
+            offset=1,
+            limit=10,
+        )
+
+        assert len(response) == 2
+        assert response[0]["user_id"] == "jessica"
+        assert response[1]["user_id"] == "john2"
