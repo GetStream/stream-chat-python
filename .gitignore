@@ -59,6 +59,6 @@ secrets.*sh
 .venv
 pip-selfcheck.json
 .idea
-
+.vscode
 *,cover
 .eggs

@@ -239,6 +239,21 @@ class StreamChat(object):
         """
         return Channel(self, channel_type, channel_id, data)
 
+    def list_commands(self):
+        return self.get("commands")
+
+    def create_command(self, data):
+        return self.post("commands", data=data)
+
+    def delete_command(self, name):
+        return self.delete("commands/{}".format(name))
+
+    def get_command(self, name):
+        return self.get("commands/{}".format(name))
+
+    def update_command(self, name, **settings):
+        return self.put("commands/{}".format(name), data=settings)
+
     def add_device(self, device_id, push_provider, user_id):
         """
         Add a device to a user
