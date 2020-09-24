@@ -25,10 +25,13 @@ def pytest_configure(config):
 
 @pytest.fixture(scope="module")
 def client():
+    base_url = os.environ.get("STREAM_HOST")
+    options = {"base_url": base_url} if base_url else {}
     return StreamChat(
         api_key=os.environ["STREAM_KEY"],
         api_secret=os.environ["STREAM_SECRET"],
         timeout=10,
+        **options,
     )
 
 
@@ -65,6 +68,15 @@ def channel(client, random_user):
     )
     channel.create(random_user["id"])
     return channel
+
+
+@pytest.fixture(scope="function")
+def command(client):
+    response = client.create_command(
+        dict(name=str(uuid.uuid4()), description="My command")
+    )
+
+    return response["command"]
 
 
 @pytest.fixture(scope="module")
