@@ -1,3 +1,6 @@
+## September 24, 2020 - 1.6.0
+- Support for creating custom commands
+
 ## September 10, 2020 - 1.5.0
 - Support for query members
 - Prefer literals over constructors to simplify code
