@@ -71,7 +71,7 @@ def channel(client, random_user):
 
 
 @pytest.fixture(scope="function")
-def command(client, random_user):
+def command(client):
     response = client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
     )
