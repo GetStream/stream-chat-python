@@ -223,3 +223,25 @@ class TestClient(object):
         assert len(response["channels"]) == 1
         assert response["channels"][0]["channel"]["id"] == "fellowship-of-the-ring"
         assert len(response["channels"][0]["members"]) == 9
+
+    def test_create_blocklist(self, client):
+        response = client.create_blocklist(name="Foo", words=["fudge", "heck"])
+
+    def test_list_blocklists(self, client):
+        response = client.list_blocklists()
+        assert len(response["blocklists"]) == 2
+        blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
+        assert "Foo" in blocklist_names
+
+    def test_get_blocklist(self, client):
+        response = client.get_blocklist("Foo")
+        assert response["blocklist"]["name"] == "Foo"
+        assert response["blocklist"]["words"] == ["fudge", "heck"]
+
+    def test_update_blocklist(self, client):
+        client.update_blocklist("Foo", words=["dang"])
+        response = client.get_blocklist("Foo")
+        assert response["blocklist"]["words"] == ["dang"]
+
+    def test_delete_blocklist(self, client):
+        client.delete_blocklist("Foo")
