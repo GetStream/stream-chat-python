@@ -321,3 +321,47 @@ class StreamChat(object):
             headers=headers,
         )
         return self._parse_response(response)
+
+    def create_blocklist(self, name, words):
+        """
+        Create a blocklist
+
+        :param name: the name of the blocklist
+        :param words: list of blocked words
+        :return:
+        """
+        return self.post("blocklists", data={"name": name, "words": words})
+
+    def list_blocklists(self):
+        """
+        List blocklists
+
+        :return: list of blocklists
+        """
+        return self.get("blocklists")
+
+    def get_blocklist(self, name):
+        """Get a blocklist by name
+
+        :param name: the name of the blocklist
+        :return: blocklist dict representation
+        """
+        return self.get("blocklists/{}".format(name))
+
+    def update_blocklist(self, name, words):
+        """
+        Update a blocklist
+
+        :param name: the name of the blocklist
+        :param words: the list of blocked words (replaces the current list)
+        :return:
+        """
+        return self.put("blocklists/{}".format(name), data={"words": words})
+
+    def delete_blocklist(self, name):
+        """Delete a blocklist by name
+
+        :param: the name of the blocklist
+        :return:
+        """
+        return self.delete("blocklists/{}".format(name))
