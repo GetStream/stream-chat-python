@@ -305,10 +305,11 @@ class StreamChat(object):
         return self.get("search", params={"payload": json.dumps(params)})
 
     def send_file(self, uri, url, name, user, content_type=None):
-        headers = {}
-        headers["Authorization"] = self.auth_token
-        headers["stream-auth-type"] = "jwt"
-        headers["X-Stream-Client"] = get_user_agent()
+        headers = {
+            "Authorization": self.auth_token,
+            "stream-auth-type": "jwt",
+            "X-Stream-Client": get_user_agent(),
+        }
         parts = urlparse(url)
         if parts[0] == "":
             url = "file://" + url

@@ -214,7 +214,7 @@ class Channel(object):
         List the message replies for a parent message
 
         :param parent_id: The message parent id, ie the top of the thread
-        :param options: Pagination params, ie {limit:10, idlte: 10}
+        :param options: Pagination params, ie {limit:10, id_lte: 10}
         :return: A response with a list of messages
         """
         return await self.client.get(
@@ -226,7 +226,7 @@ class Channel(object):
         List the reactions, supports pagination
 
         :param message_id: The message id
-        :param options: Pagination params, ie {"limit":10, "idlte": 10}
+        :param options: Pagination params, ie {"limit":10, "id_lte": 10}
         :return: A response with a list of reactions
         """
         return await self.client.get(
@@ -237,7 +237,7 @@ class Channel(object):
         """
         Bans a user from this channel
 
-        :param user_id: the ID of the user to ban
+        :param target_id: the ID of the user to ban
         :param options: additional ban options, ie {"timeout": 3600, "reason": "offensive language is not allowed here"}
         :return: The server response
         """
@@ -249,7 +249,7 @@ class Channel(object):
         """
         Removes the ban for a user on this channel
 
-        :param user_id: the ID of the user to unban
+        :param target_id: the ID of the user to unban
         :return: The server response
         """
         return await self.client.unban_user(
