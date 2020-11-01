@@ -103,7 +103,10 @@ pip install pytest-asyncio
 First, make sure you can run the test suite. Tests are run via py.test
 
 ```bash
-STREAM_KEY=my_api_key STREAM_SECRET=my_api_secret py.test stream_chat/ -v
+export STREAM_KEY=my_api_key
+export STREAM_SECRET=my_api_secret
+
+make test
 ```
 
 Install black and pycodestyle
@@ -111,6 +114,12 @@ Install black and pycodestyle
 ```
 pip install black
 pip install pycodestyle
+```
+
+Run linters
+
+```bash
+make lint
 ```
 
 
