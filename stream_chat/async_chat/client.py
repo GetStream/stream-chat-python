@@ -1,19 +1,19 @@
+import hashlib
+import hmac
+import json
 from types import TracebackType
 from typing import Optional, Type
+from urllib.parse import urlparse
+
+import jwt
 
 import aiohttp
 from aiofile import AIOFile
-from urllib.parse import urlparse
-import hmac
-import hashlib
-import json
-
-import jwt
 from aiohttp import FormData
-
 from stream_chat.__pkg__ import __version__
 from stream_chat.async_chat.channel import Channel
-from stream_chat.async_chat.exceptions import StreamAPIException
+from stream_chat.base.client import StreamChatInterface
+from stream_chat.base.exceptions import StreamAPIException
 
 
 def get_user_agent():
@@ -28,22 +28,12 @@ def get_default_header():
     return base_headers
 
 
-class StreamChatAsync(object):
+class StreamChatAsync(StreamChatInterface):
     def __init__(self, api_key, api_secret, timeout=6.0, **options):
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.timeout = timeout
-        self.options = options
-        self.base_url = options.get(
-            "base_url", "https://chat-us-east-1.stream-io-api.com"
+        super().__init__(
+            api_key=api_key, api_secret=api_secret, timeout=timeout, **options
         )
-        self.auth_token = jwt.encode(
-            {"server": True}, self.api_secret, algorithm="HS256"
-        ).decode()
         self.session = aiohttp.ClientSession()
-
-    def get_default_params(self):
-        return {"api_key": self.api_key}
 
     async def _parse_response(self, response):
         text = await response.text()
@@ -96,12 +86,6 @@ class StreamChatAsync(object):
 
     async def patch(self, relative_url, params=None, data=None):
         return await self._make_request(self.session.patch, relative_url, params, data)
-
-    def create_token(self, user_id, exp=None):
-        payload = {"user_id": user_id}
-        if exp is not None:
-            payload["exp"] = exp
-        return jwt.encode(payload, self.api_secret, algorithm="HS256").decode()
 
     async def update_app_settings(self, **settings):
         return await self.patch("app", data=settings)
@@ -295,19 +279,6 @@ class StreamChatAsync(object):
         :return: list of devices
         """
         return await self.get("devices", {"user_id": user_id})
-
-    def verify_webhook(self, request_body, x_signature):
-        """
-        Verify the signature added to a webhook event
-
-        :param request_body: the request body received from webhook
-        :param x_signature: the x-signature header included in the request
-        :return: bool
-        """
-        signature = hmac.new(
-            key=self.api_secret.encode(), msg=request_body, digestmod=hashlib.sha256
-        ).hexdigest()
-        return signature == x_signature
 
     async def search(self, filter_conditions, query, **options):
         params = {**options, "filter_conditions": filter_conditions, "query": query}

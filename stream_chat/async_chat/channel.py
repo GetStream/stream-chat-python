@@ -1,23 +1,9 @@
 import json
 
-from stream_chat.async_chat.exceptions import StreamChannelException
+from stream_chat.base.channel import ChannelInterface, add_user_id
 
 
-class Channel(object):
-    def __init__(self, client, channel_type, channel_id=None, custom_data=None):
-        self.channel_type = channel_type
-        self.id = channel_id
-        self.client = client
-        self.custom_data = custom_data
-        if self.custom_data is None:
-            self.custom_data = {}
-
-    @property
-    def url(self):
-        if self.id is None:
-            raise StreamChannelException("channel does not have an id")
-        return "channels/{}/{}".format(self.channel_type, self.id)
-
+class Channel(ChannelInterface):
     async def send_message(self, message, user_id):
         """
         Send a message to this channel
@@ -295,7 +281,3 @@ class Channel(object):
         return await self.client.post(
             "{}/show".format(self.url), data={"user_id": user_id}
         )
-
-
-def add_user_id(payload, user_id):
-    return {**payload, "user": {"id": user_id}}

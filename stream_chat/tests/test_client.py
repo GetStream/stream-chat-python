@@ -1,8 +1,10 @@
+import uuid
+
 import jwt
 import pytest
-import uuid
+
 from stream_chat import StreamChat
-from stream_chat.exceptions import StreamAPIException
+from stream_chat.base.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental

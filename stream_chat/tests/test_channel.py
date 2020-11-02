@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 
-from stream_chat.exceptions import StreamAPIException
+from stream_chat.base.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental

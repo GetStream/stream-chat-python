@@ -2,7 +2,7 @@ import jwt
 import pytest
 import uuid
 from stream_chat.async_chat import StreamChatAsync
-from stream_chat.async_chat.exceptions import StreamAPIException
+from stream_chat.base.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental

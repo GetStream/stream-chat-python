@@ -1,8 +1,9 @@
+import os
 import uuid
 
 import pytest
+
 from stream_chat import StreamChat
-import os
 
 
 def pytest_runtest_makereport(item, call):
