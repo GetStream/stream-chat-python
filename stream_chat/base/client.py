@@ -6,8 +6,6 @@ import jwt
 
 
 class StreamChatInterface(abc.ABC):
-    api_key: str
-    api_secret: str
     session = None
 
     @abc.abstractmethod

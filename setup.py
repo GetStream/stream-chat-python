@@ -6,12 +6,13 @@ from setuptools.command.test import test as TestCommand
 install_requires = [
     "pycryptodomex>=3.8.1,<4",
     "requests>=2.22.0,<3",
-    "aiohttp>=3.6.0,<4", "aiofile>=3.1,<4",
+    "aiohttp>=3.6.0,<3.7",  # aiohttp 3.7+ requires Python 3.6+
+    "aiofile>=3.1,<4",
     "async_generator>=1.10,<1.11",
     "pyjwt==1.7.1",
 ]
 long_description = open("README.md", "r").read()
-tests_require = ["pytest"]
+tests_require = ["pytest", "pytest-asyncio"]
 
 about = {}
 with open("stream_chat/__pkg__.py") as fp:
