@@ -245,3 +245,12 @@ class TestClient(object):
 
     def test_delete_blocklist(self, client):
         client.delete_blocklist("Foo")
+
+    def test_normalize_sort(self, client):
+        expected = [{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}]
+        actual = client.normalize_sort([{"field1": 1}, {"field2": -1}])
+        assert actual == expected
+        actual = client.normalize_sort([{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}])
+        assert actual == expected
+        actual = client.normalize_sort({"field1": 1})
+        assert actual == [{"field": "field1", "direction": 1}]
