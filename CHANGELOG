@@ -1,3 +1,6 @@
+## November 12, 2020 - 1.7.1
+- Normalize sort parameter in query endpoints
+
 ## October 20, 2020 - 1.7.0
 - Added support for blocklists
 
