@@ -76,7 +76,9 @@ def command(client):
         dict(name=str(uuid.uuid4()), description="My command")
     )
 
-    return response["command"]
+    yield response["command"]
+
+    client.delete_command(response["command"]["name"])
 
 
 @pytest.fixture(scope="module")
