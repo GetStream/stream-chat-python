@@ -78,7 +78,7 @@ class StreamChat(object):
 
     def normalize_sort(self, sort=None):
         sort_fields = []
-        if isinstance(sort, collections.Mapping):
+        if isinstance(sort, collections.abc.Mapping):
             sort = [sort]
         if isinstance(sort, list):
             for item in sort:
