@@ -82,7 +82,7 @@ class StreamChat(object):
             sort = [sort]
         if isinstance(sort, list):
             for item in sort:
-                if 'field' in item and 'direction' in item:
+                if "field" in item and "direction" in item:
                     sort_fields.append(item)
                 else:
                     for k, v in item.items():
@@ -204,13 +204,17 @@ class StreamChat(object):
 
     def query_users(self, filter_conditions, sort=None, **options):
         params = options.copy()
-        params.update({"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
         return self.get("users", params={"payload": json.dumps(params)})
 
     def query_channels(self, filter_conditions, sort=None, **options):
         params = {"state": True, "watch": False, "presence": False}
         params.update(options)
-        params.update({"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
         return self.get("channels", params={"payload": json.dumps(params)})
 
     def create_channel_type(self, data):

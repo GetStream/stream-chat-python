@@ -52,7 +52,6 @@ class TestClient(object):
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
 
-
     def test_get_command(self, client, command):
         response = client.get_command(command["name"])
         assert command["name"] == response["name"]
@@ -243,10 +242,15 @@ class TestClient(object):
         client.delete_blocklist("Foo")
 
     def test_normalize_sort(self, client):
-        expected = [{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}]
+        expected = [
+            {"field": "field1", "direction": 1},
+            {"field": "field2", "direction": -1},
+        ]
         actual = client.normalize_sort([{"field1": 1}, {"field2": -1}])
         assert actual == expected
-        actual = client.normalize_sort([{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}])
+        actual = client.normalize_sort(
+            [{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}]
+        )
         assert actual == expected
         actual = client.normalize_sort({"field1": 1})
         assert actual == [{"field": "field1", "direction": 1}]
