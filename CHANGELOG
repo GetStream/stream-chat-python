@@ -1,3 +1,6 @@
+## November 12, 2020 - 2.0.0
+- Drop Python 3.5 and add 3.9
+
 ## November 12, 2020 - 1.7.1
 - Normalize sort parameter in query endpoints
 
