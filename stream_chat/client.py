@@ -1,3 +1,4 @@
+import collections
 from urllib.parse import urlparse
 import hmac
 import hashlib
@@ -74,6 +75,19 @@ class StreamChat(object):
             timeout=self.timeout,
         )
         return self._parse_response(response)
+
+    def normalize_sort(self, sort=None):
+        sort_fields = []
+        if isinstance(sort, collections.abc.Mapping):
+            sort = [sort]
+        if isinstance(sort, list):
+            for item in sort:
+                if "field" in item and "direction" in item:
+                    sort_fields.append(item)
+                else:
+                    for k, v in item.items():
+                        sort_fields.append({"field": k, "direction": v})
+        return sort_fields
 
     def put(self, relative_url, params=None, data=None):
         return self._make_request(self.session.put, relative_url, params, data)
@@ -189,20 +203,18 @@ class StreamChat(object):
         return self.get("messages/{}".format(message_id))
 
     def query_users(self, filter_conditions, sort=None, **options):
-        sort_fields = []
-        if sort is not None:
-            sort_fields = [{"field": k, "direction": v} for k, v in sort.items()]
         params = options.copy()
-        params.update({"filter_conditions": filter_conditions, "sort": sort_fields})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
         return self.get("users", params={"payload": json.dumps(params)})
 
     def query_channels(self, filter_conditions, sort=None, **options):
         params = {"state": True, "watch": False, "presence": False}
-        sort_fields = []
-        if sort is not None:
-            sort_fields = [{"field": k, "direction": v} for k, v in sort.items()]
         params.update(options)
-        params.update({"filter_conditions": filter_conditions, "sort": sort_fields})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
         return self.get("channels", params={"payload": json.dumps(params)})
 
     def create_channel_type(self, data):

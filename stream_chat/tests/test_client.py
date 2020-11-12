@@ -1,5 +1,8 @@
+from operator import itemgetter
+
 import jwt
 import pytest
+import sys
 import uuid
 from stream_chat import StreamChat
 from stream_chat.exceptions import StreamAPIException
@@ -7,6 +10,27 @@ from stream_chat.exceptions import StreamAPIException
 
 @pytest.mark.incremental
 class TestClient(object):
+    def test_normalize_sort(self, client):
+        expected = [
+            {"field": "field1", "direction": 1},
+            {"field": "field2", "direction": -1},
+        ]
+        actual = client.normalize_sort([{"field1": 1}, {"field2": -1}])
+        assert actual == expected
+        actual = client.normalize_sort(
+            [{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}]
+        )
+        assert actual == expected
+        actual = client.normalize_sort({"field1": 1})
+        assert actual == [{"field": "field1", "direction": 1}]
+        # The following example is not recommended because the order of the fields is not guaranteed in Python < 3.7
+        actual = client.normalize_sort({"field1": 1, "field2": -1})
+        if sys.version_info >= (3, 7):
+            assert actual == expected
+        else:
+            # Compare elements regardless of the order
+            assert sorted(actual, key=itemgetter("field")) == expected
+
     def test_mute_user(self, client, random_users):
         response = client.mute_user(random_users[0]["id"], random_users[1]["id"])
         assert "mute" in response
@@ -60,11 +84,6 @@ class TestClient(object):
         response = client.update_command(command["name"], description="My new command")
         assert "command" in response
         assert "My new command" == response["command"]["description"]
-
-    def test_delete_command(self, client, command):
-        response = client.delete_command(command["name"])
-        with pytest.raises(StreamAPIException):
-            client.get_command(command["name"])
 
     def test_list_commands(self, client):
         response = client.list_commands()
