@@ -291,9 +291,7 @@ class StreamChatAsync(StreamChatInterface):
             async with AIOFile(url, "rb") as f:
                 content = await f.read()
         else:
-            async with self.session.get(
-                url, headers={"User-Agent": "Mozilla/5.0"}
-            ) as content_response:
+            async with self.session.get(url, headers={"User-Agent": "Mozilla/5.0"}) as content_response:
                 content = await content_response.read()
         data = FormData()
         data.add_field("user", json.dumps(user))
