@@ -254,3 +254,6 @@ class TestClient(object):
         assert actual == expected
         actual = client.normalize_sort({"field1": 1})
         assert actual == [{"field": "field1", "direction": 1}]
+        # The following example is not recommended because the order of the fields is not guaranteed in Python < 3.7
+        actual = client.normalize_sort({"field1": 1, "field2": -1})
+        assert actual == expected
