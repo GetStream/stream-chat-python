@@ -52,6 +52,7 @@ class TestClient(object):
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
 
+
     def test_get_command(self, client, command):
         response = client.get_command(command["name"])
         assert command["name"] == response["name"]
@@ -60,11 +61,6 @@ class TestClient(object):
         response = client.update_command(command["name"], description="My new command")
         assert "command" in response
         assert "My new command" == response["command"]["description"]
-
-    def test_delete_command(self, client, command):
-        response = client.delete_command(command["name"])
-        with pytest.raises(StreamAPIException):
-            client.get_command(command["name"])
 
     def test_list_commands(self, client):
         response = client.list_commands()
