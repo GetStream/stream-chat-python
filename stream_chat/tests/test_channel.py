@@ -239,5 +239,5 @@ class TestChannel(object):
         )
 
         assert len(response) == 2
-        assert response[0]["user_id"] == "jessica"
-        assert response[1]["user_id"] == "john2"
+        assert response[0]["user"]["id"] == "jessica"
+        assert response[1]["user"]["id"] == "john2"
