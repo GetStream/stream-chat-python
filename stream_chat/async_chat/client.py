@@ -178,20 +178,18 @@ class StreamChatAsync(StreamChatInterface):
         return await self.get("messages/{}".format(message_id))
 
     async def query_users(self, filter_conditions, sort=None, **options):
-        sort_fields = []
-        if sort is not None:
-            sort_fields = [{"field": k, "direction": v} for k, v in sort.items()]
         params = options.copy()
-        params.update({"filter_conditions": filter_conditions, "sort": sort_fields})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
         return await self.get("users", params={"payload": json.dumps(params)})
 
     async def query_channels(self, filter_conditions, sort=None, **options):
         params = {"state": True, "watch": False, "presence": False}
-        sort_fields = []
-        if sort is not None:
-            sort_fields = [{"field": k, "direction": v} for k, v in sort.items()]
         params.update(options)
-        params.update({"filter_conditions": filter_conditions, "sort": sort_fields})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
         return await self.get("channels", params={"payload": json.dumps(params)})
 
     async def create_channel_type(self, data):
@@ -291,7 +289,9 @@ class StreamChatAsync(StreamChatInterface):
             async with AIOFile(url, "rb") as f:
                 content = await f.read()
         else:
-            async with self.session.get(url, headers={"User-Agent": "Mozilla/5.0"}) as content_response:
+            async with self.session.get(
+                url, headers={"User-Agent": "Mozilla/5.0"}
+            ) as content_response:
                 content = await content_response.read()
         data = FormData()
         data.add_field("user", json.dumps(user))

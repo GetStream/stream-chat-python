@@ -95,7 +95,7 @@ class Channel(ChannelInterface):
 
         eg.
         channel.query_members(filter_conditions={"name": "tommaso"},
-                              sort=[{"field": "created_at", "direction": -1}],
+                              sort=[{"created_at": -1}, {"updated_at": 1}],
                               offset=0,
                               limit=10)
         """
@@ -104,7 +104,7 @@ class Channel(ChannelInterface):
             "id": self.id,
             "type": self.channel_type,
             "filter_conditions": filter_conditions,
-            "sort": sort or [],
+            "sort": self.client.normalize_sort(sort),
             **options,
         }
         response = await self.client.get(

@@ -4,7 +4,6 @@ import uuid
 
 import pytest
 
-from async_generator import async_generator, yield_
 from stream_chat.async_chat import StreamChatAsync
 
 
@@ -35,7 +34,6 @@ def event_loop(request):
 
 
 @pytest.fixture(scope="module")
-@async_generator
 async def client():
     base_url = os.environ.get("STREAM_HOST")
     options = {"base_url": base_url} if base_url else {}
@@ -45,7 +43,7 @@ async def client():
         timeout=10,
         **options,
     ) as stream_client:
-        await yield_(stream_client)
+        yield stream_client
 
 
 @pytest.fixture(scope="function")
@@ -89,7 +87,9 @@ async def command(client):
         dict(name=str(uuid.uuid4()), description="My command")
     )
 
-    return response["command"]
+    yield response["command"]
+
+    await client.delete_command(response["command"]["name"])
 
 
 @pytest.fixture(scope="module")

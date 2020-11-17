@@ -1,4 +1,5 @@
 import abc
+import collections
 import hashlib
 import hmac
 
@@ -23,6 +24,19 @@ class StreamChatInterface(abc.ABC):
 
     def get_default_params(self):
         return {"api_key": self.api_key}
+
+    def normalize_sort(self, sort=None):
+        sort_fields = []
+        if isinstance(sort, collections.abc.Mapping):
+            sort = [sort]
+        if isinstance(sort, list):
+            for item in sort:
+                if "field" in item and "direction" in item:
+                    sort_fields.append(item)
+                else:
+                    for k, v in item.items():
+                        sort_fields.append({"field": k, "direction": v})
+        return sort_fields
 
     def create_token(self, user_id, exp=None):
         payload = {"user_id": user_id}

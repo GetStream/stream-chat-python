@@ -1,3 +1,6 @@
+import sys
+from operator import itemgetter
+
 import jwt
 import pytest
 import uuid
@@ -7,6 +10,27 @@ from stream_chat.base.exceptions import StreamAPIException
 
 @pytest.mark.incremental
 class TestClient(object):
+    def test_normalize_sort(self, client):
+        expected = [
+            {"field": "field1", "direction": 1},
+            {"field": "field2", "direction": -1},
+        ]
+        actual = client.normalize_sort([{"field1": 1}, {"field2": -1}])
+        assert actual == expected
+        actual = client.normalize_sort(
+            [{"field": "field1", "direction": 1}, {"field": "field2", "direction": -1}]
+        )
+        assert actual == expected
+        actual = client.normalize_sort({"field1": 1})
+        assert actual == [{"field": "field1", "direction": 1}]
+        # The following example is not recommended because the order of the fields is not guaranteed in Python < 3.7
+        actual = client.normalize_sort({"field1": 1, "field2": -1})
+        if sys.version_info >= (3, 7):
+            assert actual == expected
+        else:
+            # Compare elements regardless of the order
+            assert sorted(actual, key=itemgetter("field")) == expected
+
     @pytest.mark.asyncio
     async def test_mute_user(self, event_loop, client, random_users):
         response = await client.mute_user(random_users[0]["id"], random_users[1]["id"])
@@ -75,12 +99,6 @@ class TestClient(object):
         )
         assert "command" in response
         assert "My new command" == response["command"]["description"]
-
-    @pytest.mark.asyncio
-    async def test_delete_command(self, client, event_loop, command):
-        response = await client.delete_command(command["name"])
-        with pytest.raises(StreamAPIException):
-            await client.get_command(command["name"])
 
     @pytest.mark.asyncio
     async def test_list_commands(self, event_loop, client):

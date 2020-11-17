@@ -5,9 +5,9 @@ from urllib.request import Request, urlopen
 import requests
 
 from stream_chat.__pkg__ import __version__
+from stream_chat.base.client import StreamChatInterface
 from stream_chat.base.exceptions import StreamAPIException
 
-from stream_chat.base.client import StreamChatInterface
 from .channel import Channel
 
 
@@ -62,19 +62,6 @@ class StreamChat(StreamChatInterface):
             timeout=self.timeout,
         )
         return self._parse_response(response)
-
-    def normalize_sort(self, sort=None):
-        sort_fields = []
-        if isinstance(sort, collections.abc.Mapping):
-            sort = [sort]
-        if isinstance(sort, list):
-            for item in sort:
-                if "field" in item and "direction" in item:
-                    sort_fields.append(item)
-                else:
-                    for k, v in item.items():
-                        sort_fields.append({"field": k, "direction": v})
-        return sort_fields
 
     def put(self, relative_url, params=None, data=None):
         return self._make_request(self.session.put, relative_url, params, data)
