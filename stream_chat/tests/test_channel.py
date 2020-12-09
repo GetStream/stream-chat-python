@@ -213,17 +213,16 @@ class TestChannel(object):
             if m["user_id"] == "ringo":
                 assert m["invited"] is True
                 assert "invite_accepted_at" in m
-        # cannot accept again
-        with pytest.raises(StreamAPIException):
-            channel.accept_invite("ringo")
+        # can accept again, noop
+        channel.accept_invite("ringo")
+
         reject = channel.reject_invite("eric")
         for m in reject["members"]:
             if m["user_id"] == "eric":
                 assert m["invited"] is True
                 assert "invite_rejected_at" in m
-        # cannot reject again
-        with pytest.raises(StreamAPIException):
-            reject = channel.reject_invite("eric")
+        # cannot reject again, noop
+        channel.reject_invite("eric")
 
     def test_query_members(self, client, channel):
         members = ["paul", "george", "john", "jessica", "john2"]
