@@ -4,7 +4,7 @@ from stream_chat.base.channel import ChannelInterface, add_user_id
 
 
 class Channel(ChannelInterface):
-    def send_message(self, message, user_id):
+    async def send_message(self, message, user_id):
         """
         Send a message to this channel
 
@@ -13,9 +13,9 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"message": add_user_id(message, user_id)}
-        return self.client.post("{}/message".format(self.url), data=payload)
+        return await self.client.post("{}/message".format(self.url), data=payload)
 
-    def send_event(self, event, user_id):
+    async def send_event(self, event, user_id):
         """
         Send an event on this channel
 
@@ -24,9 +24,9 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"event": add_user_id(event, user_id)}
-        return self.client.post("{}/event".format(self.url), data=payload)
+        return await self.client.post("{}/event".format(self.url), data=payload)
 
-    def send_reaction(self, message_id, reaction, user_id):
+    async def send_reaction(self, message_id, reaction, user_id):
         """
         Send a reaction about a message
 
@@ -36,9 +36,11 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"reaction": add_user_id(reaction, user_id)}
-        return self.client.post("messages/{}/reaction".format(message_id), data=payload)
+        return await self.client.post(
+            "messages/{}/reaction".format(message_id), data=payload
+        )
 
-    def delete_reaction(self, message_id, reaction_type, user_id):
+    async def delete_reaction(self, message_id, reaction_type, user_id):
         """
         Delete a reaction by user and type
 
@@ -47,12 +49,12 @@ class Channel(ChannelInterface):
         :param user_id: the id of the user
         :return: the Server Response
         """
-        return self.client.delete(
+        return await self.client.delete(
             "messages/{}/reaction/{}".format(message_id, reaction_type),
             params={"user_id": user_id},
         )
 
-    def create(self, user_id):
+    async def create(self, user_id):
         """
         Create the channel
 
@@ -60,9 +62,9 @@ class Channel(ChannelInterface):
         :return:
         """
         self.custom_data["created_by"] = {"id": user_id}
-        return self.query(watch=False, state=False, presence=False)
+        return await self.query(watch=False, state=False, presence=False)
 
-    def query(self, **options):
+    async def query(self, **options):
         """
         Query the API for this channel, get messages, members or other channel fields
 
@@ -75,14 +77,14 @@ class Channel(ChannelInterface):
         if self.id is not None:
             url = "{}/{}".format(url, self.id)
 
-        state = self.client.post("{}/query".format(url), data=payload)
+        state = await self.client.post("{}/query".format(url), data=payload)
 
         if self.id is None:
             self.id = state["channel"]["id"]
 
         return state
 
-    def query_members(self, filter_conditions, sort=None, **options):
+    async def query_members(self, filter_conditions, sort=None, **options):
         """
         Query the API for this channel to filter, sort and paginate its members efficiently.
 
@@ -105,10 +107,12 @@ class Channel(ChannelInterface):
             "sort": self.client.normalize_sort(sort),
             **options,
         }
-        response = self.client.get("members", params={"payload": json.dumps(payload)})
+        response = await self.client.get(
+            "members", params={"payload": json.dumps(payload)}
+        )
         return response["members"]
 
-    def update(self, channel_data, update_message=None):
+    async def update(self, channel_data, update_message=None):
         """
         Edit the channel's custom properties
 
@@ -117,70 +121,70 @@ class Channel(ChannelInterface):
         :return: The server response
         """
         payload = {"data": channel_data, "message": update_message}
-        return self.client.post(self.url, data=payload)
+        return await self.client.post(self.url, data=payload)
 
-    def delete(self):
+    async def delete(self):
         """
         Delete the channel. Messages are permanently removed.
 
         :return: The server response
         """
-        return self.client.delete(self.url)
+        return await self.client.delete(self.url)
 
-    def truncate(self):
+    async def truncate(self):
         """
         Removes all messages from the channel
 
         :return: The server response
         """
-        return self.client.post("{}/truncate".format(self.url))
+        return await self.client.post("{}/truncate".format(self.url))
 
-    def add_members(self, user_ids):
+    async def add_members(self, user_ids):
         """
         Adds members to the channel
 
         :param user_ids: user IDs to add as members
         :return:
         """
-        return self.client.post(self.url, data={"add_members": user_ids})
+        return await self.client.post(self.url, data={"add_members": user_ids})
 
-    def invite_members(self, user_ids):
+    async def invite_members(self, user_ids):
         """
         invite members to the channel
 
         :param user_ids: user IDs to invite
         :return:
         """
-        return self.client.post(self.url, data={"invites": user_ids})
+        return await self.client.post(self.url, data={"invites": user_ids})
 
-    def add_moderators(self, user_ids):
+    async def add_moderators(self, user_ids):
         """
         Adds moderators to the channel
 
         :param user_ids: user IDs to add as moderators
         :return:
         """
-        return self.client.post(self.url, data={"add_moderators": user_ids})
+        return await self.client.post(self.url, data={"add_moderators": user_ids})
 
-    def remove_members(self, user_ids):
+    async def remove_members(self, user_ids):
         """
         Remove members from the channel
 
         :param user_ids: user IDs to remove from the member list
         :return:
         """
-        return self.client.post(self.url, data={"remove_members": user_ids})
+        return await self.client.post(self.url, data={"remove_members": user_ids})
 
-    def demote_moderators(self, user_ids):
+    async def demote_moderators(self, user_ids):
         """
         Demotes moderators from the channel
 
         :param user_ids: user IDs to demote
         :return:
         """
-        return self.client.post(self.url, data={"demote_moderators": user_ids})
+        return await self.client.post(self.url, data={"demote_moderators": user_ids})
 
-    def mark_read(self, user_id, **data):
+    async def mark_read(self, user_id, **data):
         """
         Send the mark read event for this user, only works if the `read_events` setting is enabled
 
@@ -189,9 +193,9 @@ class Channel(ChannelInterface):
         :return: The server response
         """
         payload = add_user_id(data, user_id)
-        return self.client.post("{}/read".format(self.url), data=payload)
+        return await self.client.post("{}/read".format(self.url), data=payload)
 
-    def get_replies(self, parent_id, **options):
+    async def get_replies(self, parent_id, **options):
         """
         List the message replies for a parent message
 
@@ -199,9 +203,11 @@ class Channel(ChannelInterface):
         :param options: Pagination params, ie {limit:10, id_lte: 10}
         :return: A response with a list of messages
         """
-        return self.client.get("messages/{}/replies".format(parent_id), params=options)
+        return await self.client.get(
+            "messages/{}/replies".format(parent_id), params=options
+        )
 
-    def get_reactions(self, message_id, **options):
+    async def get_reactions(self, message_id, **options):
         """
         List the reactions, supports pagination
 
@@ -209,11 +215,11 @@ class Channel(ChannelInterface):
         :param options: Pagination params, ie {"limit":10, "id_lte": 10}
         :return: A response with a list of reactions
         """
-        return self.client.get(
+        return await self.client.get(
             "messages/{}/reactions".format(message_id), params=options
         )
 
-    def ban_user(self, target_id, **options):
+    async def ban_user(self, target_id, **options):
         """
         Bans a user from this channel
 
@@ -221,53 +227,57 @@ class Channel(ChannelInterface):
         :param options: additional ban options, ie {"timeout": 3600, "reason": "offensive language is not allowed here"}
         :return: The server response
         """
-        return self.client.ban_user(
+        return await self.client.ban_user(
             target_id, type=self.channel_type, id=self.id, **options
         )
 
-    def unban_user(self, target_id, **options):
+    async def unban_user(self, target_id, **options):
         """
         Removes the ban for a user on this channel
 
         :param target_id: the ID of the user to unban
         :return: The server response
         """
-        return self.client.unban_user(
+        return await self.client.unban_user(
             target_id, type=self.channel_type, id=self.id, **options
         )
 
-    def accept_invite(self, user_id, **data):
+    async def accept_invite(self, user_id, **data):
         payload = add_user_id(data, user_id)
         payload["accept_invite"] = True
-        response = self.client.post(self.url, data=payload)
+        response = await self.client.post(self.url, data=payload)
         self.custom_data = response["channel"]
         return response
 
-    def reject_invite(self, user_id, **data):
+    async def reject_invite(self, user_id, **data):
         payload = add_user_id(data, user_id)
         payload["reject_invite"] = True
-        response = self.client.post(self.url, data=payload)
+        response = await self.client.post(self.url, data=payload)
         self.custom_data = response["channel"]
         return response
 
-    def send_file(self, url, name, user, content_type=None):
-        return self.client.send_file(
+    async def send_file(self, url, name, user, content_type=None):
+        return await self.client.send_file(
             "{}/file".format(self.url), url, name, user, content_type=content_type
         )
 
-    def send_image(self, url, name, user, content_type=None):
-        return self.client.send_file(
+    async def send_image(self, url, name, user, content_type=None):
+        return await self.client.send_file(
             "{}/image".format(self.url), url, name, user, content_type=content_type
         )
 
-    def delete_file(self, url):
-        return self.client.delete("{}/file".format(self.url), {"url": url})
+    async def delete_file(self, url):
+        return await self.client.delete("{}/file".format(self.url), {"url": url})
 
-    def delete_image(self, url):
-        return self.client.delete("{}/image".format(self.url), {"url": url})
+    async def delete_image(self, url):
+        return await self.client.delete("{}/image".format(self.url), {"url": url})
 
-    def hide(self, user_id):
-        return self.client.post("{}/hide".format(self.url), data={"user_id": user_id})
+    async def hide(self, user_id):
+        return await self.client.post(
+            "{}/hide".format(self.url), data={"user_id": user_id}
+        )
 
-    def show(self, user_id):
-        return self.client.post("{}/show".format(self.url), data={"user_id": user_id})
+    async def show(self, user_id):
+        return await self.client.post(
+            "{}/show".format(self.url), data={"user_id": user_id}
+        )

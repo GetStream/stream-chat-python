@@ -36,27 +36,77 @@ pip install stream-chat
 
 ### Quickstart
 
+#### Sync
+
 ```python
-chat = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+from stream_chat import StreamChat
 
-# add a user
-chat.update_user({"id": "chuck", "name": "Chuck"})
 
-# create a channel about kung-fu
-channel = chat.channel("messaging", "kung-fu")
-channel.create("chuck")
+def main():
+    chat = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
 
-# add a first message to the channel
-channel.send_message({"text": "AMA about kung-fu"}, "chuck")
+    # add a user
+    chat.update_user({"id": "chuck", "name": "Chuck"})
+
+    # create a channel about kung-fu
+    channel = chat.channel("messaging", "kung-fu")
+    channel.create("chuck")
+
+    # add a first message to the channel
+    channel.send_message({"text": "AMA about kung-fu"}, "chuck")
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+#### Async
+
+```python
+import asyncio
+from stream_chat import StreamChatAsync
+
+
+async def main():
+    async with StreamChatAsync(api_key="STREAM_KEY", api_secret="STREAM_SECRET") as chat:
+        # add a user
+        await chat.update_user({"id": "chuck", "name": "Chuck"})
+
+        # create a channel about kung-fu
+        channel = chat.channel("messaging", "kung-fu")
+        await channel.create("chuck")
+
+        # add a first message to the channel
+        await channel.send_message({"text": "AMA about kung-fu"}, "chuck")
+
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(main())
+    finally:
+        loop.run_until_complete(loop.shutdown_asyncgens())
+        loop.close()
 
 ```
 
 ### Contributing
 
+Install pytest and pytest-asyncio
+
+```
+pip install pytest
+pip install pytest-asyncio
+```
+
 First, make sure you can run the test suite. Tests are run via py.test
 
 ```bash
-STREAM_KEY=my_api_key STREAM_SECRET=my_api_secret py.test stream_chat/ -v
+export STREAM_KEY=my_api_key
+export STREAM_SECRET=my_api_secret
+
+make test
 ```
 
 Install black and pycodestyle
@@ -64,6 +114,12 @@ Install black and pycodestyle
 ```
 pip install black
 pip install pycodestyle
+```
+
+Run linters
+
+```bash
+make lint
 ```
 
 

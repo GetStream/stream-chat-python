@@ -1,17 +1,14 @@
-import collections
-from urllib.parse import urlparse
-import hmac
-import hashlib
 import json
-import urllib
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-import jwt
 import requests
 
 from stream_chat.__pkg__ import __version__
-from stream_chat.channel import Channel
-from stream_chat.exceptions import StreamAPIException
+from stream_chat.base.client import StreamChatInterface
+from stream_chat.base.exceptions import StreamAPIException
+
+from .channel import Channel
 
 
 def get_user_agent():
@@ -26,30 +23,20 @@ def get_default_header():
     return base_headers
 
 
-class StreamChat(object):
+class StreamChat(StreamChatInterface):
     def __init__(self, api_key, api_secret, timeout=6.0, **options):
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.timeout = timeout
-        self.options = options
-        self.base_url = options.get(
-            "base_url", "https://chat-us-east-1.stream-io-api.com"
-        )
-        self.auth_token = jwt.encode(
-            {"server": True}, self.api_secret, algorithm="HS256"
+        super().__init__(
+            api_key=api_key, api_secret=api_secret, timeout=timeout, **options
         )
         self.session = requests.Session()
-
-    def get_default_params(self):
-        return {"api_key": self.api_key}
 
     def _parse_response(self, response):
         try:
             parsed_result = json.loads(response.text) if response.text else {}
         except ValueError:
-            raise StreamAPIException(response)
+            raise StreamAPIException(response.text, response.status_code)
         if response.status_code >= 399:
-            raise StreamAPIException(response)
+            raise StreamAPIException(response.text, response.status_code)
         return parsed_result
 
     def _make_request(self, method, relative_url, params=None, data=None):
@@ -76,19 +63,6 @@ class StreamChat(object):
         )
         return self._parse_response(response)
 
-    def normalize_sort(self, sort=None):
-        sort_fields = []
-        if isinstance(sort, collections.abc.Mapping):
-            sort = [sort]
-        if isinstance(sort, list):
-            for item in sort:
-                if "field" in item and "direction" in item:
-                    sort_fields.append(item)
-                else:
-                    for k, v in item.items():
-                        sort_fields.append({"field": k, "direction": v})
-        return sort_fields
-
     def put(self, relative_url, params=None, data=None):
         return self._make_request(self.session.put, relative_url, params, data)
 
@@ -103,12 +77,6 @@ class StreamChat(object):
 
     def patch(self, relative_url, params=None, data=None):
         return self._make_request(self.session.patch, relative_url, params, data)
-
-    def create_token(self, user_id, exp=None):
-        payload = {"user_id": user_id}
-        if exp is not None:
-            payload["exp"] = exp
-        return jwt.encode(payload, self.api_secret, algorithm="HS256").decode()
 
     def update_app_settings(self, **settings):
         return self.patch("app", data=settings)
@@ -299,28 +267,16 @@ class StreamChat(object):
         """
         return self.get("devices", {"user_id": user_id})
 
-    def verify_webhook(self, request_body, x_signature):
-        """
-        Verify the signature added to a webhook event
-
-        :param request_body: the request body received from webhook
-        :param x_signature: the x-signature header included in the request
-        :return: bool
-        """
-        signature = hmac.new(
-            key=self.api_secret.encode(), msg=request_body, digestmod=hashlib.sha256
-        ).hexdigest()
-        return signature == x_signature
-
     def search(self, filter_conditions, query, **options):
         params = {**options, "filter_conditions": filter_conditions, "query": query}
         return self.get("search", params={"payload": json.dumps(params)})
 
     def send_file(self, uri, url, name, user, content_type=None):
-        headers = {}
-        headers["Authorization"] = self.auth_token
-        headers["stream-auth-type"] = "jwt"
-        headers["X-Stream-Client"] = get_user_agent()
+        headers = {
+            "Authorization": self.auth_token,
+            "stream-auth-type": "jwt",
+            "X-Stream-Client": get_user_agent(),
+        }
         parts = urlparse(url)
         if parts[0] == "":
             url = "file://" + url

@@ -1,9 +1,10 @@
+import asyncio
 import os
 import uuid
 
 import pytest
 
-from stream_chat import StreamChat
+from stream_chat.async_chat import StreamChatAsync
 
 
 def pytest_runtest_makereport(item, call):
@@ -25,65 +26,74 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="module")
-def client():
+def event_loop(request):
+    """Create an instance of the default event loop for each test case."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="module")
+async def client():
     base_url = os.environ.get("STREAM_HOST")
     options = {"base_url": base_url} if base_url else {}
-    return StreamChat(
+    async with StreamChatAsync(
         api_key=os.environ["STREAM_KEY"],
         api_secret=os.environ["STREAM_SECRET"],
         timeout=10,
         **options,
-    )
+    ) as stream_client:
+        yield stream_client
 
 
 @pytest.fixture(scope="function")
-def random_user(client):
+async def random_user(client):
     user = {"id": str(uuid.uuid4())}
-    response = client.update_user(user)
+    response = await client.update_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
     return user
 
 
 @pytest.fixture(scope="function")
-def server_user(client):
+async def server_user(client):
     user = {"id": str(uuid.uuid4())}
-    response = client.update_user(user)
+    response = await client.update_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
     return user
 
 
 @pytest.fixture(scope="function")
-def random_users(client):
+async def random_users(client):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
-    client.update_users([user1, user2])
+    await client.update_users([user1, user2])
     return [user1, user2]
 
 
 @pytest.fixture(scope="function")
-def channel(client, random_user):
+async def channel(client, random_user):
     channel = client.channel(
         "messaging", str(uuid.uuid4()), {"test": True, "language": "python"}
     )
-    channel.create(random_user["id"])
+    await channel.create(random_user["id"])
     return channel
 
 
 @pytest.fixture(scope="function")
-def command(client):
-    response = client.create_command(
+async def command(client):
+    response = await client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
     )
 
     yield response["command"]
 
-    client.delete_command(response["command"]["name"])
+    await client.delete_command(response["command"]["name"])
 
 
 @pytest.fixture(scope="module")
-def fellowship_of_the_ring(client):
+async def fellowship_of_the_ring(client):
     members = [
         {"id": "frodo-baggins", "name": "Frodo Baggins", "race": "Hobbit", "age": 50},
         {"id": "sam-gamgee", "name": "Samwise Gamgee", "race": "Hobbit", "age": 38},
@@ -100,8 +110,8 @@ def fellowship_of_the_ring(client):
         },
         {"id": "peregrin-took", "name": "Peregrin Took", "race": "Hobbit", "age": 28},
     ]
-    client.update_users(members)
+    await client.update_users(members)
     channel = client.channel(
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
     )
-    channel.create("gandalf")
+    await channel.create("gandalf")

@@ -1,14 +1,18 @@
+import json
+
+
 class StreamChannelException(Exception):
     pass
 
 
 class StreamAPIException(Exception):
-    def __init__(self, response):
-        self.response = response
+    def __init__(self, text, status_code):
+        self.response_text = text
+        self.status_code = status_code
         self.json_response = False
 
         try:
-            parsed_response = response.json()
+            parsed_response = json.loads(text)
             self.error_code = parsed_response.get("code", "unknown")
             self.error_message = parsed_response.get("message", "unknown")
             self.json_response = True
@@ -21,4 +25,4 @@ class StreamAPIException(Exception):
                 self.error_code, self.error_message
             )
         else:
-            return "StreamChat error HTTP code: {}".format(self.response.status_code)
+            return "StreamChat error HTTP code: {}".format(self.status_code)
