@@ -238,17 +238,16 @@ class TestChannel(object):
             if m["user_id"] == "ringo":
                 assert m["invited"] is True
                 assert "invite_accepted_at" in m
-        # cannot accept again
-        with pytest.raises(StreamAPIException):
-            await channel.accept_invite("ringo")
+        # can accept again, noop
+        await channel.accept_invite("ringo")
+
         reject = await channel.reject_invite("eric")
         for m in reject["members"]:
             if m["user_id"] == "eric":
                 assert m["invited"] is True
                 assert "invite_rejected_at" in m
-        # cannot reject again
-        with pytest.raises(StreamAPIException):
-            reject = await channel.reject_invite("eric")
+        # can reject again, noop
+        await channel.reject_invite("eric")
 
     @pytest.mark.asyncio
     async def test_query_members(self, event_loop, client, channel):
