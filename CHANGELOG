@@ -1,3 +1,7 @@
+## December 9, 2020 - 3.0.0
+- Add async version of the client
+- Make double invite accept/reject noop
+
 ## November 12, 2020 - 2.0.0
 - Drop Python 3.5 and add 3.9
 
