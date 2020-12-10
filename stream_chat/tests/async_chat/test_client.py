@@ -269,7 +269,7 @@ class TestClient(object):
     async def test_search(self, event_loop, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         await channel.send_message(
-            {"text": "How many syllables are there in {}?".format(query)},
+            {"text": f"How many syllables are there in {query}?"},
             random_user["id"],
         )
         await channel.send_message(

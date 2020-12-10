@@ -13,7 +13,7 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"message": add_user_id(message, user_id)}
-        return self.client.post("{}/message".format(self.url), data=payload)
+        return self.client.post(f"{self.url}/message", data=payload)
 
     def send_event(self, event, user_id):
         """
@@ -24,7 +24,7 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"event": add_user_id(event, user_id)}
-        return self.client.post("{}/event".format(self.url), data=payload)
+        return self.client.post(f"{self.url}/event", data=payload)
 
     def send_reaction(self, message_id, reaction, user_id):
         """
@@ -36,7 +36,7 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"reaction": add_user_id(reaction, user_id)}
-        return self.client.post("messages/{}/reaction".format(message_id), data=payload)
+        return self.client.post(f"messages/{message_id}/reaction", data=payload)
 
     def delete_reaction(self, message_id, reaction_type, user_id):
         """
@@ -48,7 +48,7 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         return self.client.delete(
-            "messages/{}/reaction/{}".format(message_id, reaction_type),
+            f"messages/{message_id}/reaction/{reaction_type}",
             params={"user_id": user_id},
         )
 
@@ -71,11 +71,11 @@ class Channel(ChannelInterface):
         """
         payload = {"state": True, "data": self.custom_data, **options}
 
-        url = "channels/{}".format(self.channel_type)
+        url = f"channels/{self.channel_type}"
         if self.id is not None:
-            url = "{}/{}".format(url, self.id)
+            url = f"{url}/{self.id}"
 
-        state = self.client.post("{}/query".format(url), data=payload)
+        state = self.client.post(f"{url}/query", data=payload)
 
         if self.id is None:
             self.id = state["channel"]["id"]
@@ -133,7 +133,7 @@ class Channel(ChannelInterface):
 
         :return: The server response
         """
-        return self.client.post("{}/truncate".format(self.url))
+        return self.client.post(f"{self.url}/truncate")
 
     def add_members(self, user_ids):
         """
@@ -189,7 +189,7 @@ class Channel(ChannelInterface):
         :return: The server response
         """
         payload = add_user_id(data, user_id)
-        return self.client.post("{}/read".format(self.url), data=payload)
+        return self.client.post(f"{self.url}/read", data=payload)
 
     def get_replies(self, parent_id, **options):
         """
@@ -199,7 +199,7 @@ class Channel(ChannelInterface):
         :param options: Pagination params, ie {limit:10, id_lte: 10}
         :return: A response with a list of messages
         """
-        return self.client.get("messages/{}/replies".format(parent_id), params=options)
+        return self.client.get(f"messages/{parent_id}/replies", params=options)
 
     def get_reactions(self, message_id, **options):
         """
@@ -210,7 +210,7 @@ class Channel(ChannelInterface):
         :return: A response with a list of reactions
         """
         return self.client.get(
-            "messages/{}/reactions".format(message_id), params=options
+            f"messages/{message_id}/reactions", params=options
         )
 
     def ban_user(self, target_id, **options):
@@ -252,22 +252,22 @@ class Channel(ChannelInterface):
 
     def send_file(self, url, name, user, content_type=None):
         return self.client.send_file(
-            "{}/file".format(self.url), url, name, user, content_type=content_type
+            f"{self.url}/file", url, name, user, content_type=content_type
         )
 
     def send_image(self, url, name, user, content_type=None):
         return self.client.send_file(
-            "{}/image".format(self.url), url, name, user, content_type=content_type
+            f"{self.url}/image", url, name, user, content_type=content_type
         )
 
     def delete_file(self, url):
-        return self.client.delete("{}/file".format(self.url), {"url": url})
+        return self.client.delete(f"{self.url}/file", {"url": url})
 
     def delete_image(self, url):
-        return self.client.delete("{}/image".format(self.url), {"url": url})
+        return self.client.delete(f"{self.url}/image", {"url": url})
 
     def hide(self, user_id):
-        return self.client.post("{}/hide".format(self.url), data={"user_id": user_id})
+        return self.client.post(f"{self.url}/hide", data={"user_id": user_id})
 
     def show(self, user_id):
-        return self.client.post("{}/show".format(self.url), data={"user_id": user_id})
+        return self.client.post(f"{self.url}/show", data={"user_id": user_id})
