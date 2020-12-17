@@ -1,3 +1,7 @@
+## December 17, 2020 - 3.0.1
+- Use f strings internally
+- Use github actions and CI requirements to setup
+
 ## December 9, 2020 - 3.0.0
 - Add async version of the client
 - Make double invite accept/reject noop

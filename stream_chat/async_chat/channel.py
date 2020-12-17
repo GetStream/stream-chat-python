@@ -36,9 +36,7 @@ class Channel(ChannelInterface):
         :return: the Server Response
         """
         payload = {"reaction": add_user_id(reaction, user_id)}
-        return await self.client.post(
-            f"messages/{message_id}/reaction", data=payload
-        )
+        return await self.client.post(f"messages/{message_id}/reaction", data=payload)
 
     async def delete_reaction(self, message_id, reaction_type, user_id):
         """
@@ -203,9 +201,7 @@ class Channel(ChannelInterface):
         :param options: Pagination params, ie {limit:10, id_lte: 10}
         :return: A response with a list of messages
         """
-        return await self.client.get(
-            f"messages/{parent_id}/replies", params=options
-        )
+        return await self.client.get(f"messages/{parent_id}/replies", params=options)
 
     async def get_reactions(self, message_id, **options):
         """
@@ -215,9 +211,7 @@ class Channel(ChannelInterface):
         :param options: Pagination params, ie {"limit":10, "id_lte": 10}
         :return: A response with a list of reactions
         """
-        return await self.client.get(
-            f"messages/{message_id}/reactions", params=options
-        )
+        return await self.client.get(f"messages/{message_id}/reactions", params=options)
 
     async def ban_user(self, target_id, **options):
         """
@@ -273,11 +267,7 @@ class Channel(ChannelInterface):
         return await self.client.delete(f"{self.url}/image", {"url": url})
 
     async def hide(self, user_id):
-        return await self.client.post(
-            f"{self.url}/hide", data={"user_id": user_id}
-        )
+        return await self.client.post(f"{self.url}/hide", data={"user_id": user_id})
 
     async def show(self, user_id):
-        return await self.client.post(
-            f"{self.url}/show", data={"user_id": user_id}
-        )
+        return await self.client.post(f"{self.url}/show", data={"user_id": user_id})

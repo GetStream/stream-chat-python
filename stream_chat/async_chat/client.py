@@ -167,9 +167,7 @@ class StreamChatAsync(StreamChatInterface):
     async def update_message(self, message):
         if message.get("id") is None:
             raise ValueError("message must have an id")
-        return await self.post(
-            f"messages/{message['id']}", data={"message": message}
-        )
+        return await self.post(f"messages/{message['id']}", data={"message": message})
 
     async def delete_message(self, message_id, **options):
         return await self.delete(f"messages/{message_id}", options)

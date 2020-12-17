@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-target-version = ["py36"]
+target-version = ['py38']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -15,6 +15,7 @@ exclude = '''
   | src
   | bin
   | stream_chat\.egg-info
+  | fabfile.py
   | lib
   | docs
   | buck-out

@@ -12,6 +12,7 @@ install_requires = [
 ]
 long_description = open("README.md", "r").read()
 tests_require = ["pytest", "pytest-asyncio"]
+ci_require = ["black", "flake8", "pytest-cov"]
 
 about = {}
 with open("stream_chat/__pkg__.py") as fp:
@@ -31,12 +32,9 @@ class PyTest(TestCommand):
         pytest_cmd = ["stream_chat/", "-v"]
 
         try:
-            import pytest_cov
-
             pytest_cmd += [
                 "--cov=stream_chat/",
-                "--cov-report=html",
-                "--cov-report=annotate",
+                "--cov-report=xml",
             ]
         except ImportError:
             pass
@@ -58,7 +56,7 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     install_requires=install_requires,
-    extras_require={"test": tests_require},
+    extras_require={"test": tests_require, "ci": ci_require},
     tests_require=tests_require,
     include_package_data=True,
     python_requires=">=3.6",

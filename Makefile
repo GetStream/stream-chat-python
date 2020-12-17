@@ -2,7 +2,7 @@ STREAM_KEY ?= NOT_EXIST
 STREAM_SECRET ?= NOT_EXIST
 
 # These targets are not files
-.PHONY: help check test
+.PHONY: help check test lint lint-fix
 
 help: ## Display this help message
 	@echo "Please use \`make <target>\` where <target> is one of"
@@ -11,7 +11,10 @@ help: ## Display this help message
 
 lint:  ## Run linters
 	black --check stream_chat
-	pycodestyle --ignore=E501,E225,W293 stream_chat
+	flake8 --ignore=E501,E225,W293,W503,F401 stream_chat
+
+lint-fix:
+	black stream_chat
 
 test:  ## Run tests
 	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) python setup.py test
