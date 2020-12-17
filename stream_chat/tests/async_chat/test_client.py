@@ -300,7 +300,7 @@ class TestClient(object):
 
     @pytest.mark.asyncio
     async def test_create_blocklist(self, event_loop, client):
-        response = await client.create_blocklist(name="Foo", words=["fudge", "heck"])
+        await client.create_blocklist(name="Foo", words=["fudge", "heck"])
 
     @pytest.mark.asyncio
     async def test_list_blocklists(self, event_loop, client):

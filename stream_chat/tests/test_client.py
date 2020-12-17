@@ -245,7 +245,7 @@ class TestClient(object):
         assert len(response["channels"][0]["members"]) == 9
 
     def test_create_blocklist(self, client):
-        response = client.create_blocklist(name="Foo", words=["fudge", "heck"])
+        client.create_blocklist(name="Foo", words=["fudge", "heck"])
 
     def test_list_blocklists(self, client):
         response = client.list_blocklists()

@@ -16,7 +16,7 @@ class ChannelInterface(abc.ABC):
     def url(self):
         if self.id is None:
             raise StreamChannelException("channel does not have an id")
-        return f'channels/{self.channel_type}/{self.id}'
+        return f"channels/{self.channel_type}/{self.id}"
 
     @abc.abstractmethod
     def send_message(self, message, user_id):

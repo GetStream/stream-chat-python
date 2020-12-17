@@ -209,9 +209,7 @@ class Channel(ChannelInterface):
         :param options: Pagination params, ie {"limit":10, "id_lte": 10}
         :return: A response with a list of reactions
         """
-        return self.client.get(
-            f"messages/{message_id}/reactions", params=options
-        )
+        return self.client.get(f"messages/{message_id}/reactions", params=options)
 
     def ban_user(self, target_id, **options):
         """
