@@ -54,7 +54,7 @@ class StreamChatAsync(StreamChatInterface):
         headers["Authorization"] = self.auth_token
         headers["stream-auth-type"] = "jwt"
 
-        url = "{}/{}".format(self.base_url, relative_url)
+        url = f"{self.base_url}/{relative_url}"
 
         if method.__name__ in ["post", "put", "patch"]:
             serialized = json.dumps(data)
@@ -102,16 +102,16 @@ class StreamChatAsync(StreamChatInterface):
         return await self.update_users_partial([update])
 
     async def delete_user(self, user_id, **options):
-        return await self.delete("users/{}".format(user_id), options)
+        return await self.delete(f"users/{user_id}", options)
 
     async def deactivate_user(self, user_id, **options):
-        return await self.post("users/{}/deactivate".format(user_id), data=options)
+        return await self.post(f"users/{user_id}/deactivate", data=options)
 
     async def reactivate_user(self, user_id, **options):
-        return await self.post("users/{}/reactivate".format(user_id), data=options)
+        return await self.post(f"users/{user_id}/reactivate", data=options)
 
     async def export_user(self, user_id, **options):
-        return await self.get("users/{}/export".format(user_id), options)
+        return await self.get(f"users/{user_id}/export", options)
 
     async def ban_user(self, target_id, **options):
         data = {"target_user_id": target_id, **options}
@@ -168,14 +168,14 @@ class StreamChatAsync(StreamChatInterface):
         if message.get("id") is None:
             raise ValueError("message must have an id")
         return await self.post(
-            "messages/{}".format(message["id"]), data={"message": message}
+            f"messages/{message['id']}", data={"message": message}
         )
 
     async def delete_message(self, message_id, **options):
-        return await self.delete("messages/{}".format(message_id), options)
+        return await self.delete(f"messages/{message_id}", options)
 
     async def get_message(self, message_id):
-        return await self.get("messages/{}".format(message_id))
+        return await self.get(f"messages/{message_id}")
 
     async def query_users(self, filter_conditions, sort=None, **options):
         params = options.copy()
@@ -198,13 +198,13 @@ class StreamChatAsync(StreamChatInterface):
         return await self.post("channeltypes", data=data)
 
     async def get_channel_type(self, channel_type):
-        return await self.get("channeltypes/{}".format(channel_type))
+        return await self.get(f"channeltypes/{channel_type}")
 
     async def list_channel_types(self):
         return await self.get("channeltypes")
 
     async def update_channel_type(self, channel_type, **settings):
-        return await self.put("channeltypes/{}".format(channel_type), data=settings)
+        return await self.put(f"channeltypes/{channel_type}", data=settings)
 
     async def delete_channel_type(self, channel_type):
         """
@@ -213,7 +213,7 @@ class StreamChatAsync(StreamChatInterface):
         :param channel_type: the channel type
         :return:
         """
-        return await self.delete("channeltypes/{}".format(channel_type))
+        return await self.delete(f"channeltypes/{channel_type}")
 
     def channel(self, channel_type, channel_id=None, data=None):
         """
@@ -233,13 +233,13 @@ class StreamChatAsync(StreamChatInterface):
         return await self.post("commands", data=data)
 
     async def delete_command(self, name):
-        return await self.delete("commands/{}".format(name))
+        return await self.delete(f"commands/{name}")
 
     async def get_command(self, name):
-        return await self.get("commands/{}".format(name))
+        return await self.get(f"commands/{name}")
 
     async def update_command(self, name, **settings):
-        return await self.put("commands/{}".format(name), data=settings)
+        return await self.put(f"commands/{name}", data=settings)
 
     async def add_device(self, device_id, push_provider, user_id):
         """
@@ -297,7 +297,7 @@ class StreamChatAsync(StreamChatInterface):
         data.add_field("user", json.dumps(user))
         data.add_field("file", content, filename=name, content_type=content_type)
         async with self.session.post(
-            "{}/{}".format(self.base_url, uri),
+            f"{self.base_url}/{uri}",
             params=self.get_default_params(),
             data=data,
             headers=headers,
@@ -328,7 +328,7 @@ class StreamChatAsync(StreamChatInterface):
         :param name: the name of the blocklist
         :return: blocklist dict representation
         """
-        return await self.get("blocklists/{}".format(name))
+        return await self.get(f"blocklists/{name}")
 
     async def update_blocklist(self, name, words):
         """
@@ -338,7 +338,7 @@ class StreamChatAsync(StreamChatInterface):
         :param words: the list of blocked words (replaces the current list)
         :return:
         """
-        return await self.put("blocklists/{}".format(name), data={"words": words})
+        return await self.put(f"blocklists/{name}", data={"words": words})
 
     async def delete_blocklist(self, name):
         """Delete a blocklist by name
@@ -346,7 +346,7 @@ class StreamChatAsync(StreamChatInterface):
         :param: the name of the blocklist
         :return:
         """
-        return await self.delete("blocklists/{}".format(name))
+        return await self.delete(f"blocklists/{name}")
 
     async def close(self):
         await self.session.close()

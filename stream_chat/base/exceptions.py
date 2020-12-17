@@ -21,8 +21,6 @@ class StreamAPIException(Exception):
 
     def __str__(self):
         if self.json_response:
-            return "StreamChat error code {}: {}".format(
-                self.error_code, self.error_message
-            )
+            return f'StreamChat error code {self.error_code}: {self.error_message}"'
         else:
-            return "StreamChat error HTTP code: {}".format(self.status_code)
+            return f'StreamChat error HTTP code: {self.status_code}'
