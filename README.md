@@ -93,11 +93,10 @@ if __name__ == '__main__':
 
 ### Contributing
 
-Install pytest and pytest-asyncio
+Install deps
 
 ```
-pip install pytest
-pip install pytest-asyncio
+pip install .[test, ci]
 ```
 
 First, make sure you can run the test suite. Tests are run via py.test
@@ -107,13 +106,6 @@ export STREAM_KEY=my_api_key
 export STREAM_SECRET=my_api_secret
 
 make test
-```
-
-Install black and pycodestyle
-
-```
-pip install black
-pip install pycodestyle
 ```
 
 Run linters
