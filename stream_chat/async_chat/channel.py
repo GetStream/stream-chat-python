@@ -137,7 +137,7 @@ class Channel(ChannelInterface):
 
         :return: The server response
         """
-        return await self.client.post("{self.url}/truncate")
+        return await self.client.post(f"{self.url}/truncate")
 
     async def add_members(self, user_ids):
         """
@@ -193,7 +193,7 @@ class Channel(ChannelInterface):
         :return: The server response
         """
         payload = add_user_id(data, user_id)
-        return await self.client.post("{self.url}/read", data=payload)
+        return await self.client.post(f"{self.url}/read", data=payload)
 
     async def get_replies(self, parent_id, **options):
         """
