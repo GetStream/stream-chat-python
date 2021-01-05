@@ -265,3 +265,8 @@ class TestClient(object):
 
     def test_delete_blocklist(self, client):
         client.delete_blocklist("Foo")
+
+    def test_check_sqs(self, client):
+        response = client.check_sqs("key", "secret", "https://foo.com/bar")
+        assert response["status"] == "error"
+        assert "invalid SQS url" in response["error"]

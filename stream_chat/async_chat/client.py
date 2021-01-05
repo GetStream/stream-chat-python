@@ -346,6 +346,20 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.delete(f"blocklists/{name}")
 
+    async def check_sqs(self, sqs_key=None, sqs_secret=None, sqs_url=None):
+        """
+        Check SQS Push settings
+
+        When no parameters are given, the current SQS app settings are used
+
+        :param sqs_key: AWS access key
+        :param sqs_secret: AWS secret key
+        :param sqs_url: URL to SQS queue
+        :return:
+        """
+        data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
+        return await self.post("check_sqs", data=data)
+
     async def close(self):
         await self.session.close()
 

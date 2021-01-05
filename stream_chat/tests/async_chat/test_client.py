@@ -324,3 +324,9 @@ class TestClient(object):
     @pytest.mark.asyncio
     async def test_delete_blocklist(self, event_loop, client):
         await client.delete_blocklist("Foo")
+
+    @pytest.mark.asyncio
+    async def test_check_sqs(self, client):
+        response = await client.check_sqs("key", "secret", "https://foo.com/bar")
+        assert response["status"] == "error"
+        assert "invalid SQS url" in response["error"]
