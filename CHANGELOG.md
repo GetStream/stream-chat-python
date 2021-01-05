@@ -1,3 +1,6 @@
+## January 5, 2021 - 3.1.0
+- Add check SQS helper
+
 ## December 17, 2020 - 3.0.1
 - Use f strings internally
 - Use github actions and CI requirements to setup
