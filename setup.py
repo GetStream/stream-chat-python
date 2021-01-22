@@ -8,7 +8,7 @@ install_requires = [
     "requests>=2.22.0,<3",
     "aiohttp[speedups]>=3.6",
     "aiofile>=3.1,<4",
-    "pyjwt==1.7.1",
+    "pyjwt>=2.0.0,<3",
 ]
 long_description = open("README.md", "r").read()
 tests_require = ["pytest", "pytest-asyncio"]

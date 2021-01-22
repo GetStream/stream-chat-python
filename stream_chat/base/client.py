@@ -20,7 +20,7 @@ class StreamChatInterface(abc.ABC):
         )
         self.auth_token = jwt.encode(
             {"server": True}, self.api_secret, algorithm="HS256"
-        ).decode()
+        )
 
     def get_default_params(self):
         return {"api_key": self.api_key}
@@ -42,7 +42,7 @@ class StreamChatInterface(abc.ABC):
         payload = {"user_id": user_id}
         if exp is not None:
             payload["exp"] = exp
-        return jwt.encode(payload, self.api_secret, algorithm="HS256").decode()
+        return jwt.encode(payload, self.api_secret, algorithm="HS256")
 
     def verify_webhook(self, request_body, x_signature):
         """
