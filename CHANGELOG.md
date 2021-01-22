@@ -1,3 +1,6 @@
+## January 22, 2021 - 3.1.1
+- Bump pyjwt to 2.x
+
 ## January 5, 2021 - 3.1.0
 - Add check SQS helper
 
