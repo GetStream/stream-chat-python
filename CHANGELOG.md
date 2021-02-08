@@ -1,3 +1,6 @@
+## February 8, 2021 - 3.2.0
+- Add channel partial update
+
 ## January 22, 2021 - 3.1.1
 - Bump pyjwt to 2.x
 
