@@ -114,6 +114,16 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def update_partial(self, to_set=None, to_unset=None):
+        """
+        Update channel partially
+
+        :param to_set: a dictionary of key/value pairs to set or to override
+        :param to_unset: a list of keys to clear
+        """
+        pass
+
+    @abc.abstractmethod
     def delete(self):
         """
         Delete the channel. Messages are permanently removed.
