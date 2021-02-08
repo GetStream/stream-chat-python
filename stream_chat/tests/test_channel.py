@@ -54,6 +54,17 @@ class TestChannel(object):
         assert "channel" in response
         assert response["channel"]["motd"] == "one apple a day..."
 
+    def test_update_partial(self, channel):
+        response = channel.update({"color": "blue", "age": 30})
+        assert "channel" in response
+        assert response["channel"]["color"] == "blue"
+        assert response["channel"]["age"] == 30
+
+        response = channel.update_partial(to_set={"color": "red"}, to_unset=["age"])
+        assert "channel" in response
+        assert response["channel"]["color"] == "red"
+        assert "age" not in response["channel"]
+
     def test_delete(self, channel):
         response = channel.delete()
         assert "channel" in response

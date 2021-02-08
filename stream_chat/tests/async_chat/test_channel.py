@@ -63,6 +63,20 @@ class TestChannel(object):
         assert response["channel"]["motd"] == "one apple a day..."
 
     @pytest.mark.asyncio
+    async def test_update_partial(self, event_loop, channel):
+        response = await channel.update({"color": "blue", "age": 30})
+        assert "channel" in response
+        assert response["channel"]["color"] == "blue"
+        assert response["channel"]["age"] == 30
+
+        response = await channel.update_partial(
+            to_set={"color": "red"}, to_unset=["age"]
+        )
+        assert "channel" in response
+        assert response["channel"]["color"] == "red"
+        assert "age" not in response["channel"]
+
+    @pytest.mark.asyncio
     async def test_delete(self, event_loop, channel):
         response = await channel.delete()
         assert "channel" in response

@@ -119,6 +119,16 @@ class Channel(ChannelInterface):
         payload = {"data": channel_data, "message": update_message}
         return self.client.post(self.url, data=payload)
 
+    def update_partial(self, to_set=None, to_unset=None):
+        """
+        Update channel partially
+
+        :param to_set: a dictionary of key/value pairs to set or to override
+        :param to_unset: a list of keys to clear
+        """
+        payload = {"set": to_set or {}, "unset": to_unset or []}
+        return self.client.patch(self.url, data=payload)
+
     def delete(self):
         """
         Delete the channel. Messages are permanently removed.
