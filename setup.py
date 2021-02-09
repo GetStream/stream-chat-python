@@ -6,7 +6,9 @@ from setuptools.command.test import test as TestCommand
 install_requires = [
     "pycryptodomex>=3.8.1,<4",
     "requests>=2.22.0,<3",
-    "aiohttp[speedups]>=3.6",
+    "chardet>=2.0.0,<4",
+    "aiodns>=2.0.0",
+    "aiohttp>=3.6.0,<4",
     "aiofile>=3.1,<4",
     "pyjwt>=2.0.0,<3",
 ]

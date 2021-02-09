@@ -1,3 +1,7 @@
+## February 9, 2021 - 3.2.1
+- Drop brotli dependency in async, causes install issues in Darwin
+  - upstream needs updates
+
 ## February 8, 2021 - 3.2.0
 - Add channel partial update
 
