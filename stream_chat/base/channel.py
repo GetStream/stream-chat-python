@@ -19,7 +19,7 @@ class ChannelInterface(abc.ABC):
         return f"channels/{self.channel_type}/{self.id}"
 
     @abc.abstractmethod
-    def send_message(self, message, user_id):
+    def send_message(self, message, user_id, **options):
         """
         Send a message to this channel
 

@@ -26,6 +26,13 @@ class TestChannel(object):
         channel.create(random_users[0]["id"])
         assert channel.id is not None
 
+    def test_send_message_with_optinos(self, channel, random_user):
+        response = channel.send_message(
+            {"text": "hi"}, random_user["id"], skip_push=True
+        )
+        assert "message" in response
+        assert response["message"]["text"] == "hi"
+
     def test_send_event(self, channel, random_user):
         response = channel.send_event({"type": "typing.start"}, random_user["id"])
         assert "event" in response

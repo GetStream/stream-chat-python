@@ -4,7 +4,7 @@ from stream_chat.base.channel import ChannelInterface, add_user_id
 
 
 class Channel(ChannelInterface):
-    def send_message(self, message, user_id):
+    def send_message(self, message, user_id, **options):
         """
         Send a message to this channel
 
@@ -12,7 +12,7 @@ class Channel(ChannelInterface):
         :param user_id: the ID of the user that created the message
         :return: the Server Response
         """
-        payload = {"message": add_user_id(message, user_id)}
+        payload = {"message": add_user_id(message, user_id), **options}
         return self.client.post(f"{self.url}/message", data=payload)
 
     def send_event(self, event, user_id):
