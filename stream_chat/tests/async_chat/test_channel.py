@@ -29,6 +29,14 @@ class TestChannel(object):
         assert channel.id is not None
 
     @pytest.mark.asyncio
+    async def test_send_message_with_optinos(self, event_loop, channel, random_user):
+        response = await channel.send_message(
+            {"text": "hi"}, random_user["id"], skip_push=True
+        )
+        assert "message" in response
+        assert response["message"]["text"] == "hi"
+
+    @pytest.mark.asyncio
     async def test_send_event(self, event_loop, channel, random_user):
         response = await channel.send_event({"type": "typing.start"}, random_user["id"])
         assert "event" in response
