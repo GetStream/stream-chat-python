@@ -1,3 +1,7 @@
+## February 22, 2021 - 3.4.0
+
+- Add channel mute/unmute for a user
+
 ## February 22, 2021 - 3.3.0
 
 - Add options to send message
