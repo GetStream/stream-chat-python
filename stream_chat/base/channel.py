@@ -18,6 +18,12 @@ class ChannelInterface(abc.ABC):
             raise StreamChannelException("channel does not have an id")
         return f"channels/{self.channel_type}/{self.id}"
 
+    @property
+    def cid(self):
+        if self.id is None:
+            raise StreamChannelException("channel does not have an id")
+        return f"{self.channel_type}:{self.id}"
+
     @abc.abstractmethod
     def send_message(self, message, user_id, **options):
         """
@@ -275,6 +281,14 @@ class ChannelInterface(abc.ABC):
 
     @abc.abstractmethod
     def show(self, user_id):
+        pass
+
+    @abc.abstractmethod
+    def mute(self, user_id, expiration=None):
+        pass
+
+    @abc.abstractmethod
+    def unmute(self, user_id):
         pass
 
 

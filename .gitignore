@@ -62,3 +62,4 @@ pip-selfcheck.json
 .vscode
 *,cover
 .eggs
+.envrc
