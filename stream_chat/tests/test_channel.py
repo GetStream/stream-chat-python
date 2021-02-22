@@ -258,3 +258,24 @@ class TestChannel(object):
         assert len(response) == 2
         assert response[0]["user"]["id"] == "jessica"
         assert response[1]["user"]["id"] == "john2"
+
+    def test_mute_unmute(self, client, channel, random_users):
+        user_id = random_users[0]["id"]
+        response = channel.mute(user_id, expiration=30000)
+        assert "channel_mute" in response
+        assert "expires" in response["channel_mute"]
+        assert response["channel_mute"]["channel"]["cid"] == channel.cid
+        assert response["channel_mute"]["user"]["id"] == user_id
+
+        response = client.query_channels(
+            {"muted": True, "cid": channel.cid}, user_id=user_id
+        )
+        print(response, channel.cid)
+        assert len(response["channels"]) == 1
+
+        channel.unmute(user_id)
+        response = client.query_channels(
+            {"muted": True, "cid": channel.cid},
+            user_id=user_id,
+        )
+        assert len(response["channels"]) == 0

@@ -279,3 +279,34 @@ class Channel(ChannelInterface):
 
     def show(self, user_id):
         return self.client.post(f"{self.url}/show", data={"user_id": user_id})
+
+    def mute(self, user_id, expiration=None):
+        """
+        Mutes the channel for the given user for an optional expiration in milliseconds
+
+        :param user_id: the id of the user muting the channel
+        :param expiration: optional expiration in ms. If not given, mute doesn't expire until unmutes
+        :return: The server response
+        """
+
+        params = {
+            "user_id": user_id,
+            "channel_cid": self.cid,
+        }
+        if expiration:
+            params["expiration"] = expiration
+        return self.client.post("moderation/mute/channel", data=params)
+
+    def unmute(self, user_id):
+        """
+        Unmutes the channel for the given user
+
+        :param user_id: the id of the user unmuting the channel
+        :return: The server response
+        """
+
+        params = {
+            "user_id": user_id,
+            "channel_cid": self.cid,
+        }
+        return self.client.post("moderation/unmute/channel", data=params)

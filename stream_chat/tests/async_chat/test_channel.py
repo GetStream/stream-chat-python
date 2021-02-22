@@ -288,3 +288,24 @@ class TestChannel(object):
         assert len(response) == 2
         assert response[0]["user"]["id"] == "jessica"
         assert response[1]["user"]["id"] == "john2"
+
+    @pytest.mark.asyncio
+    async def test_mute_umute(self, event_loop, client, channel, random_users):
+        user_id = random_users[0]["id"]
+        response = await channel.mute(user_id, expiration=30000)
+        assert "channel_mute" in response
+        assert response["channel_mute"]["channel"]["cid"] == channel.cid
+        assert response["channel_mute"]["user"]["id"] == user_id
+
+        response = await client.query_channels(
+            {"muted": True, "cid": channel.cid},
+            user_id=user_id,
+        )
+        assert len(response["channels"]) == 1
+
+        await channel.unmute(user_id)
+        response = await client.query_channels(
+            {"muted": True, "cid": channel.cid},
+            user_id=user_id,
+        )
+        assert len(response["channels"]) == 0
