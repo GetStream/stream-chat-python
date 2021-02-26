@@ -38,8 +38,8 @@ class StreamChatInterface(abc.ABC):
                         sort_fields.append({"field": k, "direction": v})
         return sort_fields
 
-    def create_token(self, user_id, exp=None):
-        payload = {"user_id": user_id}
+    def create_token(self, user_id, exp=None, **claims):
+        payload = {**claims, "user_id": user_id}
         if exp is not None:
             payload["exp"] = exp
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
