@@ -1,3 +1,7 @@
+## February 26, 2021 - 3.5.0
+
+- Support additional claims for jwt token generation
+
 ## February 22, 2021 - 3.4.0
 
 - Add channel mute/unmute for a user
