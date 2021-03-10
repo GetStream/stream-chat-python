@@ -272,6 +272,33 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.get("devices", {"user_id": user_id})
 
+    async def get_rate_limits(
+        self, server_side=False, android=False, ios=False, web=False, endpoints=None
+    ):
+        """
+        Get rate limit quotas and usage.
+        If no params are toggled, all limits for all endpoints are returned.
+
+        :param server_side: if true, show server_side limits.
+        :param android: if true, show android limits.
+        :param ios: if true, show ios limits.
+        :param web: if true, show web limits.
+        :param endpoints: restrict returned limits to the given list of endpoints.
+        """
+        params = {}
+        if server_side:
+            params["server_side"] = "true"
+        if android:
+            params["android"] = "true"
+        if ios:
+            params["ios"] = "true"
+        if web:
+            params["web"] = "true"
+        if endpoints is not None and len(endpoints) > 0:
+            params["endpoints"] = ",".join(endpoints)
+
+        return await self.get("rate_limits", params)
+
     async def search(self, filter_conditions, query, **options):
         params = {**options, "filter_conditions": filter_conditions, "query": query}
         return await self.get("search", params={"payload": json.dumps(params)})
