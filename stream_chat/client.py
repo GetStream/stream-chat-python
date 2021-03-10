@@ -268,7 +268,7 @@ class StreamChat(StreamChatInterface):
         return self.get("devices", {"user_id": user_id})
 
     def get_rate_limits(
-        self, server_side=False, android=False, ios=False, web=False, endpoints=[]
+        self, server_side=False, android=False, ios=False, web=False, endpoints=None
     ):
         """
         Get rate limit quotas and usage.
@@ -289,7 +289,7 @@ class StreamChat(StreamChatInterface):
             params["ios"] = "true"
         if web:
             params["web"] = "true"
-        if len(endpoints) > 0:
+        if endpoints is not None and len(endpoints) > 0:
             params["endpoints"] = ",".join(endpoints)
 
         return self.get("rate_limits", params)

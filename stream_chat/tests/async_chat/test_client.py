@@ -266,6 +266,38 @@ class TestClient(object):
         assert len(response["devices"]) == 1
 
     @pytest.mark.asyncio
+    async def test_get_rate_limits(self, event_loop, client):
+        response = await client.get_rate_limits()
+        assert "server_side" in response
+        assert "android" in response
+        assert "ios" in response
+        assert "web" in response
+
+        response = await client.get_rate_limits(server_side=True, android=True)
+        assert "server_side" in response
+        assert "android" in response
+        assert "ios" not in response
+        assert "web" not in response
+
+        response = await client.get_rate_limits(
+            server_side=True, android=True, endpoints=["GetRateLimits", "SendMessage"]
+        )
+        assert "server_side" in response
+        assert "android" in response
+        assert "ios" not in response
+        assert "web" not in response
+        assert len(response["android"]) == 2
+        assert len(response["server_side"]) == 2
+        assert (
+            response["android"]["GetRateLimits"]["limit"]
+            == response["android"]["GetRateLimits"]["remaining"]
+        )
+        assert (
+            response["server_side"]["GetRateLimits"]["limit"]
+            > response["server_side"]["GetRateLimits"]["remaining"]
+        )
+
+    @pytest.mark.asyncio
     async def test_search(self, event_loop, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         await channel.send_message(
