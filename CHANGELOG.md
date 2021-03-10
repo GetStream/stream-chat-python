@@ -1,3 +1,7 @@
+## March 10, 2021 - 3.6.0
+
+- Add custom permission/role lifecycle endpoints
+
 ## February 26, 2021 - 3.5.0
 
 - Support additional claims for jwt token generation
