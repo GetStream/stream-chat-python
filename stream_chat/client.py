@@ -347,3 +347,64 @@ class StreamChat(StreamChatInterface):
         """
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return self.post("check_sqs", data=data)
+
+    def get_permission(self, name):
+        """
+        Get the definition for a permission
+
+        :param name: Name of the permission
+        """
+        return self.get(f"custom_permission/{name}")
+
+    def create_permission(self, permission):
+        """
+        Create a custom permission
+
+        :param permission: Definition of the permission
+        """
+        return self.post("custom_permission", data=permission)
+
+    def update_permission(self, name, permission):
+        """
+        Update a custom permission
+
+        :param name: Name of the permission
+        :param permission: New definition of the permission
+        """
+        return self.post(f"custom_permission/{name}", data=permission)
+
+    def delete_permission(self, name):
+        """
+        Delete a custom permission
+
+        :param name: Name of the permission
+        """
+        return self.delete(f"custom_permission/{name}")
+
+    def list_permissions(self):
+        """
+        List custom permissions of the app
+        """
+        return self.get("custom_permission")
+
+    def create_role(self, name):
+        """
+        Create a custom role
+
+        :param name: Name of the role
+        """
+        return self.post("custom_role", data={"name": name})
+
+    def delete_role(self, name):
+        """
+        Delete a custom role
+
+        :param name: Name of the role
+        """
+        return self.delete(f"custom_role/{name}")
+
+    def list_roles(self):
+        """
+        List custom roles of the app
+        """
+        return self.get("custom_role")

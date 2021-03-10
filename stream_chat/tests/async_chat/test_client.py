@@ -330,3 +330,52 @@ class TestClient(object):
         response = await client.check_sqs("key", "secret", "https://foo.com/bar")
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
+
+    @pytest.mark.asyncio
+    async def test_custom_permission_and_roles(self, client):
+        name, role = "Something restricted", "god"
+
+        try:
+            client.delete_permission(name)
+            client.delete_role(role)
+        except:  # noqa
+            pass
+
+        custom = {
+            "name": name,
+            "resource": "DeleteChannel",
+            "owner": False,
+            "same_team": True,
+        }
+
+        await client.create_permission(custom)
+        response = await client.get_permission(name)
+        print(response)
+        assert response["permission"]["name"] == name
+        assert response["permission"]["custom"]
+        assert not response["permission"]["owner"]
+        assert response["permission"]["resource"] == custom["resource"]
+
+        custom["owner"] = True
+        await client.update_permission(name, custom)
+
+        response = await client.get_permission(name)
+        print(response)
+        assert response["permission"]["name"] == name
+        assert response["permission"]["custom"]
+        assert response["permission"]["owner"]
+        assert response["permission"]["resource"] == custom["resource"]
+
+        response = await client.list_permissions()
+        assert len(response["permissions"]) == 1
+        assert response["permissions"][0]["name"] == name
+        await client.delete_permission(name)
+        response = await client.list_permissions()
+        assert len(response["permissions"]) == 0
+
+        await client.create_role(role)
+        response = await client.list_roles()
+        assert role in response["roles"]
+        await client.delete_role(role)
+        response = await client.list_roles()
+        assert role not in response["roles"]
