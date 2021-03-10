@@ -360,6 +360,67 @@ class StreamChatAsync(StreamChatInterface):
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return await self.post("check_sqs", data=data)
 
+    async def get_permission(self, name):
+        """
+        Get the definition for a permission
+
+        :param name: Name of the permission
+        """
+        return await self.get(f"custom_permission/{name}")
+
+    async def create_permission(self, permission):
+        """
+        Create a custom permission
+
+        :param permission: Definition of the permission
+        """
+        return await self.post("custom_permission", data=permission)
+
+    async def update_permission(self, name, permission):
+        """
+        Update a custom permission
+
+        :param name: Name of the permission
+        :param permission: New definition of the permission
+        """
+        return await self.post(f"custom_permission/{name}", data=permission)
+
+    async def delete_permission(self, name):
+        """
+        Delete a custom permission
+
+        :param name: Name of the permission
+        """
+        return await self.delete(f"custom_permission/{name}")
+
+    async def list_permissions(self):
+        """
+        List custom permissions of the app
+        """
+        return await self.get("custom_permission")
+
+    async def create_role(self, name):
+        """
+        Create a custom role
+
+        :param name: Name of the role
+        """
+        return await self.post("custom_role", data={"name": name})
+
+    async def delete_role(self, name):
+        """
+        Delete a custom role
+
+        :param name: Name of the role
+        """
+        return await self.delete(f"custom_role/{name}")
+
+    async def list_roles(self):
+        """
+        List custom roles of the app
+        """
+        return await self.get("custom_role")
+
     async def close(self):
         await self.session.close()
 

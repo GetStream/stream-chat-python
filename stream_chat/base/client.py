@@ -318,7 +318,7 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def check_sqs(self, sqs_key=None, sqs_secret=None, sqs_url=None):
+    def check_sqs(self, sqs_key=None, sqs_secret=None, sqs_url=None):
         """
         Check SQS Push settings
 
@@ -328,5 +328,74 @@ class StreamChatInterface(abc.ABC):
         :param sqs_secret: AWS secret key
         :param sqs_url: URL to SQS queue
         :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_permission(self, name):
+        """
+        Get the definition for a permission
+
+        :param name: Name of the permission
+        """
+        pass
+
+    @abc.abstractmethod
+    def create_permission(self, permission):
+        """
+        Create a custom permission
+
+        :param permission: Definition of the permission
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_permission(self, name, permission):
+        """
+        Update a custom permission
+
+        :param name: Name of the permission
+        :param permission: New definition of the permission
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_permission(self, name):
+        """
+        Delete a custom permission
+
+        :param name: Name of the permission
+        """
+        pass
+
+    @abc.abstractmethod
+    def list_permissions(self):
+        """
+        List custom permissions of the app
+        """
+        pass
+
+    @abc.abstractmethod
+    def create_role(self, name):
+        """
+        Create a custom role
+
+        :param name: Name of the role
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_role(self, name):
+        """
+        Delete a custom role
+
+        :param name: Name of the role
+        """
+        pass
+
+    @abc.abstractmethod
+    def list_roles(self):
+        """
+        List custom roles of the app
         """
         pass
