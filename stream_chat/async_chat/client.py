@@ -272,6 +272,8 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.get("devices", {"user_id": user_id})
 
+    async def get_rate_limits(self, )
+
     async def search(self, filter_conditions, query, **options):
         params = {**options, "filter_conditions": filter_conditions, "query": query}
         return await self.get("search", params={"payload": json.dumps(params)})
