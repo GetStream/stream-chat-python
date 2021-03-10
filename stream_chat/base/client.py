@@ -261,6 +261,20 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def get_rate_limits(self, server_side, android, ios, web, endpoints):
+        """
+        Get rate limit quotas and usage.
+        If no params are toggled, all limits for all endpoints are returned.
+
+        :param server_side: if true, show server_side limits.
+        :param android: if true, show android limits.
+        :param ios: if true, show ios limits.
+        :param web: if true, show web limits.
+        :param endpoints: restrict returned limits to the given list of endpoints.
+        """
+        pass
+
+    @abc.abstractmethod
     def search(self, filter_conditions, query, **options):
         pass
 
