@@ -217,6 +217,37 @@ class TestClient(object):
         response = client.get_devices(random_user["id"])
         assert len(response["devices"]) == 1
 
+    def test_get_rate_limits(self, client):
+        response = client.get_rate_limits()
+        assert "server_side" in response
+        assert "android" in response
+        assert "ios" in response
+        assert "web" in response
+
+        response = client.get_rate_limits(server_side=True, android=True)
+        assert "server_side" in response
+        assert "android" in response
+        assert "ios" not in response
+        assert "web" not in response
+
+        response = client.get_rate_limits(
+            server_side=True, android=True, endpoints=["GetRateLimits", "SendMessage"]
+        )
+        assert "server_side" in response
+        assert "android" in response
+        assert "ios" not in response
+        assert "web" not in response
+        assert len(response["android"]) == 2
+        assert len(response["server_side"]) == 2
+        assert (
+            response["android"]["GetRateLimits"]["limit"]
+            == response["android"]["GetRateLimits"]["remaining"]
+        )
+        assert (
+            response["server_side"]["GetRateLimits"]["limit"]
+            > response["server_side"]["GetRateLimits"]["remaining"]
+        )
+
     def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
