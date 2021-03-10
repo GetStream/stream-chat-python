@@ -277,7 +277,7 @@ class TestClient(object):
         try:
             client.delete_permission(name)
             client.delete_role(role)
-        except:
+        except:  # noqa
             pass
 
         custom = {
@@ -291,8 +291,8 @@ class TestClient(object):
         response = client.get_permission(name)
         print(response)
         assert response["permission"]["name"] == name
-        assert response["permission"]["custom"] == True
-        assert response["permission"]["owner"] == False
+        assert response["permission"]["custom"]
+        assert not response["permission"]["owner"]
         assert response["permission"]["resource"] == custom["resource"]
 
         custom["owner"] = True
@@ -301,8 +301,8 @@ class TestClient(object):
         response = client.get_permission(name)
         print(response)
         assert response["permission"]["name"] == name
-        assert response["permission"]["custom"] == True
-        assert response["permission"]["owner"] == True
+        assert response["permission"]["custom"]
+        assert response["permission"]["owner"]
         assert response["permission"]["resource"] == custom["resource"]
 
         response = client.list_permissions()
