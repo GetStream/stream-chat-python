@@ -1,3 +1,7 @@
+## March 10, 2021 - 3.7.0
+
+- Add get_rate_limits endpoint support
+
 ## March 10, 2021 - 3.6.0
 
 - Add custom permission/role lifecycle endpoints
