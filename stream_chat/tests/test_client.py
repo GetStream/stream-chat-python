@@ -1,10 +1,11 @@
+import sys
 from operator import itemgetter
-
-import uuid
+from contextlib import suppress
 
 import jwt
 import pytest
-import sys
+import time
+import uuid
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
 
@@ -305,11 +306,10 @@ class TestClient(object):
     def test_custom_permission_and_roles(self, client):
         name, role = "Something restricted", "god"
 
-        try:
+        with suppress(Exception):
             client.delete_permission(name)
+        with suppress(Exception):
             client.delete_role(role)
-        except:  # noqa
-            pass
 
         custom = {
             "name": name,
@@ -319,8 +319,8 @@ class TestClient(object):
         }
 
         client.create_permission(custom)
+        time.sleep(1)
         response = client.get_permission(name)
-        print(response)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
         assert not response["permission"]["owner"]
@@ -330,7 +330,6 @@ class TestClient(object):
         client.update_permission(name, custom)
 
         response = client.get_permission(name)
-        print(response)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
         assert response["permission"]["owner"]
