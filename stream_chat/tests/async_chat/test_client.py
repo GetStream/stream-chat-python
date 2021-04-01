@@ -382,7 +382,7 @@ class TestClient(object):
         }
 
         await client.create_permission(custom)
-        time.sleep(1)
+        time.sleep(2)
         response = await client.get_permission(name)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
@@ -392,7 +392,7 @@ class TestClient(object):
         custom["owner"] = True
         await client.update_permission(name, custom)
 
-        time.sleep(1)
+        time.sleep(2)
         response = await client.get_permission(name)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
