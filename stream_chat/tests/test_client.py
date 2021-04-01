@@ -329,6 +329,7 @@ class TestClient(object):
         custom["owner"] = True
         client.update_permission(name, custom)
 
+        time.sleep(1)
         response = client.get_permission(name)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
