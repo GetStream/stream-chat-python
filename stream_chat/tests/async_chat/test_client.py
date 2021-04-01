@@ -368,8 +368,8 @@ class TestClient(object):
         name, role = "Something restricted", "god"
 
         try:
-            client.delete_permission(name)
-            client.delete_role(role)
+            await client.delete_permission(name)
+            await client.delete_role(role)
         except:  # noqa
             pass
 
