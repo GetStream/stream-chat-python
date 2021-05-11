@@ -437,41 +437,41 @@ class StreamChat(StreamChatInterface):
         """
         return self.get("custom_role")
 
-    def revoke_tokens(self, since=datetime.datetime.now()):
+    def revoke_tokens(self, before=datetime.datetime.now()):
         """
         Revokes tokens for a application
-        :param since: date since which the tokens are to be revoked
+        :param since: date before which the tokens are to be revoked
         """
-        if isinstance(since, datetime.datetime):
-            since = since.isoformat()
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
 
-        self.update_app_settings({"revoke_tokens_issued_before": since})
+        self.update_app_settings({"revoke_tokens_issued_before": before})
 
-    def revoke_user_token(self, user_id, since=datetime.datetime.now()):
+    def revoke_user_token(self, user_id, before=datetime.datetime.now()):
         """
         Revokes token for a user
         :param user_id: user_id of user for which the token needs to be revoked
-        :param since: date since which the tokens are to be revoked
+        :param since: date before which the tokens are to be revoked
         """
-        if isinstance(since, datetime.datetime):
-            since = since.isoformat()
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
 
         self.update_user_partial(
-            {"id": user_id, "set": {"revoke_tokens_issued_before": since}}
+            {"id": user_id, "set": {"revoke_tokens_issued_before": before}}
         )
 
-    def revoke_users_token(self, user_ids, since=datetime.datetime.now()):
+    def revoke_users_token(self, user_ids, before=datetime.datetime.now()):
         """
         Revokes tokens for given users
         :param user_ids: user_ids for user for whom the token needs to be revoked
-        :param since: date since which the tokens are to be revoked
+        :param since: date before which the tokens are to be revoked
         """
-        if isinstance(since, datetime.datetime):
-            since = since.isoformat()
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
 
         updates = []
         for user_id in user_ids:
             updates.append(
-                {"id": user_id, "set": {"revoke_tokens_issued_before": since}}
+                {"id": user_id, "set": {"revoke_tokens_issued_before": before}}
             )
         self.update_users_partial(updates)
