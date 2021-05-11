@@ -416,21 +416,21 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod    
+    @abc.abstractmethod
     def revoke_tokens(self, since):
         """
         Revoke tokens for a application issued since
         """
         pass
 
-    @abc.abstractmethod    
+    @abc.abstractmethod
     def revoke_user_token(self, user_id, since):
         """
         Revoke tokens for a user issued since
         """
         pass
 
-    @abc.abstractmethod    
+    @abc.abstractmethod
     def revoke_users_token(self, user_ids, since):
         """
         Revoke tokens for users issued since

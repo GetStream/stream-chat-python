@@ -1,4 +1,5 @@
-import json, datetime
+import json
+import datetime
 from types import TracebackType
 from typing import Optional, Type
 from urllib.parse import urlparse
@@ -456,11 +457,11 @@ class StreamChatAsync(StreamChatInterface):
         if isinstance(since, datetime.datetime):
             since = since.isoformat()
 
-        await self.update_app_settings({
-            "revoke_tokens_issued_before": since
-        })
+        await self.update_app_settings({"revoke_tokens_issued_before": since})
 
-    async def revoke_user_token(self, user_id, since=datetime.datetime.now().isoformat()):
+    async def revoke_user_token(
+        self, user_id, since=datetime.datetime.now().isoformat()
+    ):
         """
         Revokes token for a user
         :param user_id: user_id of user for which the token needs to be revoked
@@ -469,31 +470,27 @@ class StreamChatAsync(StreamChatInterface):
         if isinstance(since, datetime.datetime):
             since = since.isoformat()
 
-        await self.update_user_partial({
-            "id": user_id,
-            "set": {
-                "revoke_tokens_issued_before": since
-            }
-        })
+        await self.update_user_partial(
+            {"id": user_id, "set": {"revoke_tokens_issued_before": since}}
+        )
 
-    async def revoke_users_token(self, user_ids, since=datetime.datetime.now().isoformat()):
+    async def revoke_users_token(
+        self, user_ids, since=datetime.datetime.now().isoformat()
+    ):
         """
         Revokes tokens for given users
         :param user_ids: user_ids for user for whom the token needs to be revoked
-        :param since: date since which the tokens are to be revoked 
+        :param since: date since which the tokens are to be revoked
         """
         if isinstance(since, datetime.datetime):
             since = since.isoformat()
 
         updates = []
         for user_id in user_ids:
-            updates.append({
-                "id": user_id,
-                "set": {
-                    "revoke_tokens_issued_before": since
-                }
-            })
-        await self.update_users_partial(updates)  
+            updates.append(
+                {"id": user_id, "set": {"revoke_tokens_issued_before": since}}
+            )
+        await self.update_users_partial(updates)
 
     async def close(self):
         await self.session.close()
