@@ -459,9 +459,7 @@ class StreamChatAsync(StreamChatInterface):
 
         await self.update_app_settings({"revoke_tokens_issued_before": before})
 
-    async def revoke_user_token(
-        self, user_id, before=datetime.datetime.now().isoformat()
-    ):
+    async def revoke_user_token(self, user_id, before=datetime.datetime.now()):
         """
         Revokes token for a user
         :param user_id: user_id of user for which the token needs to be revoked
@@ -474,9 +472,7 @@ class StreamChatAsync(StreamChatInterface):
             {"id": user_id, "set": {"revoke_tokens_issued_before": before}}
         )
 
-    async def revoke_users_token(
-        self, user_ids, before=datetime.datetime.now().isoformat()
-    ):
+    async def revoke_users_token(self, user_ids, before=datetime.datetime.now()):
         """
         Revokes tokens for given users
         :param user_ids: user_ids for user for whom the token needs to be revoked
