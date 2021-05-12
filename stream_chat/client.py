@@ -439,7 +439,7 @@ class StreamChat(StreamChatInterface):
 
     def revoke_tokens(self, before):
         """
-        Revokes tokens for a application
+        Revokes tokens for an application
         :param before: date before which the tokens are to be revoked, to reset pass None
         """
         if isinstance(before, datetime.datetime):

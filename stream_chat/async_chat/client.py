@@ -449,34 +449,29 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.get("custom_role")
 
-    async def revoke_tokens(self, before=datetime.datetime.now()):
+    async def revoke_tokens(self, before):
         """
-        Revokes tokens for a application
-        :param since: date before which the tokens are to be revoked
+        Revokes tokens for an application
+        :param before: date before which the tokens are to be revoked, pass None to reset
         """
         if isinstance(before, datetime.datetime):
             before = before.isoformat()
 
         await self.update_app_settings({"revoke_tokens_issued_before": before})
 
-    async def revoke_user_token(self, user_id, before=datetime.datetime.now()):
+    async def revoke_user_token(self, user_id, before):
         """
         Revokes token for a user
         :param user_id: user_id of user for which the token needs to be revoked
-        :param since: date before which the tokens are to be revoked
+        :param before: date before which the tokens are to be revoked, , pass None to reset
         """
-        if isinstance(before, datetime.datetime):
-            before = before.isoformat()
+        await self.revoke_users_token([user_id], before)
 
-        await self.update_user_partial(
-            {"id": user_id, "set": {"revoke_tokens_issued_before": before}}
-        )
-
-    async def revoke_users_token(self, user_ids, before=datetime.datetime.now()):
+    async def revoke_users_token(self, user_ids, before):
         """
         Revokes tokens for given users
         :param user_ids: user_ids for user for whom the token needs to be revoked
-        :param since: date before which the tokens are to be revoked
+        :param before: date before which the tokens are to be revoked, pass None to reset
         """
         if isinstance(before, datetime.datetime):
             before = before.isoformat()
