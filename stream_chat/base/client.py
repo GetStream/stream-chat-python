@@ -419,7 +419,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def revoke_tokens(self, since):
         """
-        Revoke tokens for a application issued since
+        Revoke tokens for an application issued since
         """
         pass
 
