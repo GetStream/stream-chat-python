@@ -193,6 +193,15 @@ class TestClient(object):
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.flag_message(msg_id, user_id=server_user["id"])
 
+    def test_query_message_flags(self, client, channel, random_user, server_user):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        client.flag_message(msg_id, user_id=server_user["id"])
+        response = client.query_message_flags({"channel_cid": channel.cid})
+        assert len(response["flags"]) == 1
+        response = client.query_message_flags({"user_id": {"$in": [random_user["id"]]}})
+        assert len(response["flags"]) == 1
+
     def test_unflag_message(self, client, channel, random_user, server_user):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
