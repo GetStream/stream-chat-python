@@ -244,7 +244,9 @@ class TestClient(object):
         await client.flag_message(msg_id, user_id=server_user["id"])
         response = await client.query_message_flags({"channel_cid": channel.cid})
         assert len(response["flags"]) == 1
-        response = await client.query_message_flags({"user_id": {"$in": [random_user["id"]]}})
+        response = await client.query_message_flags(
+            {"user_id": {"$in": [random_user["id"]]}}
+        )
         assert len(response["flags"]) == 1
 
     @pytest.mark.asyncio
