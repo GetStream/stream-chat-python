@@ -248,6 +248,32 @@ class TestClient(object):
             > response["server_side"]["GetRateLimits"]["remaining"]
         )
 
+    def test_search_v2(self, client, channel, random_user):
+        text = str(uuid.uuid4())
+        ids = ["0" + text, "1" + text]
+        channel.send_message(
+            {"text": text, "id": ids[0]},
+            random_user["id"],
+        )
+        channel.send_message(
+            {"text": text, "id": ids[1]},
+            random_user["id"],
+        )
+        response = client.search_v2(
+            {"type": "messaging"}, text, [{"created_at": -1}], **{"limit": 1}
+        )
+        # searches all channels so make sure at least one is found
+        assert len(response["results"]) >= 1
+        assert response["next"] is not None
+        assert ids[1] == response["results"][0]["message"]["id"]
+        response = client.search_v2(
+            {"type": "messaging"}, text, **{"limit": 1, "next": response["next"]}
+        )
+        assert len(response["results"]) >= 1
+        assert response["previous"] is not None
+        assert response["next"] is None
+        assert ids[0] == response["results"][0]["message"]["id"]
+
     def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
