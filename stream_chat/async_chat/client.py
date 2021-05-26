@@ -131,7 +131,10 @@ class StreamChatAsync(StreamChatInterface):
         return await self.post("moderation/unflag", data=data)
 
     async def query_message_flags(self, filter_conditions, **options):
-        params = {"filter_conditions": filter_conditions, **options}
+        params = {
+            **options,
+            "filter_conditions": filter_conditions,
+        }
         return await self.get(
             "moderation/flags/message", params={"payload": json.dumps(params)}
         )
