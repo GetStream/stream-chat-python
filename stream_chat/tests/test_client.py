@@ -252,8 +252,7 @@ class TestClient(object):
     def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
-            {"text": f"How many syllables are there in {query}?"},
-            random_user["id"],
+            {"text": f"How many syllables are there in {query}?"}, random_user["id"],
         )
         channel.send_message(
             {"text": "Does 'cious' count as one or two?"}, random_user["id"]
@@ -303,13 +302,19 @@ class TestClient(object):
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
 
+    @pytest.mark.skip(reason="slow and flaky due to waits")
     def test_custom_permission_and_roles(self, client):
         name, role = "Something restricted", "god"
 
+        def wait():
+            time.sleep(3)
+
         with suppress(Exception):
             client.delete_permission(name)
+            wait()
         with suppress(Exception):
             client.delete_role(role)
+            wait()
 
         custom = {
             "name": name,
@@ -319,7 +324,7 @@ class TestClient(object):
         }
 
         client.create_permission(custom)
-        time.sleep(2)
+        wait()
         response = client.get_permission(name)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
@@ -329,7 +334,7 @@ class TestClient(object):
         custom["owner"] = True
         client.update_permission(name, custom)
 
-        time.sleep(2)
+        wait()
         response = client.get_permission(name)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
@@ -340,12 +345,15 @@ class TestClient(object):
         assert len(response["permissions"]) == 1
         assert response["permissions"][0]["name"] == name
         client.delete_permission(name)
+        wait()
         response = client.list_permissions()
         assert len(response["permissions"]) == 0
 
         client.create_role(role)
+        wait()
         response = client.list_roles()
         assert role in response["roles"]
         client.delete_role(role)
+        wait()
         response = client.list_roles()
         assert role not in response["roles"]
