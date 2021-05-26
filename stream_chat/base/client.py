@@ -116,6 +116,10 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def query_message_flags(self, filter_conditions, **options):
+        pass
+
+    @abc.abstractmethod
     def flag_user(self, target_id, **options):
         pass
 

@@ -234,6 +234,22 @@ class TestClient(object):
         await client.flag_message(msg_id, user_id=server_user["id"])
 
     @pytest.mark.asyncio
+    async def test_query_message_flags(
+        self, event_loop, client, channel, random_user, server_user
+    ):
+        msg_id = str(uuid.uuid4())
+        await channel.send_message(
+            {"id": msg_id, "text": "helloworld"}, random_user["id"]
+        )
+        await client.flag_message(msg_id, user_id=server_user["id"])
+        response = await client.query_message_flags({"channel_cid": channel.cid})
+        assert len(response["flags"]) == 1
+        response = await client.query_message_flags(
+            {"user_id": {"$in": [random_user["id"]]}}
+        )
+        assert len(response["flags"]) == 1
+
+    @pytest.mark.asyncio
     async def test_unflag_message(
         self, event_loop, client, channel, random_user, server_user
     ):
