@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 import requests
+import datetime
 
 from stream_chat.__pkg__ import __version__
 from stream_chat.base.client import StreamChatInterface
@@ -435,3 +436,37 @@ class StreamChat(StreamChatInterface):
         List custom roles of the app
         """
         return self.get("custom_role")
+
+    def revoke_tokens(self, before):
+        """
+        Revokes tokens for an application
+        :param before: date before which the tokens are to be revoked, to reset pass None
+        """
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
+
+        self.update_app_settings({"revoke_tokens_issued_before": before})
+
+    def revoke_user_token(self, user_id, before):
+        """
+        Revokes token for a user
+        :param user_id: user_id of user for which the token needs to be revoked
+        :param before: date before which the tokens are to be revoked, to reset pass None
+        """
+        self.revoke_users_token([user_id], before)
+
+    def revoke_users_token(self, user_ids, before):
+        """
+        Revokes tokens for given users
+        :param user_ids: user_ids for user for whom the token needs to be revoked
+        :param before: date before which the tokens are to be revoked, to reset pass None
+        """
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
+
+        updates = []
+        for user_id in user_ids:
+            updates.append(
+                {"id": user_id, "set": {"revoke_tokens_issued_before": before}}
+            )
+        self.update_users_partial(updates)

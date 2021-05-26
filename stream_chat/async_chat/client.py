@@ -1,4 +1,5 @@
 import json
+import datetime
 from types import TracebackType
 from typing import Optional, Type
 from urllib.parse import urlparse
@@ -447,6 +448,40 @@ class StreamChatAsync(StreamChatInterface):
         List custom roles of the app
         """
         return await self.get("custom_role")
+
+    async def revoke_tokens(self, before):
+        """
+        Revokes tokens for an application
+        :param before: date before which the tokens are to be revoked, pass None to reset
+        """
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
+
+        await self.update_app_settings({"revoke_tokens_issued_before": before})
+
+    async def revoke_user_token(self, user_id, before):
+        """
+        Revokes token for a user
+        :param user_id: user_id of user for which the token needs to be revoked
+        :param before: date before which the tokens are to be revoked, , pass None to reset
+        """
+        await self.revoke_users_token([user_id], before)
+
+    async def revoke_users_token(self, user_ids, before):
+        """
+        Revokes tokens for given users
+        :param user_ids: user_ids for user for whom the token needs to be revoked
+        :param before: date before which the tokens are to be revoked, pass None to reset
+        """
+        if isinstance(before, datetime.datetime):
+            before = before.isoformat()
+
+        updates = []
+        for user_id in user_ids:
+            updates.append(
+                {"id": user_id, "set": {"revoke_tokens_issued_before": before}}
+            )
+        await self.update_users_partial(updates)
 
     async def close(self):
         await self.session.close()
