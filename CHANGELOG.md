@@ -1,3 +1,10 @@
+## May 26, 2021 - 3.8.0
+
+- Add query_message_flags endpoint support
+- Add token revoke support
+- Run CI sequentially for different Python versions
+- Drop codecov
+
 ## March 10, 2021 - 3.7.0
 
 - Add get_rate_limits endpoint support
