@@ -1,8 +1,10 @@
 import sys
+from contextlib import suppress
 from operator import itemgetter
 
 import jwt
 import pytest
+import time
 import uuid
 from stream_chat.async_chat import StreamChatAsync
 from stream_chat.base.exceptions import StreamAPIException
@@ -364,14 +366,19 @@ class TestClient(object):
         assert "invalid SQS url" in response["error"]
 
     @pytest.mark.asyncio
+    @pytest.mark.skip(reason="slow and flaky due to waits")
     async def test_custom_permission_and_roles(self, client):
         name, role = "Something restricted", "god"
 
-        try:
-            client.delete_permission(name)
-            client.delete_role(role)
-        except:  # noqa
-            pass
+        def wait():
+            time.sleep(3)
+
+        with suppress(Exception):
+            await client.delete_permission(name)
+            wait()
+        with suppress(Exception):
+            await client.delete_role(role)
+            wait()
 
         custom = {
             "name": name,
@@ -381,8 +388,8 @@ class TestClient(object):
         }
 
         await client.create_permission(custom)
+        wait()
         response = await client.get_permission(name)
-        print(response)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
         assert not response["permission"]["owner"]
@@ -391,8 +398,8 @@ class TestClient(object):
         custom["owner"] = True
         await client.update_permission(name, custom)
 
+        wait()
         response = await client.get_permission(name)
-        print(response)
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
         assert response["permission"]["owner"]
@@ -402,12 +409,15 @@ class TestClient(object):
         assert len(response["permissions"]) == 1
         assert response["permissions"][0]["name"] == name
         await client.delete_permission(name)
+        wait()
         response = await client.list_permissions()
         assert len(response["permissions"]) == 0
 
         await client.create_role(role)
+        wait()
         response = await client.list_roles()
         assert role in response["roles"]
         await client.delete_role(role)
+        wait()
         response = await client.list_roles()
         assert role not in response["roles"]
