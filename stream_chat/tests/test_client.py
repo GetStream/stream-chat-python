@@ -252,7 +252,8 @@ class TestClient(object):
     def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
-            {"text": f"How many syllables are there in {query}?"}, random_user["id"],
+            {"text": f"How many syllables are there in {query}?"},
+            random_user["id"],
         )
         channel.send_message(
             {"text": "Does 'cious' count as one or two?"}, random_user["id"]
