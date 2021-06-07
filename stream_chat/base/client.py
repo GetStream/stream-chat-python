@@ -279,18 +279,6 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def search_v2(self, filter_conditions, query, sort, **options):
-        """
-        Search for a message
-
-        :param filter_conditions: filter conditions for a channel.
-        :param query: filter conditions for a message, either a string or mongo-style filters.
-        :param sort: list of sort options.
-        :param options: additional pagination options.
-        """
-        pass
-
-    @abc.abstractmethod
     def send_file(self, uri, url, name, user, content_type=None):
         pass
 

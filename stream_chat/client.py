@@ -298,15 +298,6 @@ class StreamChat(StreamChatInterface):
         params = {**options, "filter_conditions": filter_conditions, "query": query}
         return self.get("search", params={"payload": json.dumps(params)})
 
-    def search_v2(self, filter_conditions, query, sort, **options):
-        params = {
-            **options,
-            "filter_conditions": filter_conditions,
-            "query": query,
-            "sort": sort,
-        }
-        return self.get("search/v2", params={"payload": json.dumps(params)})
-
     def send_file(self, uri, url, name, user, content_type=None):
         headers = {
             "Authorization": self.auth_token,
