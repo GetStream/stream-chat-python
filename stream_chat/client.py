@@ -295,22 +295,17 @@ class StreamChat(StreamChatInterface):
         return self.get("rate_limits", params)
 
     def search(self, filter_conditions, query, sort=None, **options):
-        if "message_filter_conditions" in options and query:
-            raise ValueError(
-                "can only specify one of message_filter_conditions and query, not both"
-            )
-        if "message_filter_conditions" not in options and not query:
-            raise ValueError("must specify one of message_filter_conditions and query")
         if "offset" in options:
             if sort or "next" in options:
                 raise ValueError("cannot use offset with sort or next parameters")
         params = options.copy()
+        if isinstance(query, str):
+            params.update({"query": query})
+        else:
+            params.update({"message_filter_conditions": query})
         params.update(
             {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
         )
-        if query:
-            params.update({"query": query})
-
         return self.get("search", params={"payload": json.dumps(params)})
 
     def send_file(self, uri, url, name, user, content_type=None):

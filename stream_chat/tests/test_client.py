@@ -306,32 +306,14 @@ class TestClient(object):
         )
         response = client.search(
             {"type": "messaging"},
-            None,
+            {"text": {"$q": query}},
             **{
                 "limit": 2,
                 "offset": 0,
-                "message_filter_conditions": {"text": {"$q": query}},
             },
         )
         assert len(response["results"]) >= 1
         assert query in response["results"][0]["message"]["text"]
-
-    def test_search_query_and_message_filters(self, client):
-        query = "supercalifragilisticexpialidocious"
-        with pytest.raises(ValueError):
-            client.search(
-                {"type": "messaging"},
-                query,
-                **{
-                    "limit": 2,
-                    "offset": 0,
-                    "message_filter_conditions": {"text": {"$q": query}},
-                },
-            )
-
-    def test_search_no_query_or_message_filters(self, client):
-        with pytest.raises(ValueError):
-            client.search({"type": "messaging"}, None, **{"limit": 2, "offset": 0})
 
     def test_search_offset_with_sort(self, client):
         query = "supercalifragilisticexpialidocious"
