@@ -38,10 +38,12 @@ class StreamChatInterface(abc.ABC):
                         sort_fields.append({"field": k, "direction": v})
         return sort_fields
 
-    def create_token(self, user_id, exp=None, **claims):
+    def create_token(self, user_id, exp=None, iat=None, **claims):
         payload = {**claims, "user_id": user_id}
         if exp is not None:
             payload["exp"] = exp
+        if iat is not None:
+            payload["iat"] = iat
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
 
     def create_search_params(self, filter_conditions, query, sort, **options):
@@ -122,6 +124,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def unflag_message(self, target_id, **options):
+        pass
+
+    @abc.abstractmethod
+    def query_message_flags(self, filter_conditions, **options):
         pass
 
     @abc.abstractmethod
@@ -422,5 +428,26 @@ class StreamChatInterface(abc.ABC):
     def list_roles(self):
         """
         List custom roles of the app
+        """
+        pass
+
+    @abc.abstractmethod
+    def revoke_tokens(self, since):
+        """
+        Revoke tokens for an application issued since
+        """
+        pass
+
+    @abc.abstractmethod
+    def revoke_user_token(self, user_id, since):
+        """
+        Revoke tokens for a user issued since
+        """
+        pass
+
+    @abc.abstractmethod
+    def revoke_users_token(self, user_ids, since):
+        """
+        Revoke tokens for users issued since
         """
         pass
