@@ -303,14 +303,7 @@ class StreamChatAsync(StreamChatInterface):
         if "offset" in options:
             if sort or "next" in options:
                 raise ValueError("cannot use offset with sort or next parameters")
-        params = options.copy()
-        if isinstance(query, str):
-            params.update({"query": query})
-        else:
-            params.update({"message_filter_conditions": query})
-        params.update(
-            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
-        )
+        params = self.create_search_params(filter_conditions, query, sort, **options)
         return await self.get("search", params={"payload": json.dumps(params)})
 
     async def send_file(self, uri, url, name, user, content_type=None):
