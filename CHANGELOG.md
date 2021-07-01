@@ -1,3 +1,7 @@
+## Jul 1, 2021 - 3.9.0
+
+- Add support for search improvements (i.e. next, prev, sorting, more filters)
+
 ## May 26, 2021 - 3.8.0
 
 - Add query_message_flags endpoint support
