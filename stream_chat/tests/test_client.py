@@ -10,7 +10,6 @@ from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
 
 
-@pytest.mark.incremental
 class TestClient(object):
     def test_normalize_sort(self, client):
         expected = [
@@ -258,6 +257,33 @@ class TestClient(object):
             > response["server_side"]["GetRateLimits"]["remaining"]
         )
 
+    @pytest.mark.xfail
+    def test_search_with_sort(self, client, channel, random_user):
+        text = str(uuid.uuid4())
+        ids = ["0" + text, "1" + text]
+        channel.send_message(
+            {"text": text, "id": ids[0]},
+            random_user["id"],
+        )
+        channel.send_message(
+            {"text": text, "id": ids[1]},
+            random_user["id"],
+        )
+        response = client.search(
+            {"type": "messaging"}, text, **{"limit": 1, "sort": [{"created_at": -1}]}
+        )
+        # searches all channels so make sure at least one is found
+        assert len(response["results"]) >= 1
+        assert response["next"] is not None
+        assert ids[1] == response["results"][0]["message"]["id"]
+        response = client.search(
+            {"type": "messaging"}, text, **{"limit": 1, "next": response["next"]}
+        )
+        assert len(response["results"]) >= 1
+        assert response["previous"] is not None
+        assert response["next"] is None
+        assert ids[0] == response["results"][0]["message"]["id"]
+
     def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
@@ -278,6 +304,42 @@ class TestClient(object):
         )
         for message in response["results"]:
             assert query not in message["message"]["text"]
+
+    def test_search_message_filters(self, client, channel, random_user):
+        query = "supercalifragilisticexpialidocious"
+        channel.send_message(
+            {"text": f"How many syllables are there in {query}?"},
+            random_user["id"],
+        )
+        channel.send_message(
+            {"text": "Does 'cious' count as one or two?"}, random_user["id"]
+        )
+        response = client.search(
+            {"type": "messaging"},
+            {"text": {"$q": query}},
+            **{
+                "limit": 2,
+                "offset": 0,
+            },
+        )
+        assert len(response["results"]) >= 1
+        assert query in response["results"][0]["message"]["text"]
+
+    def test_search_offset_with_sort(self, client):
+        query = "supercalifragilisticexpialidocious"
+        with pytest.raises(ValueError):
+            client.search(
+                {"type": "messaging"},
+                query,
+                **{"limit": 2, "offset": 1, "sort": [{"created_at": -1}]},
+            )
+
+    def test_search_offset_with_next(self, client):
+        query = "supercalifragilisticexpialidocious"
+        with pytest.raises(ValueError):
+            client.search(
+                {"type": "messaging"}, query, **{"limit": 2, "offset": 1, "next": query}
+            )
 
     def test_query_channels_members_in(self, client, fellowship_of_the_ring):
         response = client.query_channels({"members": {"$in": ["gimli"]}}, {"id": 1})

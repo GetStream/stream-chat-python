@@ -10,7 +10,6 @@ from stream_chat.async_chat import StreamChatAsync
 from stream_chat.base.exceptions import StreamAPIException
 
 
-@pytest.mark.incremental
 class TestClient(object):
     def test_normalize_sort(self, client):
         expected = [
@@ -315,8 +314,36 @@ class TestClient(object):
             > response["server_side"]["GetRateLimits"]["remaining"]
         )
 
+    @pytest.mark.xfail
     @pytest.mark.asyncio
-    async def test_search(self, event_loop, client, channel, random_user):
+    async def test_search_with_sort(self, client, channel, random_user):
+        text = str(uuid.uuid4())
+        ids = ["0" + text, "1" + text]
+        await channel.send_message(
+            {"text": text, "id": ids[0]},
+            random_user["id"],
+        )
+        await channel.send_message(
+            {"text": text, "id": ids[1]},
+            random_user["id"],
+        )
+        response = await client.search(
+            {"type": "messaging"}, text, **{"limit": 1, "sort": [{"created_at": -1}]}
+        )
+        # searches all channels so make sure at least one is found
+        assert len(response["results"]) >= 1
+        assert response["next"] is not None
+        assert ids[1] == response["results"][0]["message"]["id"]
+        response = await client.search(
+            {"type": "messaging"}, text, **{"limit": 1, "next": response["next"]}
+        )
+        assert len(response["results"]) >= 1
+        assert response["previous"] is not None
+        assert response["next"] is None
+        assert ids[0] == response["results"][0]["message"]["id"]
+
+    @pytest.mark.asyncio
+    async def test_search(self, client, channel, random_user):
         query = "supercalifragilisticexpialidocious"
         await channel.send_message(
             {"text": f"How many syllables are there in {query}?"},
@@ -336,6 +363,45 @@ class TestClient(object):
         )
         for message in response["results"]:
             assert query not in message["message"]["text"]
+
+    @pytest.mark.asyncio
+    async def test_search_message_filters(self, client, channel, random_user):
+        query = "supercalifragilisticexpialidocious"
+        await channel.send_message(
+            {"text": f"How many syllables are there in {query}?"},
+            random_user["id"],
+        )
+        await channel.send_message(
+            {"text": "Does 'cious' count as one or two?"}, random_user["id"]
+        )
+        response = await client.search(
+            {"type": "messaging"},
+            {"text": {"$q": query}},
+            **{
+                "limit": 2,
+                "offset": 0,
+            },
+        )
+        assert len(response["results"]) >= 1
+        assert query in response["results"][0]["message"]["text"]
+
+    @pytest.mark.asyncio
+    async def test_search_offset_with_sort(self, client):
+        query = "supercalifragilisticexpialidocious"
+        with pytest.raises(ValueError):
+            await client.search(
+                {"type": "messaging"},
+                query,
+                **{"limit": 2, "offset": 1, "sort": [{"created_at": -1}]},
+            )
+
+    @pytest.mark.asyncio
+    async def test_search_offset_with_next(self, client):
+        query = "supercalifragilisticexpialidocious"
+        with pytest.raises(ValueError):
+            await client.search(
+                {"type": "messaging"}, query, **{"limit": 2, "offset": 1, "next": query}
+            )
 
     @pytest.mark.asyncio
     async def test_query_channels_members_in(

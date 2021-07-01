@@ -309,8 +309,11 @@ class StreamChatAsync(StreamChatInterface):
 
         return await self.get("rate_limits", params)
 
-    async def search(self, filter_conditions, query, **options):
-        params = {**options, "filter_conditions": filter_conditions, "query": query}
+    async def search(self, filter_conditions, query, sort=None, **options):
+        if "offset" in options:
+            if sort or "next" in options:
+                raise ValueError("cannot use offset with sort or next parameters")
+        params = self.create_search_params(filter_conditions, query, sort, **options)
         return await self.get("search", params={"payload": json.dumps(params)})
 
     async def send_file(self, uri, url, name, user, content_type=None):

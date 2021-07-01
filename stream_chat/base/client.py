@@ -46,6 +46,17 @@ class StreamChatInterface(abc.ABC):
             payload["iat"] = iat
         return jwt.encode(payload, self.api_secret, algorithm="HS256")
 
+    def create_search_params(self, filter_conditions, query, sort, **options):
+        params = options.copy()
+        if isinstance(query, str):
+            params.update({"query": query})
+        else:
+            params.update({"message_filter_conditions": query})
+        params.update(
+            {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
+        )
+        return params
+
     def verify_webhook(self, request_body, x_signature):
         """
         Verify the signature added to a webhook event
