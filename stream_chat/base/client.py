@@ -432,6 +432,104 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def create_segment(self, segment):
+        """
+        Create a segment
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_segment(self, segment_id):
+        """
+        Get a segment by id
+        """
+        pass
+
+    @abc.abstractmethod
+    def list_segments(self, **params):
+        """
+        List segments
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_segment(self, segment_id, data):
+        """
+        Update a segment by id
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_segment(self, segment_id):
+        """
+        Delete a segment by id
+        """
+        pass
+
+    @abc.abstractmethod
+    def create_campaign(self, campaign):
+        """
+        Create a campaign
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_campaign(self, campaign_id):
+        """
+        Get a campaign by id
+        """
+        pass
+
+    @abc.abstractmethod
+    def list_campaigns(self, **params):
+        """
+        List campaigns
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_campaign(self, campaign_id, data):
+        """
+        Update a campaign
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_campaign(self, campaign_id):
+        """
+        Delete a campaign by id
+        """
+        pass
+
+    @abc.abstractmethod
+    def schedule_campaign(self, campaign_id, send_at):
+        """
+        Schedule a campaign at given time
+        """
+        pass
+
+    @abc.abstractmethod
+    async def stop_campaign(self, campaign_id):
+        """
+        Stop a in progress campaign
+        """
+        pass
+
+    @abc.abstractmethod
+    def resume_campaign(self, campaign_id):
+        """
+        Resume a stopped campaign
+        """
+        pass
+
+    @abc.abstractmethod
+    def test_campaign(self, campaign_id, users):
+        """
+        Trigger a test send of the given campaing to given users
+        """
+        pass
+
+    @abc.abstractmethod
     def revoke_tokens(self, since):
         """
         Revoke tokens for an application issued since
