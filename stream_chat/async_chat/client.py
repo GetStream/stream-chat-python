@@ -465,7 +465,7 @@ class StreamChatAsync(StreamChatInterface):
         """
         Create a segment
         """
-        return await self.post(f"segments", data={"segment": segment})
+        return await self.post("segments", data={"segment": segment})
 
     async def get_segment(self, segment_id):
         """
@@ -477,7 +477,7 @@ class StreamChatAsync(StreamChatInterface):
         """
         List segments
         """
-        return await self.get(f"segments", params)
+        return await self.get("segments", params)
 
     async def update_segment(self, segment_id, data):
         """

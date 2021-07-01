@@ -453,7 +453,7 @@ class StreamChat(StreamChatInterface):
         """
         Create a segment
         """
-        return self.post(f"segments", data={"segment": segment})
+        return self.post("segments", data={"segment": segment})
 
     def get_segment(self, segment_id):
         """
@@ -465,7 +465,7 @@ class StreamChat(StreamChatInterface):
         """
         List segments
         """
-        return self.get(f"segments", params)
+        return self.get("segments", params)
 
     def update_segment(self, segment_id, data):
         """
