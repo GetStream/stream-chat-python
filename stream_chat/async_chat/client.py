@@ -461,6 +461,92 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.get("custom_role")
 
+    async def create_segment(self, segment):
+        """
+        Create a segment
+        """
+        return await self.post("segments", data={"segment": segment})
+
+    async def get_segment(self, segment_id):
+        """
+        Get a segment by id
+        """
+        return await self.get(f"segments/{segment_id}")
+
+    async def list_segments(self, **params):
+        """
+        List segments
+        """
+        return await self.get("segments", params)
+
+    async def update_segment(self, segment_id, data):
+        """
+        Update a segment by id
+        """
+        return await self.put(f"segments/{segment_id}", data={"segment": data})
+
+    async def delete_segment(self, segment_id):
+        """
+        Delete a segment by id
+        """
+        return await self.delete(f"segments/{segment_id}")
+
+    async def create_campaign(self, campaign):
+        """
+        Create a campaign
+        """
+        return await self.post("campaigns", data={"campaign": campaign})
+
+    async def get_campaign(self, campaign_id):
+        """
+        Get a campaign by id
+        """
+        return await self.get(f"campaigns/{campaign_id}")
+
+    async def list_campaigns(self, **params):
+        """
+        List campaigns
+        """
+        return await self.get("campaigns/", params)
+
+    async def update_campaign(self, campaign_id, data):
+        """
+        Update a campaign
+        """
+        return await self.put(f"campaigns/{campaign_id}", data={"campaign": data})
+
+    async def delete_campaign(self, campaign_id):
+        """
+        Delete a campaign by id
+        """
+        return await self.delete(f"campaigns/{campaign_id}")
+
+    async def schedule_campaign(self, campaign_id, send_at):
+        """
+        Schedule a campaign at given time
+        """
+        return await self.patch(
+            f"campaigns/{campaign_id}/schedule", data={"send_at": send_at}
+        )
+
+    async def stop_campaign(self, campaign_id):
+        """
+        Stop a in progress campaign
+        """
+        return await self.patch(f"campaigns/{campaign_id}/stop")
+
+    async def resume_campaign(self, campaign_id):
+        """
+        Resume a stopped campaign
+        """
+        return await self.patch(f"campaigns/{campaign_id}/resume")
+
+    async def test_campaign(self, campaign_id, users):
+        """
+        Trigger a test send of the given campaing to given users
+        """
+        return await self.post(f"campaigns/{campaign_id}/test", data={"users": users})
+
     async def revoke_tokens(self, before):
         """
         Revokes tokens for an application

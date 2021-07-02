@@ -449,6 +449,92 @@ class StreamChat(StreamChatInterface):
         """
         return self.get("custom_role")
 
+    def create_segment(self, segment):
+        """
+        Create a segment
+        """
+        return self.post("segments", data={"segment": segment})
+
+    def get_segment(self, segment_id):
+        """
+        Get a segment by id
+        """
+        return self.get(f"segments/{segment_id}")
+
+    def list_segments(self, **params):
+        """
+        List segments
+        """
+        return self.get("segments", params)
+
+    def update_segment(self, segment_id, data):
+        """
+        Update a segment by id
+        """
+        return self.put(f"segments/{segment_id}", data={"segment": data})
+
+    def delete_segment(self, segment_id):
+        """
+        Delete a segment by id
+        """
+        return self.delete(f"segments/{segment_id}")
+
+    def create_campaign(self, campaign):
+        """
+        Create a campaign
+        """
+        return self.post("campaigns", data={"campaign": campaign})
+
+    def get_campaign(self, campaign_id):
+        """
+        Get a campaign by id
+        """
+        return self.get(f"campaigns/{campaign_id}")
+
+    def list_campaigns(self, **params):
+        """
+        List campaigns
+        """
+        return self.get("campaigns/", params)
+
+    def update_campaign(self, campaign_id, data):
+        """
+        Update a campaign
+        """
+        return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
+
+    def delete_campaign(self, campaign_id):
+        """
+        Delete a campaign by id
+        """
+        return self.delete(f"campaigns/{campaign_id}")
+
+    def schedule_campaign(self, campaign_id, send_at):
+        """
+        Schedule a campaign at given time
+        """
+        return self.patch(
+            f"campaigns/{campaign_id}/schedule", data={"send_at": send_at}
+        )
+
+    def stop_campaign(self, campaign_id):
+        """
+        Stop a in progress campaign
+        """
+        return self.patch(f"campaigns/{campaign_id}/stop")
+
+    def resume_campaign(self, campaign_id):
+        """
+        Resume a stopped campaign
+        """
+        return self.patch(f"campaigns/{campaign_id}/resume")
+
+    def test_campaign(self, campaign_id, users):
+        """
+        Trigger a test send of the given campaing to given users
+        """
+        return self.post(f"campaigns/{campaign_id}/test", data={"users": users})
+
     def revoke_tokens(self, before):
         """
         Revokes tokens for an application

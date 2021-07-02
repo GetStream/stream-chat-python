@@ -33,6 +33,7 @@ pip install stream-chat
 - User devices
 - User search
 - Channel search
+- Campaign API (alpha - susceptible changes and even won't be available in some regions yet)
 
 ### Quickstart
 
