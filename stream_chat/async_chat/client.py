@@ -521,7 +521,7 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.delete(f"campaigns/{campaign_id}")
 
-    async def schedule_campaign(self, campaign_id, send_at):
+    async def schedule_campaign(self, campaign_id, send_at=None):
         """
         Schedule a campaign at given time
         """
