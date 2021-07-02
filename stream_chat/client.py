@@ -509,7 +509,7 @@ class StreamChat(StreamChatInterface):
         """
         return self.delete(f"campaigns/{campaign_id}")
 
-    def schedule_campaign(self, campaign_id, send_at):
+    def schedule_campaign(self, campaign_id, send_at=None):
         """
         Schedule a campaign at given time
         """
