@@ -388,13 +388,13 @@ class StreamChat(StreamChatInterface):
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return self.post("check_sqs", data=data)
 
-    def get_permission(self, name):
+    def get_permission(self, id):
         """
         Get the definition for a permission
 
-        :param name: Name of the permission
+        :param id: ID of the permission
         """
-        return self.get(f"custom_permission/{name}")
+        return self.get(f"permissions/{id}")
 
     def create_permission(self, permission):
         """
@@ -402,30 +402,30 @@ class StreamChat(StreamChatInterface):
 
         :param permission: Definition of the permission
         """
-        return self.post("custom_permission", data=permission)
+        return self.post("permissions", data=permission)
 
-    def update_permission(self, name, permission):
+    def update_permission(self, id, permission):
         """
         Update a custom permission
 
-        :param name: Name of the permission
+        :param id: ID of the permission
         :param permission: New definition of the permission
         """
-        return self.post(f"custom_permission/{name}", data=permission)
+        return self.put(f"permissions/{id}", data=permission)
 
-    def delete_permission(self, name):
+    def delete_permission(self, id):
         """
         Delete a custom permission
 
-        :param name: Name of the permission
+        :param id: ID of the permission
         """
-        return self.delete(f"custom_permission/{name}")
+        return self.delete(f"permissions/{id}")
 
     def list_permissions(self):
         """
         List custom permissions of the app
         """
-        return self.get("custom_permission")
+        return self.get("permissions")
 
     def create_role(self, name):
         """
@@ -433,7 +433,7 @@ class StreamChat(StreamChatInterface):
 
         :param name: Name of the role
         """
-        return self.post("custom_role", data={"name": name})
+        return self.post("roles", data={"name": name})
 
     def delete_role(self, name):
         """
@@ -441,13 +441,13 @@ class StreamChat(StreamChatInterface):
 
         :param name: Name of the role
         """
-        return self.delete(f"custom_role/{name}")
+        return self.delete(f"roles/{name}")
 
     def list_roles(self):
         """
-        List custom roles of the app
+        List all roles of the app
         """
-        return self.get("custom_role")
+        return self.get("roles")
 
     def create_segment(self, segment):
         """

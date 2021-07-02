@@ -376,20 +376,21 @@ class TestClient(object):
 
     @pytest.mark.skip(reason="slow and flaky due to waits")
     def test_custom_permission_and_roles(self, client):
-        name, role = "Something restricted", "god"
+        id, role = "my-custom-permission", "god"
 
         def wait():
             time.sleep(3)
 
         with suppress(Exception):
-            client.delete_permission(name)
+            client.delete_permission(id)
             wait()
         with suppress(Exception):
             client.delete_role(role)
             wait()
 
         custom = {
-            "name": name,
+            "id": id,
+            "name": "My Custom Permission",
             "action": "DeleteChannel",
             "owner": False,
             "same_team": True,
@@ -397,26 +398,26 @@ class TestClient(object):
 
         client.create_permission(custom)
         wait()
-        response = client.get_permission(name)
-        assert response["permission"]["name"] == name
+        response = client.get_permission(id)
+        assert response["permission"]["id"] == id
         assert response["permission"]["custom"]
         assert not response["permission"]["owner"]
         assert response["permission"]["action"] == custom["action"]
 
         custom["owner"] = True
-        client.update_permission(name, custom)
+        client.update_permission(id, custom)
 
         wait()
-        response = client.get_permission(name)
-        assert response["permission"]["name"] == name
+        response = client.get_permission(id)
+        assert response["permission"]["id"] == id
         assert response["permission"]["custom"]
         assert response["permission"]["owner"]
         assert response["permission"]["action"] == custom["action"]
 
         response = client.list_permissions()
         original_len = len(response["permissions"])
-        assert response["permissions"][0]["name"] == name
-        client.delete_permission(name)
+        assert response["permissions"][0]["id"] == id
+        client.delete_permission(id)
         wait()
         response = client.list_permissions()
         assert len(response["permissions"]) == original_len - 1
