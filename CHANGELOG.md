@@ -1,3 +1,7 @@
+## Jul 2, 2021 - 3.10.0
+
+- Add support for campaign API (early alpha, can change)
+
 ## Jul 1, 2021 - 3.9.0
 
 - Add support for search improvements (i.e. next, prev, sorting, more filters)
