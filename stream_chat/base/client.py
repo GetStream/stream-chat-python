@@ -402,7 +402,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def list_permissions(self):
         """
-        List custom permissions of the app
+        List all permissions of the app
         """
         pass
 
@@ -427,7 +427,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def list_roles(self):
         """
-        List custom roles of the app
+        List all roles of the app
         """
         pass
 

@@ -406,7 +406,7 @@ class StreamChatAsync(StreamChatInterface):
 
         :param name: Name of the permission
         """
-        return await self.get(f"custom_permission/{name}")
+        return await self.get(f"permissions/{name}")
 
     async def create_permission(self, permission):
         """
@@ -414,7 +414,7 @@ class StreamChatAsync(StreamChatInterface):
 
         :param permission: Definition of the permission
         """
-        return await self.post("custom_permission", data=permission)
+        return await self.post("permissions", data=permission)
 
     async def update_permission(self, name, permission):
         """
@@ -423,7 +423,7 @@ class StreamChatAsync(StreamChatInterface):
         :param name: Name of the permission
         :param permission: New definition of the permission
         """
-        return await self.post(f"custom_permission/{name}", data=permission)
+        return await self.put(f"permissions/{name}", data=permission)
 
     async def delete_permission(self, name):
         """
@@ -431,13 +431,13 @@ class StreamChatAsync(StreamChatInterface):
 
         :param name: Name of the permission
         """
-        return await self.delete(f"custom_permission/{name}")
+        return await self.delete(f"permissions/{name}")
 
     async def list_permissions(self):
         """
-        List custom permissions of the app
+        List all permissions of the app
         """
-        return await self.get("custom_permission")
+        return await self.get("permissions")
 
     async def create_role(self, name):
         """
@@ -445,7 +445,7 @@ class StreamChatAsync(StreamChatInterface):
 
         :param name: Name of the role
         """
-        return await self.post("custom_role", data={"name": name})
+        return await self.post("roles", data={"name": name})
 
     async def delete_role(self, name):
         """
@@ -453,13 +453,13 @@ class StreamChatAsync(StreamChatInterface):
 
         :param name: Name of the role
         """
-        return await self.delete(f"custom_role/{name}")
+        return await self.delete(f"roles/{name}")
 
     async def list_roles(self):
         """
-        List custom roles of the app
+        List all roles of the app
         """
-        return await self.get("custom_role")
+        return await self.get("roles")
 
     async def create_segment(self, segment):
         """

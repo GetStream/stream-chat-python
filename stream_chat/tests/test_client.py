@@ -390,7 +390,7 @@ class TestClient(object):
 
         custom = {
             "name": name,
-            "resource": "DeleteChannel",
+            "action": "DeleteChannel",
             "owner": False,
             "same_team": True,
         }
@@ -401,7 +401,7 @@ class TestClient(object):
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
         assert not response["permission"]["owner"]
-        assert response["permission"]["resource"] == custom["resource"]
+        assert response["permission"]["action"] == custom["action"]
 
         custom["owner"] = True
         client.update_permission(name, custom)
@@ -411,15 +411,15 @@ class TestClient(object):
         assert response["permission"]["name"] == name
         assert response["permission"]["custom"]
         assert response["permission"]["owner"]
-        assert response["permission"]["resource"] == custom["resource"]
+        assert response["permission"]["action"] == custom["action"]
 
         response = client.list_permissions()
-        assert len(response["permissions"]) == 1
+        original_len = len(response["permissions"])
         assert response["permissions"][0]["name"] == name
         client.delete_permission(name)
         wait()
         response = client.list_permissions()
-        assert len(response["permissions"]) == 0
+        assert len(response["permissions"]) == original_len - 1
 
         client.create_role(role)
         wait()
