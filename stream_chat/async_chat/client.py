@@ -400,13 +400,13 @@ class StreamChatAsync(StreamChatInterface):
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return await self.post("check_sqs", data=data)
 
-    async def get_permission(self, name):
+    async def get_permission(self, id):
         """
         Get the definition for a permission
 
-        :param name: Name of the permission
+        :param id: ID of the permission
         """
-        return await self.get(f"permissions/{name}")
+        return await self.get(f"permissions/{id}")
 
     async def create_permission(self, permission):
         """
@@ -416,22 +416,22 @@ class StreamChatAsync(StreamChatInterface):
         """
         return await self.post("permissions", data=permission)
 
-    async def update_permission(self, name, permission):
+    async def update_permission(self, id, permission):
         """
         Update a custom permission
 
-        :param name: Name of the permission
+        :param id: ID of the permission
         :param permission: New definition of the permission
         """
-        return await self.put(f"permissions/{name}", data=permission)
+        return await self.put(f"permissions/{id}", data=permission)
 
-    async def delete_permission(self, name):
+    async def delete_permission(self, id):
         """
         Delete a custom permission
 
-        :param name: Name of the permission
+        :param id: ID of the permission
         """
-        return await self.delete(f"permissions/{name}")
+        return await self.delete(f"permissions/{id}")
 
     async def list_permissions(self):
         """

@@ -450,50 +450,51 @@ class TestClient(object):
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="slow and flaky due to waits")
     async def test_custom_permission_and_roles(self, client):
-        name, role = "Something restricted", "god"
+        id, role = "my-custom-permission", "god"
 
         def wait():
             time.sleep(3)
 
         with suppress(Exception):
-            await client.delete_permission(name)
+            await client.delete_permission(id)
             wait()
         with suppress(Exception):
             await client.delete_role(role)
             wait()
 
         custom = {
-            "name": name,
-            "resource": "DeleteChannel",
+            "id": id,
+            "name": "My Custom Permission",
+            "action": "DeleteChannel",
             "owner": False,
             "same_team": True,
         }
 
         await client.create_permission(custom)
         wait()
-        response = await client.get_permission(name)
-        assert response["permission"]["name"] == name
+        response = await client.get_permission(id)
+        assert response["permission"]["id"] == id
         assert response["permission"]["custom"]
         assert not response["permission"]["owner"]
-        assert response["permission"]["resource"] == custom["resource"]
+        assert response["permission"]["action"] == custom["action"]
 
         custom["owner"] = True
-        await client.update_permission(name, custom)
+        await client.update_permission(id, custom)
 
         wait()
-        response = await client.get_permission(name)
-        assert response["permission"]["name"] == name
+        response = await client.get_permission(id)
+        assert response["permission"]["id"] == id
         assert response["permission"]["custom"]
         assert response["permission"]["owner"]
-        assert response["permission"]["resource"] == custom["resource"]
+        assert response["permission"]["action"] == custom["action"]
 
         response = await client.list_permissions()
-        assert len(response["permissions"]) == 1
-        assert response["permissions"][0]["name"] == name
-        await client.delete_permission(name)
+        original_len = len(response["permissions"])
+        assert response["permissions"][0]["id"] == id
+        await client.delete_permission(id)
         wait()
         response = await client.list_permissions()
-        assert len(response["permissions"]) == 0
+        assert len(response["permissions"]) == original_len - 1
 
         await client.create_role(role)
         wait()
