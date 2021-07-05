@@ -1,3 +1,7 @@
+## Jul 5, 2021 - 3.11.0
+
+- Update existing permission related API (/roles and /permissions endpoints) 
+
 ## Jul 2, 2021 - 3.10.0
 
 - Add support for campaign API (early alpha, can change)
