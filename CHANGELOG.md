@@ -1,6 +1,10 @@
+## Aug 19, 2021 - 3.11.1
+
+- Fix base path for listing campaigns
+
 ## Jul 5, 2021 - 3.11.0
 
-- Update existing permission related API (/roles and /permissions endpoints) 
+- Update existing permission related API (/roles and /permissions endpoints)
 
 ## Jul 2, 2021 - 3.10.0
 
