@@ -495,7 +495,7 @@ class StreamChat(StreamChatInterface):
         """
         List campaigns
         """
-        return self.get("campaigns/", params)
+        return self.get("campaigns", params)
 
     def update_campaign(self, campaign_id, data):
         """
