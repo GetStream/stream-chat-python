@@ -1,3 +1,8 @@
+## Aug 20, 2021 - 3.11.2
+
+- Set base url to edge, there is no need to set a region anymore.
+- Fix file uploads from a local file.
+
 ## Aug 19, 2021 - 3.11.1
 
 - Fix base path for listing campaigns
