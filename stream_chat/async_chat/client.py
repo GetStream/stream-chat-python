@@ -507,7 +507,7 @@ class StreamChatAsync(StreamChatInterface):
         """
         List campaigns
         """
-        return await self.get("campaigns/", params)
+        return await self.get("campaigns", params)
 
     async def update_campaign(self, campaign_id, data):
         """

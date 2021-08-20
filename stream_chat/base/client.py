@@ -15,9 +15,7 @@ class StreamChatInterface(abc.ABC):
         self.api_secret = api_secret
         self.timeout = timeout
         self.options = options
-        self.base_url = options.get(
-            "base_url", "https://chat-us-east-1.stream-io-api.com"
-        )
+        self.base_url = options.get("base_url", "https://chat.stream-io-api.com")
         self.auth_token = jwt.encode(
             {"server": True}, self.api_secret, algorithm="HS256"
         )
