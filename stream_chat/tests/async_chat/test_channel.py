@@ -175,18 +175,18 @@ class TestChannel(object):
 
     @pytest.mark.asyncio
     async def test_send_and_delete_file(self, event_loop, channel, random_user):
-        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
-        resp = await channel.send_file(url, "lena.png", random_user)
-        assert "lena.png" in resp["file"]
+        url = "../helloworld.jpg"
+        resp = await channel.send_file(url, "helloword.jpg", random_user)
+        assert "helloworld.jpg" in resp["file"]
         resp = await channel.delete_file(resp["file"])
 
     @pytest.mark.asyncio
     async def test_send_and_delete_image(self, event_loop, channel, random_user):
-        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
+        url = "../helloworld.jpg"
         resp = await channel.send_image(
-            url, "lena.png", random_user, content_type="image/png"
+            url, "helloworld.jpg", random_user, content_type="image/jpeg"
         )
-        assert "lena.png" in resp["file"]
+        assert "helloworld.jpg" in resp["file"]
         # resp = channel.delete_image(resp['file'])
 
     @pytest.mark.asyncio
