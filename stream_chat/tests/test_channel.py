@@ -26,7 +26,7 @@ class TestChannel(object):
         channel.create(random_users[0]["id"])
         assert channel.id is not None
 
-    def test_send_message_with_optinos(self, channel, random_user):
+    def test_send_message_with_options(self, channel, random_user):
         response = channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
         )
@@ -152,25 +152,18 @@ class TestChannel(object):
         assert response["reactions"][0]["count"] == 42
 
     def test_send_and_delete_file(self, channel, random_user):
-        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
-        resp = channel.send_file(url, "lena.png", random_user)
-        assert "lena.png" in resp["file"]
-        resp = channel.delete_file(resp["file"])
+        url = "helloworld.jpg"
+        resp = channel.send_file(url, "helloworld.jpg", random_user)
+        assert "helloworld.jpg" in resp["file"]
+        channel.delete_file(resp["file"])
 
     def test_send_and_delete_image(self, channel, random_user):
-        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
+        url = "helloworld.jpg"
         resp = channel.send_image(
-            url, "lena.png", random_user, content_type="image/png"
+            url, "helloworld.jpg", random_user, content_type="image/jpeg"
         )
-        assert "lena.png" in resp["file"]
-        # resp = channel.delete_image(resp['file'])
-
-    def test_send_image_with_bot_blocked(self, channel, random_user):
-        # following url blocks bots and we set a generic header to skip it
-        # but it can start failing again, see initial discussion here: https://github.com/GetStream/stream-chat-python/pull/30#discussion_r444209891
-        url = "https://api.twilio.com/2010-04-01/Accounts/AC3e136e1a00279f4dadcb10a9f1a1e8a3/Messages/MM547edf6f4846a30231c3033fa20f8419/Media/ME498020f8fe0b0ba2ff83ac99e4782e02"
-        resp = channel.send_image(url, "js.png", random_user, content_type="image/png")
-        assert "js.png" in resp["file"]
+        assert "helloworld.jpg" in resp["file"]
+        channel.delete_image(resp["file"])
 
     def test_channel_hide_show(self, client, channel, random_users):
         # setup

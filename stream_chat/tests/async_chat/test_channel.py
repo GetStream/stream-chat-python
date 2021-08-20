@@ -1,5 +1,4 @@
 import uuid
-
 import pytest
 
 from stream_chat.base.exceptions import StreamAPIException
@@ -29,7 +28,7 @@ class TestChannel(object):
         assert channel.id is not None
 
     @pytest.mark.asyncio
-    async def test_send_message_with_optinos(self, event_loop, channel, random_user):
+    async def test_send_message_with_options(self, event_loop, channel, random_user):
         response = await channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
         )
@@ -175,29 +174,19 @@ class TestChannel(object):
 
     @pytest.mark.asyncio
     async def test_send_and_delete_file(self, event_loop, channel, random_user):
-        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
-        resp = await channel.send_file(url, "lena.png", random_user)
-        assert "lena.png" in resp["file"]
-        resp = await channel.delete_file(resp["file"])
+        url = "helloworld.jpg"
+        resp = await channel.send_file(url, "helloworld.jpg", random_user)
+        assert "helloworld.jpg" in resp["file"]
+        await channel.delete_file(resp["file"])
 
     @pytest.mark.asyncio
     async def test_send_and_delete_image(self, event_loop, channel, random_user):
-        url = "https://homepages.cae.wisc.edu/~ece533/images/lena.png"
+        url = "helloworld.jpg"
         resp = await channel.send_image(
-            url, "lena.png", random_user, content_type="image/png"
+            url, "helloworld.jpg", random_user, content_type="image/jpeg"
         )
-        assert "lena.png" in resp["file"]
-        # resp = channel.delete_image(resp['file'])
-
-    @pytest.mark.asyncio
-    async def test_send_image_with_bot_blocked(self, event_loop, channel, random_user):
-        # following url blocks bots and we set a generic header to skip it
-        # but it can start failing again, see initial discussion here: https://github.com/GetStream/stream-chat-python/pull/30#discussion_r444209891
-        url = "https://api.twilio.com/2010-04-01/Accounts/AC3e136e1a00279f4dadcb10a9f1a1e8a3/Messages/MM547edf6f4846a30231c3033fa20f8419/Media/ME498020f8fe0b0ba2ff83ac99e4782e02"
-        resp = await channel.send_image(
-            url, "js.png", random_user, content_type="image/png"
-        )
-        assert "js.png" in resp["file"]
+        assert "helloworld.jpg" in resp["file"]
+        await channel.delete_image(resp["file"])
 
     @pytest.mark.asyncio
     async def test_channel_hide_show(self, event_loop, client, channel, random_users):

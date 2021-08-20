@@ -483,7 +483,7 @@ class StreamChatAsync(StreamChatInterface):
         """
         Update a segment by id
         """
-        return await self.put(f"segments/{segment_id}", data={"segment": data})
+        return await self.put(f"segments/{segment_id}", data=data)
 
     async def delete_segment(self, segment_id):
         """
@@ -507,13 +507,13 @@ class StreamChatAsync(StreamChatInterface):
         """
         List campaigns
         """
-        return await self.get("campaigns/", params)
+        return await self.get("campaigns", params)
 
     async def update_campaign(self, campaign_id, data):
         """
         Update a campaign
         """
-        return await self.put(f"campaigns/{campaign_id}", data={"campaign": data})
+        return await self.put(f"campaigns/{campaign_id}", data=data)
 
     async def delete_campaign(self, campaign_id):
         """
