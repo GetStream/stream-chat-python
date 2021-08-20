@@ -319,8 +319,12 @@ class StreamChat(StreamChatInterface):
         }
         parts = urlparse(url)
         if parts[0] == "":
-            url = "file://" + url
-        content = urlopen(Request(url, headers={"User-Agent": "Mozilla/5.0"})).read()
+            with open(url, "rb") as f:
+                content = f.read()
+        else:
+            content = urlopen(
+                Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            ).read()
         response = requests.post(
             f"{self.base_url}/{uri}",
             params=self.get_default_params(),
