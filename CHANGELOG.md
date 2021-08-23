@@ -1,3 +1,7 @@
+## Aug 23, 2021 - 3.12.0
+
+- Add support for channel exports.
+
 ## Aug 20, 2021 - 3.11.2
 
 - Set base url to edge, there is no need to set a region anymore.
