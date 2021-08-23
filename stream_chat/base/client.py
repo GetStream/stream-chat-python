@@ -549,22 +549,23 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def export_channel(self, channel_id: str, channel_type: str, messages_since: str = None,
-                       messages_until=None):
+    def export_channel(
+        self, channel_type, channel_id, messages_since=None, messages_until=None
+    ):
         """
         Requests a channel export
         """
         pass
 
     @abc.abstractmethod
-    def export_channels(self, channels_data: list):
+    def export_channels(self, channels):
         """
         Requests a channels export
         """
         pass
 
     @abc.abstractmethod
-    def get_export_channel_status(self, task_id: str):
+    def get_export_channel_status(self, task_id):
         """
         Retrieves status of export
         """

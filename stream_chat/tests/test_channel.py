@@ -1,4 +1,5 @@
 import uuid
+import time
 
 import pytest
 
@@ -263,7 +264,6 @@ class TestChannel(object):
         response = client.query_channels(
             {"muted": True, "cid": channel.cid}, user_id=user_id
         )
-        print(response, channel.cid)
         assert len(response["channels"]) == 1
 
         channel.unmute(user_id)
@@ -272,3 +272,29 @@ class TestChannel(object):
             user_id=user_id,
         )
         assert len(response["channels"]) == 0
+
+    def test_export_channel_status(self, client, channel):
+        with pytest.raises(StreamAPIException, match=r".*Can't find task.*"):
+            client.get_export_channel_status(str(uuid.uuid4()))
+
+        with pytest.raises(StreamAPIException, match=r".*Can't find channel.*"):
+            client.export_channel("messaging", str(uuid.uuid4()))
+
+    def test_export_channel(self, client, channel, random_users):
+        channel.send_message({"text": "Hey Joni"}, random_users[0]["id"])
+
+        resp = client.export_channel(channel.channel_type, channel.id)
+        task_id = resp["task_id"]
+        assert task_id != ""
+
+        while True:
+            resp = client.get_export_channel_status(task_id)
+            assert resp["status"] != ""
+            assert resp["created_at"] != ""
+            assert resp["updated_at"] != ""
+            if resp["status"] == "completed":
+                assert len(resp["result"]) != 0
+                assert resp["result"]["url"] != ""
+                assert len(resp["error"]) != 0
+                break
+            time.sleep(0.5)
