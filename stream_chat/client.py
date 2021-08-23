@@ -573,16 +573,21 @@ class StreamChat(StreamChatInterface):
             )
         self.update_users_partial(updates)
 
-    def export_channel(self, channel_id: str, channel_type: str, messages_since: str = None,
-                       messages_until=None):
+    def export_channel(
+        self,
+        channel_type,
+        channel_id,
+        messages_since=None,
+        messages_until=None,
+    ):
         """
         Requests a channel export
-        :param channel_id: channel_id of channel which needs to be exported
         :param channel_type: channel_type of channel which needs to be exported
+        :param channel_id: channel_id of channel which needs to be exported
         :param messages_since: RFC-3339 string or datetime to filter messages since that time, optional
         :param messages_until: RFC-3339 string or datetime to filter messages until that time, optional
-        :type channel_id: str
         :type channel_type: str
+        :type channel_id: str
         :type messages_since: Union[str, datetime.datetime]
         :type messages_until: Union[str, datetime.datetime]
         """
@@ -597,24 +602,24 @@ class StreamChat(StreamChatInterface):
                     "id": channel_id,
                     "type": channel_type,
                     "messages_since": messages_since,
-                    "messages_until": messages_until
+                    "messages_until": messages_until,
                 }
             ]
         )
 
-    def export_channels(self, channels_data: list):
+    def export_channels(self, channels):
         """
         Requests a channels export
-        :param channels_data: list of channel's data which need to be exported with keys:
-        - `channel_id`: str
+        :param channels: list of channel's data which need to be exported with keys:
         - `channel_type`: str
+        - `channel_id`: str
         - `messages_since` (optional, nullable): str
         - `messages_until` (optional, nullable): str
-        :type channels_data: List[Dict[str, str]]
+        :type channels: List[Dict[str, str]]
         """
-        return self.post("export_channels", data={"channels": channels_data})
+        return self.post("export_channels", data={"channels": channels})
 
-    def get_export_channel_status(self, task_id: str):
+    def get_export_channel_status(self, task_id):
         """
         Retrieves status of export
         :param task_id: task_id of task which status needs to be retrieved

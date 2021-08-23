@@ -1,4 +1,5 @@
 import uuid
+import time
 import pytest
 
 from stream_chat.base.exceptions import StreamAPIException
@@ -298,3 +299,31 @@ class TestChannel(object):
             user_id=user_id,
         )
         assert len(response["channels"]) == 0
+
+    @pytest.mark.asyncio
+    async def test_export_channel_status(self, client, channel):
+        with pytest.raises(StreamAPIException, match=r".*Can't find task.*"):
+            await client.get_export_channel_status(str(uuid.uuid4()))
+
+        with pytest.raises(StreamAPIException, match=r".*Can't find channel.*"):
+            await client.export_channel("messaging", str(uuid.uuid4()))
+
+    @pytest.mark.asyncio
+    async def test_export_channel(self, client, channel, random_users):
+        await channel.send_message({"text": "Hey Joni"}, random_users[0]["id"])
+
+        resp = await client.export_channel(channel.channel_type, channel.id)
+        task_id = resp["task_id"]
+        assert task_id != ""
+
+        while True:
+            resp = await client.get_export_channel_status(task_id)
+            assert resp["status"] != ""
+            assert resp["created_at"] != ""
+            assert resp["updated_at"] != ""
+            if resp["status"] == "completed":
+                assert len(resp["result"]) != 0
+                assert resp["result"]["url"] != ""
+                assert len(resp["error"]) != 0
+                break
+            time.sleep(0.5)

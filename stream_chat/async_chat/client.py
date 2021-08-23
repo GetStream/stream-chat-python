@@ -581,12 +581,17 @@ class StreamChatAsync(StreamChatInterface):
             )
         await self.update_users_partial(updates)
 
-    async def export_channel(self, channel_id: str, channel_type: str, messages_since: str = None,
-                             messages_until=None):
+    async def export_channel(
+        self,
+        channel_type,
+        channel_id,
+        messages_since=None,
+        messages_until=None,
+    ):
         """
         Requests a channel export
-        :param channel_id: channel_id of channel which needs to be exported
         :param channel_type: channel_type of channel which needs to be exported
+        :param channel_id: channel_id of channel which needs to be exported
         :param messages_since: RFC-3339 string or datetime to filter messages since that time, optional
         :param messages_until: RFC-3339 string or datetime to filter messages until that time, optional
         :type channel_id: str
@@ -605,22 +610,22 @@ class StreamChatAsync(StreamChatInterface):
                     "id": channel_id,
                     "type": channel_type,
                     "messages_since": messages_since,
-                    "messages_until": messages_until
+                    "messages_until": messages_until,
                 }
             ]
         )
 
-    async def export_channels(self, channels_data: list):
+    async def export_channels(self, channels):
         """
         Requests a channels export
         :param channels_data: list of channel's data which need to be exported with keys:
-        - `channel_id`: str
         - `channel_type`: str
+        - `channel_id`: str
         - `messages_since` (optional, nullable): str
         - `messages_until` (optional, nullable): str
         :type channels_data: List[Dict[str, str]]
         """
-        return await self.post("export_channels", data={"channels": channels_data})
+        return await self.post("export_channels", data={"channels": channels})
 
     async def get_export_channel_status(self, task_id: str):
         """
