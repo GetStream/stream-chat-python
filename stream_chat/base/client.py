@@ -547,3 +547,25 @@ class StreamChatInterface(abc.ABC):
         Revoke tokens for users issued since
         """
         pass
+
+    @abc.abstractmethod
+    def export_channel(self, channel_id: str, channel_type: str, messages_since: str = None,
+                       messages_until=None):
+        """
+        Requests a channel export
+        """
+        pass
+
+    @abc.abstractmethod
+    def export_channels(self, channels_data: list):
+        """
+        Requests a channels export
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_export_channel_status(self, task_id: str):
+        """
+        Retrieves status of export
+        """
+        pass

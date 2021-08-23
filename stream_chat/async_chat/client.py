@@ -581,6 +581,55 @@ class StreamChatAsync(StreamChatInterface):
             )
         await self.update_users_partial(updates)
 
+    async def export_channel(self, channel_id: str, channel_type: str, messages_since: str = None,
+                             messages_until=None):
+        """
+        Requests a channel export
+        :param channel_id: channel_id of channel which needs to be exported
+        :param channel_type: channel_type of channel which needs to be exported
+        :param messages_since: RFC-3339 string or datetime to filter messages since that time, optional
+        :param messages_until: RFC-3339 string or datetime to filter messages until that time, optional
+        :type channel_id: str
+        :type channel_type: str
+        :type messages_since: Union[str, datetime.datetime]
+        :type messages_until: Union[str, datetime.datetime]
+        """
+        if isinstance(messages_since, datetime.datetime):
+            messages_since = messages_since.isoformat()
+        if isinstance(messages_until, datetime.datetime):
+            messages_until = messages_until.isoformat()
+
+        return await self.export_channels(
+            [
+                {
+                    "id": channel_id,
+                    "type": channel_type,
+                    "messages_since": messages_since,
+                    "messages_until": messages_until
+                }
+            ]
+        )
+
+    async def export_channels(self, channels_data: list):
+        """
+        Requests a channels export
+        :param channels_data: list of channel's data which need to be exported with keys:
+        - `channel_id`: str
+        - `channel_type`: str
+        - `messages_since` (optional, nullable): str
+        - `messages_until` (optional, nullable): str
+        :type channels_data: List[Dict[str, str]]
+        """
+        return await self.post("export_channels", data={"channels": channels_data})
+
+    async def get_export_channel_status(self, task_id: str):
+        """
+        Retrieves status of export
+        :param task_id: task_id of task which status needs to be retrieved
+        :type task_id: str
+        """
+        return await self.get(f"export_channels/{task_id}")
+
     async def close(self):
         await self.session.close()
 
