@@ -1,3 +1,7 @@
+## Aug 24, 2021 - 3.12.1
+
+- Add namespace for ease of use and consistency in campaign update endpoints.
+
 ## Aug 23, 2021 - 3.12.0
 
 - Add support for channel exports.
