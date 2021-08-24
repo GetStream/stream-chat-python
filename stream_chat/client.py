@@ -475,7 +475,7 @@ class StreamChat(StreamChatInterface):
         """
         Update a segment by id
         """
-        return self.put(f"segments/{segment_id}", data=data)
+        return self.put(f"segments/{segment_id}", data={"segment": data})
 
     def delete_segment(self, segment_id):
         """
@@ -505,7 +505,7 @@ class StreamChat(StreamChatInterface):
         """
         Update a campaign
         """
-        return self.put(f"campaigns/{campaign_id}", data=data)
+        return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
 
     def delete_campaign(self, campaign_id):
         """
