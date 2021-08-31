@@ -1,3 +1,7 @@
+## Aug 31, 2021 - 3.12.2
+
+- Use post instead of get requests in query channels
+
 ## Aug 24, 2021 - 3.12.1
 
 - Add namespace for ease of use and consistency in campaign update endpoints.

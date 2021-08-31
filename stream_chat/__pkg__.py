@@ -1,6 +1,6 @@
 __author__ = "Tommaso Barbugli"
 __copyright__ = "Copyright 2019-2021, Stream.io, Inc"
-__version__ = "3.12.1"
+__version__ = "3.12.2"
 __maintainer__ = "Tommaso Barbugli"
 __email__ = "support@getstream.io"
 __status__ = "Production"
