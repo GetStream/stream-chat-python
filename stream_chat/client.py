@@ -193,7 +193,7 @@ class StreamChat(StreamChatInterface):
         params.update(
             {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
         )
-        return self.get("channels", params={"payload": json.dumps(params)})
+        return self.post("channels", data=params)
 
     def create_channel_type(self, data):
         if "commands" not in data or not data["commands"]:

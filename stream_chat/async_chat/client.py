@@ -198,7 +198,7 @@ class StreamChatAsync(StreamChatInterface):
         params.update(
             {"filter_conditions": filter_conditions, "sort": self.normalize_sort(sort)}
         )
-        return await self.get("channels", params={"payload": json.dumps(params)})
+        return await self.post("channels", data=params)
 
     async def create_channel_type(self, data):
         if "commands" not in data or not data["commands"]:
