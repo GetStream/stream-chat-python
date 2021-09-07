@@ -148,7 +148,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_members(self, user_ids):
+    def add_members(self, user_ids, message=None):
         """
         Adds members to the channel
 
@@ -158,7 +158,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def invite_members(self, user_ids):
+    def invite_members(self, user_ids, message=None):
         """
         invite members to the channel
 
@@ -168,7 +168,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_moderators(self, user_ids):
+    def add_moderators(self, user_ids, message=None):
         """
         Adds moderators to the channel
 
@@ -178,7 +178,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def remove_members(self, user_ids):
+    def remove_members(self, user_ids, message=None):
         """
         Remove members from the channel
 
@@ -188,7 +188,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def demote_moderators(self, user_ids):
+    def demote_moderators(self, user_ids, message=None):
         """
         Demotes moderators from the channel
 
