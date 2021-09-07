@@ -150,6 +150,7 @@ class Channel(ChannelInterface):
         Adds members to the channel
 
         :param user_ids: user IDs to add as members
+        :param message: An optional to show
         :return:
         """
         return self.client.post(
@@ -161,6 +162,7 @@ class Channel(ChannelInterface):
         invite members to the channel
 
         :param user_ids: user IDs to invite
+        :param message: An optional to show
         :return:
         """
         return self.client.post(
@@ -172,6 +174,7 @@ class Channel(ChannelInterface):
         Adds moderators to the channel
 
         :param user_ids: user IDs to add as moderators
+        :param message: An optional to show
         :return:
         """
         return self.client.post(
@@ -183,6 +186,7 @@ class Channel(ChannelInterface):
         Remove members from the channel
 
         :param user_ids: user IDs to remove from the member list
+        :param message: An optional to show
         :return:
         """
         return self.client.post(
@@ -194,6 +198,7 @@ class Channel(ChannelInterface):
         Demotes moderators from the channel
 
         :param user_ids: user IDs to demote
+        :param message: An optional to show
         :return:
         """
         return self.client.post(
