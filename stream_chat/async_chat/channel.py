@@ -147,50 +147,65 @@ class Channel(ChannelInterface):
         """
         return await self.client.post(f"{self.url}/truncate")
 
-    async def add_members(self, user_ids):
+    async def add_members(self, user_ids, message=None):
         """
         Adds members to the channel
 
         :param user_ids: user IDs to add as members
+        :param message: An optional to show
         :return:
         """
-        return await self.client.post(self.url, data={"add_members": user_ids})
+        return await self.client.post(
+            self.url, data={"add_members": user_ids, "message": message}
+        )
 
-    async def invite_members(self, user_ids):
+    async def invite_members(self, user_ids, message=None):
         """
         invite members to the channel
 
         :param user_ids: user IDs to invite
+        :param message: An optional to show
         :return:
         """
-        return await self.client.post(self.url, data={"invites": user_ids})
+        return await self.client.post(
+            self.url, data={"invites": user_ids, "message": message}
+        )
 
-    async def add_moderators(self, user_ids):
+    async def add_moderators(self, user_ids, message=None):
         """
         Adds moderators to the channel
 
         :param user_ids: user IDs to add as moderators
+        :param message: An optional to show
         :return:
         """
-        return await self.client.post(self.url, data={"add_moderators": user_ids})
+        return await self.client.post(
+            self.url, data={"add_moderators": user_ids, "message": message}
+        )
 
-    async def remove_members(self, user_ids):
+    async def remove_members(self, user_ids, message=None):
         """
         Remove members from the channel
 
         :param user_ids: user IDs to remove from the member list
+        :param message: An optional to show
         :return:
         """
-        return await self.client.post(self.url, data={"remove_members": user_ids})
+        return await self.client.post(
+            self.url, data={"remove_members": user_ids, "message": message}
+        )
 
-    async def demote_moderators(self, user_ids):
+    async def demote_moderators(self, user_ids, message=None):
         """
         Demotes moderators from the channel
 
         :param user_ids: user IDs to demote
+        :param message: An optional to show
         :return:
         """
-        return await self.client.post(self.url, data={"demote_moderators": user_ids})
+        return await self.client.post(
+            self.url, data={"demote_moderators": user_ids, "message": message}
+        )
 
     async def mark_read(self, user_id, **data):
         """

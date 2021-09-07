@@ -148,51 +148,56 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_members(self, user_ids):
+    def add_members(self, user_ids, message=None):
         """
         Adds members to the channel
 
         :param user_ids: user IDs to add as members
+        :param message: An optional to show
         :return:
         """
         pass
 
     @abc.abstractmethod
-    def invite_members(self, user_ids):
+    def invite_members(self, user_ids, message=None):
         """
         invite members to the channel
 
         :param user_ids: user IDs to invite
+        :param message: An optional to show
         :return:
         """
         pass
 
     @abc.abstractmethod
-    def add_moderators(self, user_ids):
+    def add_moderators(self, user_ids, message=None):
         """
         Adds moderators to the channel
 
         :param user_ids: user IDs to add as moderators
+        :param message: An optional to show
         :return:
         """
         pass
 
     @abc.abstractmethod
-    def remove_members(self, user_ids):
+    def remove_members(self, user_ids, message=None):
         """
         Remove members from the channel
 
         :param user_ids: user IDs to remove from the member list
+        :param message: An optional to show
         :return:
         """
         pass
 
     @abc.abstractmethod
-    def demote_moderators(self, user_ids):
+    def demote_moderators(self, user_ids, message=None):
         """
         Demotes moderators from the channel
 
         :param user_ids: user IDs to demote
+        :param message: An optional to show
         :return:
         """
         pass
