@@ -1,3 +1,7 @@
+## Sep 7, 2021 - 3.13.0
+
+- Add optional message into member updates
+
 ## Aug 31, 2021 - 3.12.2
 
 - Use post instead of get requests in query channels
