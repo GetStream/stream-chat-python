@@ -29,7 +29,10 @@ class StreamChat(StreamChatInterface):
         super().__init__(
             api_key=api_key, api_secret=api_secret, timeout=timeout, **options
         )
-        self.session = requests.Session()
+        s = requests.Session()
+        s.mount("http://", requests.adapters.HTTPAdapter(max_retries=1))
+        s.mount("https://", requests.adapters.HTTPAdapter(max_retries=1))
+        self.session = s
 
     def _parse_response(self, response):
         try:
