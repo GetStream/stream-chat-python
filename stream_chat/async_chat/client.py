@@ -30,7 +30,9 @@ class StreamChatAsync(StreamChatInterface):
         super().__init__(
             api_key=api_key, api_secret=api_secret, timeout=timeout, **options
         )
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(keepalive_timeout=3.9)
+        )
 
     async def _parse_response(self, response):
         text = await response.text()
