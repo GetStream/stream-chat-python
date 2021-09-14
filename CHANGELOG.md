@@ -1,3 +1,7 @@
+## Sep 14, 2021 - 3.13.1
+
+- Tweak connection pool configuration for idle timeouts
+
 ## Sep 7, 2021 - 3.13.0
 
 - Add optional message into member updates
