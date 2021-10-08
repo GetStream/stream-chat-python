@@ -137,7 +137,9 @@ class TestClient(object):
 
         for _ in range(10):
             response = client.get_task(response["task_id"])
-            if response["status"] == "completed":
+            if response["status"] == "completed" and response["result"][
+                random_user["id"]
+            ] == {"status": "ok"}:
                 return
 
             time.sleep(1)
@@ -452,7 +454,9 @@ class TestClient(object):
 
         for _ in range(10):
             response = client.get_task(response["task_id"])
-            if response["status"] == "completed":
+            if response["status"] == "completed" and response["result"][
+                channel.cid
+            ] == {"status": "ok"}:
                 return
 
             time.sleep(1)
