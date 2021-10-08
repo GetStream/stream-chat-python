@@ -109,7 +109,7 @@ class StreamChatAsync(StreamChatInterface):
 
     async def delete_users(self, delete_type, user_ids, **options):
         return await self.post(
-            f"users/delete", dict(options, user=delete_type, user_ids=user_ids)
+            f"users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
         )
 
     async def deactivate_user(self, user_id, **options):
@@ -655,3 +655,6 @@ class StreamChatAsync(StreamChatInterface):
         exc_tb: Optional[TracebackType],
     ) -> None:
         await self.close()
+
+    async def get_task(self, task_id):
+        return await self.get(f"tasks/{task_id}")

@@ -135,6 +135,15 @@ class TestClient(object):
         )
         assert "task_id" in response
 
+        for _ in range(10):
+            response = client.get_task(response["task_id"])
+            if response["status"] == "completed":
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"
+
     def test_deactivate_user(self, client, random_user):
         response = client.deactivate_user(random_user["id"])
         assert "user" in response
@@ -255,12 +264,12 @@ class TestClient(object):
         assert len(response["android"]) == 2
         assert len(response["server_side"]) == 2
         assert (
-            response["android"]["GetRateLimits"]["limit"]
-            == response["android"]["GetRateLimits"]["remaining"]
+                response["android"]["GetRateLimits"]["limit"]
+                == response["android"]["GetRateLimits"]["remaining"]
         )
         assert (
-            response["server_side"]["GetRateLimits"]["limit"]
-            > response["server_side"]["GetRateLimits"]["remaining"]
+                response["server_side"]["GetRateLimits"]["limit"]
+                > response["server_side"]["GetRateLimits"]["remaining"]
         )
 
     @pytest.mark.xfail

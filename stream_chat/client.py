@@ -286,7 +286,7 @@ class StreamChat(StreamChatInterface):
         return self.get("devices", {"user_id": user_id})
 
     def get_rate_limits(
-        self, server_side=False, android=False, ios=False, web=False, endpoints=None
+            self, server_side=False, android=False, ios=False, web=False, endpoints=None
     ):
         """
         Get rate limit quotas and usage.
@@ -582,11 +582,11 @@ class StreamChat(StreamChatInterface):
         self.update_users_partial(updates)
 
     def export_channel(
-        self,
-        channel_type,
-        channel_id,
-        messages_since=None,
-        messages_until=None,
+            self,
+            channel_type,
+            channel_id,
+            messages_since=None,
+            messages_until=None,
     ):
         """
         Requests a channel export
@@ -634,3 +634,6 @@ class StreamChat(StreamChatInterface):
         :type task_id: str
         """
         return self.get(f"export_channels/{task_id}")
+
+    def get_task(self, task_id):
+        return self.get(f"tasks/{task_id}")

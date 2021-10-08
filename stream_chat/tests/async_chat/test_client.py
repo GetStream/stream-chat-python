@@ -157,6 +157,15 @@ class TestClient(object):
         )
         assert "task_id" in response
 
+        for _ in range(10):
+            response = await client.get_task(response["task_id"])
+            if response["status"] == "completed":
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"
+
     @pytest.mark.asyncio
     async def test_deactivate_user(self, event_loop, client, random_user):
         response = await client.deactivate_user(random_user["id"])

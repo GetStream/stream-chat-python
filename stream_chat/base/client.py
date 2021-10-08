@@ -97,6 +97,10 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def delete_users(self, delete_type, user_ids, **options):
+        pass
+
+    @abc.abstractmethod
     def deactivate_user(self, user_id, **options):
         pass
 
@@ -568,5 +572,12 @@ class StreamChatInterface(abc.ABC):
     def get_export_channel_status(self, task_id):
         """
         Retrieves status of export
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_task(self, task_id):
+        """
+        Retrieves status of task
         """
         pass
