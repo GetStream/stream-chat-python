@@ -445,3 +445,16 @@ class TestClient(object):
         wait()
         response = client.list_roles()
         assert role not in response["roles"]
+
+    def test_delete_channels(self, client, channel):
+        response = client.delete_channels([channel.cid])
+        assert "task_id" in response
+
+        for _ in range(10):
+            response = client.get_task(response["task_id"])
+            if response["status"] == "completed":
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"

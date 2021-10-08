@@ -241,6 +241,11 @@ class StreamChatAsync(StreamChatInterface):
         """
         return Channel(self, channel_type, channel_id, data)
 
+    async def delete_channels(self, cids, **options):
+        return await self.post(
+            f"channels/delete", data=dict(options, cids=cids)
+        )
+
     async def list_commands(self):
         return await self.get("commands")
 

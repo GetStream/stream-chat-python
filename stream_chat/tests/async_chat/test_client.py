@@ -520,3 +520,17 @@ class TestClient(object):
         wait()
         response = await client.list_roles()
         assert role not in response["roles"]
+
+    @pytest.mark.asyncio
+    async def test_delete_channels(self, event_loop, client, channel):
+        response = await client.delete_channels([channel.cid])
+        assert "task_id" in response
+
+        for _ in range(10):
+            response = await client.get_task(response["task_id"])
+            if response["status"] == "completed":
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"

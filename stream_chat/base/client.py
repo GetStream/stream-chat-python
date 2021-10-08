@@ -227,6 +227,10 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def delete_channels(self, cids, **options):
+        pass
+
+    @abc.abstractmethod
     def list_commands(self):
         pass
 
