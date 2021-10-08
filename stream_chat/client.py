@@ -238,9 +238,7 @@ class StreamChat(StreamChatInterface):
         return Channel(self, channel_type, channel_id, data)
 
     def delete_channels(self, cids, **options):
-        return self.post(
-            f"channels/delete", data=dict(options, cids=cids)
-        )
+        return self.post(f"channels/delete", data=dict(options, cids=cids))
 
     def list_commands(self):
         return self.get("commands")
@@ -291,7 +289,7 @@ class StreamChat(StreamChatInterface):
         return self.get("devices", {"user_id": user_id})
 
     def get_rate_limits(
-            self, server_side=False, android=False, ios=False, web=False, endpoints=None
+        self, server_side=False, android=False, ios=False, web=False, endpoints=None
     ):
         """
         Get rate limit quotas and usage.
@@ -587,11 +585,11 @@ class StreamChat(StreamChatInterface):
         self.update_users_partial(updates)
 
     def export_channel(
-            self,
-            channel_type,
-            channel_id,
-            messages_since=None,
-            messages_until=None,
+        self,
+        channel_type,
+        channel_id,
+        messages_since=None,
+        messages_until=None,
     ):
         """
         Requests a channel export

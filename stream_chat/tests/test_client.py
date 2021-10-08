@@ -264,12 +264,12 @@ class TestClient(object):
         assert len(response["android"]) == 2
         assert len(response["server_side"]) == 2
         assert (
-                response["android"]["GetRateLimits"]["limit"]
-                == response["android"]["GetRateLimits"]["remaining"]
+            response["android"]["GetRateLimits"]["limit"]
+            == response["android"]["GetRateLimits"]["remaining"]
         )
         assert (
-                response["server_side"]["GetRateLimits"]["limit"]
-                > response["server_side"]["GetRateLimits"]["remaining"]
+            response["server_side"]["GetRateLimits"]["limit"]
+            > response["server_side"]["GetRateLimits"]["remaining"]
         )
 
     @pytest.mark.xfail
