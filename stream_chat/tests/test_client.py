@@ -129,6 +129,12 @@ class TestClient(object):
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
+    def test_delete_users(self, client, random_user):
+        response = client.delete_users(
+            "hard", [random_user["id"]], conversations="hard", messages="hard"
+        )
+        assert "task_id" in response
+
     def test_deactivate_user(self, client, random_user):
         response = client.deactivate_user(random_user["id"])
         assert "user" in response

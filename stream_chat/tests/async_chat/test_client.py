@@ -151,6 +151,13 @@ class TestClient(object):
         assert random_user["id"] == response["user"]["id"]
 
     @pytest.mark.asyncio
+    async def test_delete_users(self, event_loop, client, random_user):
+        response = await client.delete_users(
+            "hard", [random_user["id"]], conversations="hard", messages="hard"
+        )
+        assert "task_id" in response
+
+    @pytest.mark.asyncio
     async def test_deactivate_user(self, event_loop, client, random_user):
         response = await client.deactivate_user(random_user["id"])
         assert "user" in response

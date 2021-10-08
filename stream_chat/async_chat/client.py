@@ -107,6 +107,11 @@ class StreamChatAsync(StreamChatInterface):
     async def delete_user(self, user_id, **options):
         return await self.delete(f"users/{user_id}", options)
 
+    async def delete_users(self, delete_type, user_ids, **options):
+        return await self.post(
+            f"users/delete", dict(options, user=delete_type, user_ids=user_ids)
+        )
+
     async def deactivate_user(self, user_id, **options):
         return await self.post(f"users/{user_id}/deactivate", data=options)
 
