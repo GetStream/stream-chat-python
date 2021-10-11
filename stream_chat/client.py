@@ -105,7 +105,7 @@ class StreamChat(StreamChatInterface):
 
     def delete_users(self, delete_type, user_ids, **options):
         return self.post(
-            f"users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
+            "users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
         )
 
     def deactivate_user(self, user_id, **options):
