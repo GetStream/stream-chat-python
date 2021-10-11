@@ -97,7 +97,7 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete_users(self, delete_type, user_ids, **options):
+    def delete_users(self, user_ids, delete_type, **options):
         pass
 
     @abc.abstractmethod

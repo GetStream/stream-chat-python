@@ -131,7 +131,7 @@ class TestClient(object):
 
     def test_delete_users(self, client, random_user):
         response = client.delete_users(
-            "hard", [random_user["id"]], conversations="hard", messages="hard"
+            [random_user["id"]], "hard", conversations="hard", messages="hard"
         )
         assert "task_id" in response
 

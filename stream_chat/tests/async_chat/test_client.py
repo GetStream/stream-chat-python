@@ -153,7 +153,7 @@ class TestClient(object):
     @pytest.mark.asyncio
     async def test_delete_users(self, event_loop, client, random_user):
         response = await client.delete_users(
-            "hard", [random_user["id"]], conversations="hard", messages="hard"
+            [random_user["id"]], "hard", conversations="hard", messages="hard"
         )
         assert "task_id" in response
 
