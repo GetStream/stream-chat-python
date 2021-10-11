@@ -98,6 +98,14 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def delete_users(self, user_ids, delete_type, **options):
+        """
+        Delete users asynchronously
+
+        :param user_ids: a list of user IDs to delete
+        :param delete_type: type of user delete (hard|soft)
+        :param options: additional delete options
+        :return: task_id
+        """
         pass
 
     @abc.abstractmethod
