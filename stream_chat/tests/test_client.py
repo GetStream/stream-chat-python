@@ -129,6 +129,23 @@ class TestClient(object):
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
+    def test_delete_users(self, client, random_user):
+        response = client.delete_users(
+            [random_user["id"]], "hard", conversations="hard", messages="hard"
+        )
+        assert "task_id" in response
+
+        for _ in range(10):
+            response = client.get_task(response["task_id"])
+            if response["status"] == "completed" and response["result"][
+                random_user["id"]
+            ] == {"status": "ok"}:
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"
+
     def test_deactivate_user(self, client, random_user):
         response = client.deactivate_user(random_user["id"])
         assert "user" in response
@@ -430,3 +447,18 @@ class TestClient(object):
         wait()
         response = client.list_roles()
         assert role not in response["roles"]
+
+    def test_delete_channels(self, client, channel):
+        response = client.delete_channels([channel.cid])
+        assert "task_id" in response
+
+        for _ in range(10):
+            response = client.get_task(response["task_id"])
+            if response["status"] == "completed" and response["result"][
+                channel.cid
+            ] == {"status": "ok"}:
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"

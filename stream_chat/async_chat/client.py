@@ -107,6 +107,11 @@ class StreamChatAsync(StreamChatInterface):
     async def delete_user(self, user_id, **options):
         return await self.delete(f"users/{user_id}", options)
 
+    async def delete_users(self, user_ids, delete_type, **options):
+        return await self.post(
+            "users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
+        )
+
     async def deactivate_user(self, user_id, **options):
         return await self.post(f"users/{user_id}/deactivate", data=options)
 
@@ -235,6 +240,9 @@ class StreamChatAsync(StreamChatInterface):
         :return: Channel
         """
         return Channel(self, channel_type, channel_id, data)
+
+    async def delete_channels(self, cids, **options):
+        return await self.post(f"channels/delete", data=dict(options, cids=cids))
 
     async def list_commands(self):
         return await self.get("commands")
@@ -650,3 +658,6 @@ class StreamChatAsync(StreamChatInterface):
         exc_tb: Optional[TracebackType],
     ) -> None:
         await self.close()
+
+    async def get_task(self, task_id):
+        return await self.get(f"tasks/{task_id}")

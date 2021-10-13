@@ -151,6 +151,24 @@ class TestClient(object):
         assert random_user["id"] == response["user"]["id"]
 
     @pytest.mark.asyncio
+    async def test_delete_users(self, event_loop, client, random_user):
+        response = await client.delete_users(
+            [random_user["id"]], "hard", conversations="hard", messages="hard"
+        )
+        assert "task_id" in response
+
+        for _ in range(10):
+            response = await client.get_task(response["task_id"])
+            if response["status"] == "completed" and response["result"][
+                random_user["id"]
+            ] == {"status": "ok"}:
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"
+
+    @pytest.mark.asyncio
     async def test_deactivate_user(self, event_loop, client, random_user):
         response = await client.deactivate_user(random_user["id"])
         assert "user" in response
@@ -504,3 +522,19 @@ class TestClient(object):
         wait()
         response = await client.list_roles()
         assert role not in response["roles"]
+
+    @pytest.mark.asyncio
+    async def test_delete_channels(self, event_loop, client, channel):
+        response = await client.delete_channels([channel.cid])
+        assert "task_id" in response
+
+        for _ in range(10):
+            response = await client.get_task(response["task_id"])
+            if response["status"] == "completed" and response["result"][
+                channel.cid
+            ] == {"status": "ok"}:
+                return
+
+            time.sleep(1)
+
+        assert False, "task did not succeed"

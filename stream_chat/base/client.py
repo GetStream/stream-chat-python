@@ -97,6 +97,18 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def delete_users(self, user_ids, delete_type, **options):
+        """
+        Delete users asynchronously
+
+        :param user_ids: a list of user IDs to delete
+        :param delete_type: type of user delete (hard|soft)
+        :param options: additional delete options
+        :return: task_id
+        """
+        pass
+
+    @abc.abstractmethod
     def deactivate_user(self, user_id, **options):
         pass
 
@@ -220,6 +232,10 @@ class StreamChatInterface(abc.ABC):
         :param data: additional data, ie: {"members":[id1, id2, ...]}
         :return: Channel
         """
+        pass
+
+    @abc.abstractmethod
+    def delete_channels(self, cids, **options):
         pass
 
     @abc.abstractmethod
@@ -568,5 +584,12 @@ class StreamChatInterface(abc.ABC):
     def get_export_channel_status(self, task_id):
         """
         Retrieves status of export
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_task(self, task_id):
+        """
+        Retrieves status of task
         """
         pass

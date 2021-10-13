@@ -103,6 +103,11 @@ class StreamChat(StreamChatInterface):
     def delete_user(self, user_id, **options):
         return self.delete(f"users/{user_id}", options)
 
+    def delete_users(self, user_ids, delete_type, **options):
+        return self.post(
+            "users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
+        )
+
     def deactivate_user(self, user_id, **options):
         return self.post(f"users/{user_id}/deactivate", data=options)
 
@@ -231,6 +236,9 @@ class StreamChat(StreamChatInterface):
         :return: Channel
         """
         return Channel(self, channel_type, channel_id, data)
+
+    def delete_channels(self, cids, **options):
+        return self.post(f"channels/delete", data=dict(options, cids=cids))
 
     def list_commands(self):
         return self.get("commands")
@@ -629,3 +637,6 @@ class StreamChat(StreamChatInterface):
         :type task_id: str
         """
         return self.get(f"export_channels/{task_id}")
+
+    def get_task(self, task_id):
+        return self.get(f"tasks/{task_id}")
