@@ -486,6 +486,9 @@ class TestClient(object):
             "action": "DeleteChannel",
             "owner": False,
             "same_team": True,
+            "condition": {
+                "$subject.magic_custom_field": "magic_custom_value",
+            },
         }
 
         await client.create_permission(custom)
