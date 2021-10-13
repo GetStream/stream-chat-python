@@ -280,7 +280,7 @@ class TestChannel(object):
         assert response[1]["user"]["id"] == "john2"
 
     @pytest.mark.asyncio
-    async def test_mute_umute(self, event_loop, client, channel, random_users):
+    async def test_mute_unmute(self, event_loop, client, channel, random_users):
         user_id = random_users[0]["id"]
         response = await channel.mute(user_id, expiration=30000)
         assert "channel_mute" in response
@@ -324,6 +324,5 @@ class TestChannel(object):
             if resp["status"] == "completed":
                 assert len(resp["result"]) != 0
                 assert resp["result"]["url"] != ""
-                assert len(resp["error"]) != 0
                 break
             time.sleep(0.5)
