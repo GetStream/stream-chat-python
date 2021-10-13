@@ -295,6 +295,5 @@ class TestChannel(object):
             if resp["status"] == "completed":
                 assert len(resp["result"]) != 0
                 assert resp["result"]["url"] != ""
-                assert len(resp["error"]) != 0
                 break
             time.sleep(0.5)
