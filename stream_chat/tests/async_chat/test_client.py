@@ -194,6 +194,40 @@ class TestClient(object):
         await client.ban_user(random_user["id"], user_id=server_user["id"])
 
     @pytest.mark.asyncio
+    async def test_shadow_ban(
+        self, event_loop, client, random_user, server_user, channel
+    ):
+        msg_id = str(uuid.uuid4())
+        response = await channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+
+        response = await client.get_message(msg_id)
+        assert response["message"]["shadowed"] == False
+
+        response = await client.shadow_ban(random_user["id"], user_id=server_user["id"])
+
+        msg_id = str(uuid.uuid4())
+        response = await channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+
+        response = await client.get_message(msg_id)
+        assert response["message"]["shadowed"] == True
+
+        response = await client.remove_shadow_ban(
+            random_user["id"], user_id=server_user["id"]
+        )
+
+        msg_id = str(uuid.uuid4())
+        response = await channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+
+        response = await client.get_message(msg_id)
+        assert response["message"]["shadowed"] == False
+
+    @pytest.mark.asyncio
     async def test_unban_user(self, event_loop, client, random_user, server_user):
         await client.ban_user(random_user["id"], user_id=server_user["id"])
         await client.unban_user(random_user["id"], user_id=server_user["id"])

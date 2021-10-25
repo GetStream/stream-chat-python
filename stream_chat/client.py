@@ -121,6 +121,12 @@ class StreamChat(StreamChatInterface):
         data = {"target_user_id": target_id, **options}
         return self.post("moderation/ban", data=data)
 
+    def shadow_ban(self, target_id, **options):
+        return self.ban_user(target_id, shadow=True, **options)
+
+    def remove_shadow_ban(self, target_id, **options):
+        return self.unban_user(target_id, shadow=True, **options)
+
     def unban_user(self, target_id, **options):
         params = {"target_user_id": target_id, **options}
         return self.delete("moderation/ban", params)

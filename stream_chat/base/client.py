@@ -125,6 +125,14 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def shadow_ban(self, target_id, **options):
+        pass
+
+    @abc.abstractmethod
+    def remove_shadow_ban(self, target_id, **options):
+        pass
+
+    @abc.abstractmethod
     def unban_user(self, target_id, **options):
         pass
 
