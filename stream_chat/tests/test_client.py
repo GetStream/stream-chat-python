@@ -164,6 +164,37 @@ class TestClient(object):
         assert "user" in response
         assert response["user"]["name"] == "Gandalf the Grey"
 
+    def test_shadow_ban(self, client, random_user, server_user, channel):
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+
+        response = client.get_message(msg_id)
+        assert response["message"]["shadowed"] == False
+
+        response = client.shadow_ban(random_user["id"], user_id=server_user["id"])
+
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+
+        response = client.get_message(msg_id)
+        assert response["message"]["shadowed"] == True
+
+        response = client.remove_shadow_ban(
+            random_user["id"], user_id=server_user["id"]
+        )
+
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+
+        response = client.get_message(msg_id)
+        assert response["message"]["shadowed"] == False
+
     def test_ban_user(self, client, random_user, server_user):
         client.ban_user(random_user["id"], user_id=server_user["id"])
 

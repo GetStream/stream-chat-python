@@ -125,6 +125,12 @@ class StreamChatAsync(StreamChatInterface):
         data = {"target_user_id": target_id, **options}
         return await self.post("moderation/ban", data=data)
 
+    async def shadow_ban(self, target_id, **options):
+        return await self.ban_user(target_id, shadow=True, **options)
+
+    async def remove_shadow_ban(self, target_id, **options):
+        return await self.unban_user(target_id, shadow=True, **options)
+
     async def unban_user(self, target_id, **options):
         params = {"target_user_id": target_id, **options}
         return await self.delete("moderation/ban", params)
