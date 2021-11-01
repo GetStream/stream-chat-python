@@ -171,7 +171,7 @@ class TestClient(object):
         )
 
         response = client.get_message(msg_id)
-        assert response["message"]["shadowed"] == False
+        assert not response["message"]["shadowed"]
 
         response = client.shadow_ban(random_user["id"], user_id=server_user["id"])
 
@@ -181,7 +181,7 @@ class TestClient(object):
         )
 
         response = client.get_message(msg_id)
-        assert response["message"]["shadowed"] == True
+        assert response["message"]["shadowed"]
 
         response = client.remove_shadow_ban(
             random_user["id"], user_id=server_user["id"]
@@ -193,7 +193,7 @@ class TestClient(object):
         )
 
         response = client.get_message(msg_id)
-        assert response["message"]["shadowed"] == False
+        assert not response["message"]["shadowed"]
 
     def test_ban_user(self, client, random_user, server_user):
         client.ban_user(random_user["id"], user_id=server_user["id"])

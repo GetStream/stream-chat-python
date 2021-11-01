@@ -203,7 +203,7 @@ class TestClient(object):
         )
 
         response = await client.get_message(msg_id)
-        assert response["message"]["shadowed"] == False
+        assert not response["message"]["shadowed"]
 
         response = await client.shadow_ban(random_user["id"], user_id=server_user["id"])
 
@@ -213,7 +213,7 @@ class TestClient(object):
         )
 
         response = await client.get_message(msg_id)
-        assert response["message"]["shadowed"] == True
+        assert response["message"]["shadowed"]
 
         response = await client.remove_shadow_ban(
             random_user["id"], user_id=server_user["id"]
@@ -225,7 +225,7 @@ class TestClient(object):
         )
 
         response = await client.get_message(msg_id)
-        assert response["message"]["shadowed"] == False
+        assert not response["message"]["shadowed"]
 
     @pytest.mark.asyncio
     async def test_unban_user(self, event_loop, client, random_user, server_user):
