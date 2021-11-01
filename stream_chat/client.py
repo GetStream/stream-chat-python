@@ -244,7 +244,7 @@ class StreamChat(StreamChatInterface):
         return Channel(self, channel_type, channel_id, data)
 
     def delete_channels(self, cids, **options):
-        return self.post(f"channels/delete", data=dict(options, cids=cids))
+        return self.post("channels/delete", data=dict(options, cids=cids))
 
     def list_commands(self):
         return self.get("commands")

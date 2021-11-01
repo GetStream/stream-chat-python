@@ -37,8 +37,8 @@ class StreamChatAsync(StreamChatInterface):
     async def _parse_response(self, response):
         text = await response.text()
         try:
-            parsed_result = json.loads(text) if text else {}
-        except ValueError:
+            parsed_result = await response.json() if text else {}
+        except aiohttp.ClientResponseError:
             raise StreamAPIException(text, response.status)
         if response.status >= 399:
             raise StreamAPIException(text, response.status)
@@ -248,7 +248,7 @@ class StreamChatAsync(StreamChatInterface):
         return Channel(self, channel_type, channel_id, data)
 
     async def delete_channels(self, cids, **options):
-        return await self.post(f"channels/delete", data=dict(options, cids=cids))
+        return await self.post("channels/delete", data=dict(options, cids=cids))
 
     async def list_commands(self):
         return await self.get("commands")
