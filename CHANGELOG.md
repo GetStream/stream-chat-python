@@ -1,3 +1,14 @@
+## Nov 1, 2021 - 3.14.0
+
+- Add support for async endpoints
+  - get_task
+  - delete_users
+  - delete_channels
+- Add support for permissions v2
+- Add convenience helpers for shadow ban
+- Use json helper for unmarshal response in async
+- Add support for Python 3.10
+
 ## Sep 14, 2021 - 3.13.1
 
 - Tweak connection pool configuration for idle timeouts
