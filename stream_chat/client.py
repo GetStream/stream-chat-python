@@ -183,10 +183,34 @@ class StreamChat(StreamChatInterface):
     def mark_all_read(self, user_id):
         return self.post("channels/read", data={"user": {"id": user_id}})
 
+    def pin_message(self, message_id, user_id, expiration=None):
+        updates = {
+            "set": {
+                "pinned": True,
+                "pin_expires": expiration,
+            }
+        }
+        return self.update_message_partial(message_id, updates, user_id)
+
+    def unpin_message(self, message_id, user_id):
+        updates = {
+            "set": {
+                "pinned": False,
+            }
+        }
+        return self.update_message_partial(message_id, updates, user_id)
+
     def update_message(self, message):
         if message.get("id") is None:
             raise ValueError("message must have an id")
         return self.post(f"messages/{message['id']}", data={"message": message})
+
+    def update_message_partial(self, message_id, updates, user_id, **options):
+        data = updates.copy()
+        if user_id:
+            data["user"] = {"id": user_id}
+        data.update(options)
+        return self.put(f"messages/{message_id}", data=data)
 
     def delete_message(self, message_id, **options):
         return self.delete(f"messages/{message_id}", options)
