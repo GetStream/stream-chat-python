@@ -212,6 +212,20 @@ class TestClient(object):
     def test_mark_all_read(self, client, random_user):
         client.mark_all_read(random_user["id"])
 
+    def test_pin_unpin_message(self, client, channel, random_user):
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+        assert response["message"]["text"] == "hello world"
+        response = client.pin_message(msg_id, random_user["id"])
+        assert response["message"]["pinned_at"] is not None
+        assert response["message"]["pinned_by"]["id"] == random_user["id"]
+
+        response = client.unpin_message(msg_id, random_user["id"])
+        assert response["message"]["pinned_at"] is None
+        assert response["message"]["pinned_by"] is None
+
     def test_update_message(self, client, channel, random_user):
         msg_id = str(uuid.uuid4())
         response = channel.send_message(
@@ -226,6 +240,20 @@ class TestClient(object):
                 "user": {"id": response["message"]["user"]["id"]},
             }
         )
+
+    def test_update_message_partial(self, client, channel, random_user):
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+        assert response["message"]["text"] == "hello world"
+        response = client.update_message_partial(
+            msg_id,
+            dict(set=dict(awesome=True, text="helloworld")),
+            random_user["id"],
+        )
+        assert response["message"]["text"] == "helloworld"
+        assert response["message"]["awesome"] is True
 
     def test_delete_message(self, client, channel, random_user):
         msg_id = str(uuid.uuid4())

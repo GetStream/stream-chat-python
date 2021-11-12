@@ -185,7 +185,19 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def pin_message(self, message_id, user_id, expiration=None):
+        pass
+
+    @abc.abstractmethod
+    def unpin_message(self, message_id, user_id):
+        pass
+
+    @abc.abstractmethod
     def update_message(self, message):
+        pass
+
+    @abc.abstractmethod
+    def update_message_partial(self, message_id, updates, user_id, **options):
         pass
 
     @abc.abstractmethod

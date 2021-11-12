@@ -246,6 +246,21 @@ class TestClient(object):
         await client.mark_all_read(random_user["id"])
 
     @pytest.mark.asyncio
+    async def test_pin_unpin_message(self, event_loop, client, channel, random_user):
+        msg_id = str(uuid.uuid4())
+        response = await channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+        assert response["message"]["text"] == "hello world"
+        response = await client.pin_message(msg_id, random_user["id"])
+        assert response["message"]["pinned_at"] is not None
+        assert response["message"]["pinned_by"]["id"] == random_user["id"]
+
+        response = await client.unpin_message(msg_id, random_user["id"])
+        assert response["message"]["pinned_at"] is None
+        assert response["message"]["pinned_by"] is None
+
+    @pytest.mark.asyncio
     async def test_update_message(self, event_loop, client, channel, random_user):
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
@@ -260,6 +275,23 @@ class TestClient(object):
                 "user": {"id": response["message"]["user"]["id"]},
             }
         )
+
+    @pytest.mark.asyncio
+    async def test_update_message_partial(
+        self, event_loop, client, channel, random_user
+    ):
+        msg_id = str(uuid.uuid4())
+        response = await channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+        assert response["message"]["text"] == "hello world"
+        response = await client.update_message_partial(
+            msg_id,
+            dict(set=dict(awesome=True, text="helloworld")),
+            random_user["id"],
+        )
+        assert response["message"]["text"] == "helloworld"
+        assert response["message"]["awesome"] is True
 
     @pytest.mark.asyncio
     async def test_delete_message(self, event_loop, client, channel, random_user):
