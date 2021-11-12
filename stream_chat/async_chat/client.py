@@ -214,7 +214,6 @@ class StreamChatAsync(StreamChatInterface):
         if user_id:
             data["user"] = {"id": user_id}
         data.update(options)
-        print(data)
         return await self.put(f"messages/{message_id}", data=data)
 
     async def delete_message(self, message_id, **options):
