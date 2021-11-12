@@ -253,7 +253,7 @@ class TestClient(object):
             random_user["id"],
         )
         assert response["message"]["text"] == "helloworld"
-        assert response["message"]["awesome"] == True
+        assert response["message"]["awesome"] is True
 
     def test_delete_message(self, client, channel, random_user):
         msg_id = str(uuid.uuid4())

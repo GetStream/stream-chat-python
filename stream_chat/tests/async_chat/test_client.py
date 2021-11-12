@@ -291,7 +291,7 @@ class TestClient(object):
             random_user["id"],
         )
         assert response["message"]["text"] == "helloworld"
-        assert response["message"]["awesome"] == True
+        assert response["message"]["awesome"] is True
 
     @pytest.mark.asyncio
     async def test_delete_message(self, event_loop, client, channel, random_user):
