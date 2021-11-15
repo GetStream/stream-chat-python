@@ -1,7 +1,12 @@
+## Nov 15, 2021 - 3.16.0
+
+- Add support for assign_roles feature
+
 ## Nov 12, 2021 - 3.15.0
 
 - Add update message partial support
 - Add pin message and unpin message helpers
+
 ## Nov 1, 2021 - 3.14.0
 
 - Add support for async endpoints
