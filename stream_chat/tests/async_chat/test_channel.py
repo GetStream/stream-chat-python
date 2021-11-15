@@ -122,6 +122,18 @@ class TestChannel(object):
         assert not response["members"][0].get("is_moderator", False)
 
     @pytest.mark.asyncio
+    async def test_assign_roles_moderators(self, event_loop, channel, random_user):
+        member = {"user_id": random_user["id"], "channel_role": "channel_moderator"}
+        response = await channel.add_members([member])
+        assert len(response["members"]) == 1
+        assert response["members"][0]["channel_role"] == "channel_moderator"
+
+        member["channel_role"] = "channel_member"
+        response = await channel.assign_roles([member])
+        assert len(response["members"]) == 1
+        assert response["members"][0]["channel_role"] == "channel_member"
+
+    @pytest.mark.asyncio
     async def test_mark_read(self, event_loop, channel, random_user):
         response = await channel.mark_read(random_user["id"])
         assert "event" in response

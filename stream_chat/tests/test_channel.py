@@ -105,6 +105,17 @@ class TestChannel(object):
         response = channel.demote_moderators([random_user["id"]])
         assert not response["members"][0].get("is_moderator", False)
 
+    def test_assign_roles_moderators(self, channel, random_user):
+        member = {"user_id": random_user["id"], "channel_role": "channel_moderator"}
+        response = channel.add_members([member])
+        assert len(response["members"]) == 1
+        assert response["members"][0]["channel_role"] == "channel_moderator"
+
+        member["channel_role"] = "channel_member"
+        response = channel.assign_roles([member])
+        assert len(response["members"]) == 1
+        assert response["members"][0]["channel_role"] == "channel_member"
+
     def test_mark_read(self, channel, random_user):
         response = channel.mark_read(random_user["id"])
         assert "event" in response

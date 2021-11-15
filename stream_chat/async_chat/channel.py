@@ -147,16 +147,28 @@ class Channel(ChannelInterface):
         """
         return await self.client.post(f"{self.url}/truncate")
 
-    async def add_members(self, user_ids, message=None):
+    async def add_members(self, members, message=None):
         """
         Adds members to the channel
 
-        :param user_ids: user IDs to add as members
+        :param members: member objects to add
         :param message: An optional to show
         :return:
         """
         return await self.client.post(
-            self.url, data={"add_members": user_ids, "message": message}
+            self.url, data={"add_members": members, "message": message}
+        )
+
+    async def assign_roles(self, members, message=None):
+        """
+        Assigns new roles to specified channel members
+
+        :param members: member objects with role information
+        :param message: An optional to show
+        :return:
+        """
+        return await self.client.post(
+            self.url, data={"assign_roles": members, "message": message}
         )
 
     async def invite_members(self, user_ids, message=None):
