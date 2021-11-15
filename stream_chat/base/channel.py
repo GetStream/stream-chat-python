@@ -148,11 +148,22 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_members(self, user_ids, message=None):
+    def add_members(self, members, message=None):
         """
         Adds members to the channel
 
-        :param user_ids: user IDs to add as members
+        :param members: member objects to add
+        :param message: An optional to show
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def assign_roles(self, members, message=None):
+        """
+        Assigns new roles to specified channel members
+
+        :param members: member objects with role information
         :param message: An optional to show
         :return:
         """
