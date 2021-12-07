@@ -8,7 +8,7 @@ from stream_chat.base.exceptions import StreamAPIException
 @pytest.mark.incremental
 class TestChannel(object):
     @pytest.mark.asyncio
-    async def test_ban_user(self, event_loop, channel, random_user, server_user):
+    async def test_ban_user(self, channel, random_user, server_user):
         await channel.ban_user(random_user["id"], user_id=server_user["id"])
         await channel.ban_user(
             random_user["id"],
@@ -19,7 +19,7 @@ class TestChannel(object):
         await channel.unban_user(random_user["id"])
 
     @pytest.mark.asyncio
-    async def test_create_without_id(self, event_loop, client, random_users):
+    async def test_create_without_id(self, client, random_users):
         channel = client.channel(
             "messaging", data={"members": [u["id"] for u in random_users]}
         )
@@ -29,7 +29,7 @@ class TestChannel(object):
         assert channel.id is not None
 
     @pytest.mark.asyncio
-    async def test_send_message_with_options(self, event_loop, channel, random_user):
+    async def test_send_message_with_options(self, channel, random_user):
         response = await channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
         )
@@ -37,13 +37,13 @@ class TestChannel(object):
         assert response["message"]["text"] == "hi"
 
     @pytest.mark.asyncio
-    async def test_send_event(self, event_loop, channel, random_user):
+    async def test_send_event(self, channel, random_user):
         response = await channel.send_event({"type": "typing.start"}, random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "typing.start"
 
     @pytest.mark.asyncio
-    async def test_send_reaction(self, event_loop, channel, random_user):
+    async def test_send_reaction(self, channel, random_user):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         response = await channel.send_reaction(
             msg["message"]["id"], {"type": "love"}, random_user["id"]
@@ -53,7 +53,7 @@ class TestChannel(object):
         assert response["message"]["latest_reactions"][0]["type"] == "love"
 
     @pytest.mark.asyncio
-    async def test_delete_reaction(self, event_loop, channel, random_user):
+    async def test_delete_reaction(self, channel, random_user):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         await channel.send_reaction(
             msg["message"]["id"], {"type": "love"}, random_user["id"]
@@ -65,13 +65,13 @@ class TestChannel(object):
         assert len(response["message"]["latest_reactions"]) == 0
 
     @pytest.mark.asyncio
-    async def test_update(self, event_loop, channel):
+    async def test_update(self, channel):
         response = await channel.update({"motd": "one apple a day..."})
         assert "channel" in response
         assert response["channel"]["motd"] == "one apple a day..."
 
     @pytest.mark.asyncio
-    async def test_update_partial(self, event_loop, channel):
+    async def test_update_partial(self, channel):
         response = await channel.update({"color": "blue", "age": 30})
         assert "channel" in response
         assert response["channel"]["color"] == "blue"
@@ -85,18 +85,18 @@ class TestChannel(object):
         assert "age" not in response["channel"]
 
     @pytest.mark.asyncio
-    async def test_delete(self, event_loop, channel):
+    async def test_delete(self, channel):
         response = await channel.delete()
         assert "channel" in response
         assert response["channel"].get("deleted_at") is not None
 
     @pytest.mark.asyncio
-    async def test_truncate(self, event_loop, channel):
+    async def test_truncate(self, channel):
         response = await channel.truncate()
         assert "channel" in response
 
     @pytest.mark.asyncio
-    async def test_truncate_with_options(self, event_loop, channel, random_user):
+    async def test_truncate_with_options(self, channel, random_user):
         response = await channel.truncate(
             skip_push=True,
             message={
@@ -107,7 +107,7 @@ class TestChannel(object):
         assert "channel" in response
 
     @pytest.mark.asyncio
-    async def test_add_members(self, event_loop, channel, random_user):
+    async def test_add_members(self, channel, random_user):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
 
@@ -116,7 +116,7 @@ class TestChannel(object):
         assert not response["members"][0].get("is_moderator", False)
 
     @pytest.mark.asyncio
-    async def test_invite_members(self, event_loop, channel, random_user):
+    async def test_invite_members(self, channel, random_user):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
 
@@ -125,7 +125,7 @@ class TestChannel(object):
         assert response["members"][0].get("invited", True)
 
     @pytest.mark.asyncio
-    async def test_add_moderators(self, event_loop, channel, random_user):
+    async def test_add_moderators(self, channel, random_user):
         response = await channel.add_moderators([random_user["id"]])
         assert response["members"][0]["is_moderator"]
 
@@ -133,7 +133,7 @@ class TestChannel(object):
         assert not response["members"][0].get("is_moderator", False)
 
     @pytest.mark.asyncio
-    async def test_assign_roles_moderators(self, event_loop, channel, random_user):
+    async def test_assign_roles_moderators(self, channel, random_user):
         member = {"user_id": random_user["id"], "channel_role": "channel_moderator"}
         response = await channel.add_members([member])
         assert len(response["members"]) == 1
@@ -145,13 +145,13 @@ class TestChannel(object):
         assert response["members"][0]["channel_role"] == "channel_member"
 
     @pytest.mark.asyncio
-    async def test_mark_read(self, event_loop, channel, random_user):
+    async def test_mark_read(self, channel, random_user):
         response = await channel.mark_read(random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "message.read"
 
     @pytest.mark.asyncio
-    async def test_get_replies(self, event_loop, channel, random_user):
+    async def test_get_replies(self, channel, random_user):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         response = await channel.get_replies(msg["message"]["id"])
         assert "messages" in response
@@ -173,7 +173,7 @@ class TestChannel(object):
         assert response["messages"][0]["index"] == 7
 
     @pytest.mark.asyncio
-    async def test_get_reactions(self, event_loop, channel, random_user):
+    async def test_get_reactions(self, channel, random_user):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         response = await channel.get_reactions(msg["message"]["id"])
 
@@ -197,14 +197,14 @@ class TestChannel(object):
         assert response["reactions"][0]["count"] == 42
 
     @pytest.mark.asyncio
-    async def test_send_and_delete_file(self, event_loop, channel, random_user):
+    async def test_send_and_delete_file(self, channel, random_user):
         url = "helloworld.jpg"
         resp = await channel.send_file(url, "helloworld.jpg", random_user)
         assert "helloworld.jpg" in resp["file"]
         await channel.delete_file(resp["file"])
 
     @pytest.mark.asyncio
-    async def test_send_and_delete_image(self, event_loop, channel, random_user):
+    async def test_send_and_delete_image(self, channel, random_user):
         url = "helloworld.jpg"
         resp = await channel.send_image(
             url, "helloworld.jpg", random_user, content_type="image/jpeg"
@@ -213,7 +213,7 @@ class TestChannel(object):
         await channel.delete_image(resp["file"])
 
     @pytest.mark.asyncio
-    async def test_channel_hide_show(self, event_loop, client, channel, random_users):
+    async def test_channel_hide_show(self, client, channel, random_users):
         # setup
         await channel.add_members([u["id"] for u in random_users])
         # verify
@@ -255,7 +255,7 @@ class TestChannel(object):
         assert len(response["channels"]) == 1
 
     @pytest.mark.asyncio
-    async def test_invites(self, event_loop, client, channel):
+    async def test_invites(self, client, channel):
         members = ["john", "paul", "george", "pete", "ringo", "eric"]
         await client.update_users([{"id": m} for m in members])
         channel = client.channel(
@@ -285,7 +285,7 @@ class TestChannel(object):
         await channel.reject_invite("eric")
 
     @pytest.mark.asyncio
-    async def test_query_members(self, event_loop, client, channel):
+    async def test_query_members(self, client, channel):
         members = ["paul", "george", "john", "jessica", "john2"]
         await client.update_users([{"id": m, "name": m} for m in members])
         for member in members:
@@ -303,7 +303,7 @@ class TestChannel(object):
         assert response[1]["user"]["id"] == "john2"
 
     @pytest.mark.asyncio
-    async def test_mute_unmute(self, event_loop, client, channel, random_users):
+    async def test_mute_unmute(self, client, channel, random_users):
         user_id = random_users[0]["id"]
         response = await channel.mute(user_id, expiration=30000)
         assert "channel_mute" in response
