@@ -82,6 +82,16 @@ class TestChannel(object):
         response = channel.truncate()
         assert "channel" in response
 
+    def test_truncate_with_options(self, channel, random_user):
+        response = channel.truncate(
+            skip_push=True,
+            message={
+                "text": "Truncating channel.",
+                "user_id": random_user["id"],
+            },
+        )
+        assert "channel" in response
+
     def test_add_members(self, channel, random_user):
         response = channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0

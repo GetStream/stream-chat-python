@@ -139,10 +139,11 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def truncate(self):
+    def truncate(self, **options):
         """
         Removes all messages from the channel
 
+        :param options: the query options, check docs on https://getstream.io/chat/docs/python/channel_delete/?language=python#truncating-a-channel
         :return: The server response
         """
         pass

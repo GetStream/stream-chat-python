@@ -96,6 +96,17 @@ class TestChannel(object):
         assert "channel" in response
 
     @pytest.mark.asyncio
+    async def test_truncate_with_options(self, event_loop, channel, random_user):
+        response = await channel.truncate(
+            skip_push=True,
+            message={
+                "text": "Truncating channel.",
+                "user_id": random_user["id"],
+            },
+        )
+        assert "channel" in response
+
+    @pytest.mark.asyncio
     async def test_add_members(self, event_loop, channel, random_user):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
