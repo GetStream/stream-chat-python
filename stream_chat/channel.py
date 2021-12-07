@@ -137,13 +137,14 @@ class Channel(ChannelInterface):
         """
         return self.client.delete(self.url)
 
-    def truncate(self):
+    def truncate(self, **options):
         """
         Removes all messages from the channel
 
+        :param options: the query options, check docs on https://getstream.io/chat/docs/python/channel_delete/?language=python#truncating-a-channel
         :return: The server response
         """
-        return self.client.post(f"{self.url}/truncate")
+        return self.client.post(f"{self.url}/truncate", data=options)
 
     def add_members(self, members, message=None):
         """
