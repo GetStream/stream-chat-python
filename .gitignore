@@ -57,6 +57,7 @@ secrets.*sh
 .idea
 
 .venv
+.python-version
 pip-selfcheck.json
 .idea
 .vscode

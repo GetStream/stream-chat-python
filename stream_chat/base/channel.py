@@ -149,12 +149,13 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_members(self, members, message=None):
+    def add_members(self, members, message=None, **options):
         """
         Adds members to the channel
 
         :param members: member objects to add
         :param message: An optional to show
+        :param options: additional options such as hide_history
         :return:
         """
         pass
