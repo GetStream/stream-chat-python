@@ -146,17 +146,17 @@ class Channel(ChannelInterface):
         """
         return self.client.post(f"{self.url}/truncate", data=options)
 
-    def add_members(self, members, message=None):
+    def add_members(self, members, message=None, **options):
         """
         Adds members to the channel
 
         :param members: member objects to add
         :param message: An optional to show
+        :param options: additional options such as hide_history
         :return:
         """
-        return self.client.post(
-            self.url, data={"add_members": members, "message": message}
-        )
+        payload = {"add_members": members, "message": message, **options}
+        return self.client.post(self.url, data=payload)
 
     def assign_roles(self, members, message=None):
         """

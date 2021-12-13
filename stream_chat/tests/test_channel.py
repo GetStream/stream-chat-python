@@ -100,6 +100,13 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert not response["members"][0].get("is_moderator", False)
 
+    def test_add_members_with_additional_options(self, channel, random_user):
+        response = channel.remove_members([random_user["id"]])
+        assert len(response["members"]) == 0
+
+        response = channel.add_members([random_user["id"]], hide_history=True)
+        assert len(response["members"]) == 1
+
     def test_invite_members(self, channel, random_user):
         response = channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0

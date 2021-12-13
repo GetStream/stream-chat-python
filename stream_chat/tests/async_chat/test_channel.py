@@ -116,6 +116,14 @@ class TestChannel(object):
         assert not response["members"][0].get("is_moderator", False)
 
     @pytest.mark.asyncio
+    async def test_add_members_with_options(self, channel, random_user):
+        response = await channel.remove_members([random_user["id"]])
+        assert len(response["members"]) == 0
+
+        response = await channel.add_members([random_user["id"]], hide_history=True)
+        assert len(response["members"]) == 1
+
+    @pytest.mark.asyncio
     async def test_invite_members(self, channel, random_user):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
