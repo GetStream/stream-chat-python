@@ -23,3 +23,13 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.mypy]
+disallow_untyped_defs = true
+disallow_untyped_calls = true
+check_untyped_defs = true
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = "stream_chat.tests.*"
+ignore_errors = true

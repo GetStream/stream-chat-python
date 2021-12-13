@@ -1,4 +1,5 @@
 import os
+from typing import Dict, List
 import uuid
 
 import pytest
@@ -17,7 +18,7 @@ def pytest_runtest_setup(item):
     if "incremental" in item.keywords:
         previousfailed = getattr(item.parent, "_previousfailed", None)
         if previousfailed is not None:
-            pytest.xfail("previous test failed (%s)" % previousfailed.name)
+            pytest.xfail(f"previous test failed ({previousfailed.name})")
 
 
 def pytest_configure(config):
@@ -37,7 +38,7 @@ def client():
 
 
 @pytest.fixture(scope="function")
-def random_user(client):
+def random_user(client: StreamChat):
     user = {"id": str(uuid.uuid4())}
     response = client.update_user(user)
     assert "users" in response
@@ -46,7 +47,7 @@ def random_user(client):
 
 
 @pytest.fixture(scope="function")
-def server_user(client):
+def server_user(client: StreamChat):
     user = {"id": str(uuid.uuid4())}
     response = client.update_user(user)
     assert "users" in response
@@ -55,7 +56,7 @@ def server_user(client):
 
 
 @pytest.fixture(scope="function")
-def random_users(client):
+def random_users(client: StreamChat):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
     client.update_users([user1, user2])
@@ -63,7 +64,7 @@ def random_users(client):
 
 
 @pytest.fixture(scope="function")
-def channel(client, random_user):
+def channel(client: StreamChat, random_user: Dict):
     channel = client.channel(
         "messaging", str(uuid.uuid4()), {"test": True, "language": "python"}
     )
@@ -72,7 +73,7 @@ def channel(client, random_user):
 
 
 @pytest.fixture(scope="function")
-def command(client):
+def command(client: StreamChat):
     response = client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
     )
@@ -83,8 +84,8 @@ def command(client):
 
 
 @pytest.fixture(scope="module")
-def fellowship_of_the_ring(client):
-    members = [
+def fellowship_of_the_ring(client: StreamChat):
+    members: List[Dict] = [
         {"id": "frodo-baggins", "name": "Frodo Baggins", "race": "Hobbit", "age": 50},
         {"id": "sam-gamgee", "name": "Samwise Gamgee", "race": "Hobbit", "age": 38},
         {"id": "gandalf", "name": "Gandalf the Grey", "race": "Istari"},

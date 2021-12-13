@@ -11,12 +11,13 @@ help: ## Display this help message
 
 lint:  ## Run linters
 	black --check stream_chat
-	flake8 --ignore=E501,E225,W293,W503,F401 stream_chat
+	flake8 --ignore=E501,W503 stream_chat
+	mypy stream_chat
 
 lint-fix:
 	black stream_chat
 
 test:  ## Run tests
-	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) python setup.py test
+	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) pytest --cov=stream_chat --cov-report=xml stream_chat/tests
 
 check: lint test  ## Run linters + tests

@@ -1,6 +1,6 @@
 # stream-chat-python
 
-[![build](https://github.com/GetStream/stream-chat-python/workflows/build/badge.svg)](https://github.com/GetStream/stream-chat-python/actions) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stream-chat.svg)
+[![build](https://github.com/GetStream/stream-chat-python/workflows/build/badge.svg)](https://github.com/GetStream/stream-chat-python/actions) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stream-chat.svg) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 the official Python API client for [Stream chat](https://getstream.io/chat/) a service for building chat applications.
 
@@ -36,6 +36,8 @@ pip install stream-chat
 - Campaign API (alpha - susceptible changes and even won't be available in some regions yet)
 
 ### Quickstart
+
+> :bulb: The library is almost 100% typed. Feel free to enable [mypy](https://github.com/python/mypy) for our library. We will introduce more improvements in the future in this area.
 
 #### Sync
 
@@ -125,7 +127,7 @@ In order to release new version you need to be a maintainer on Pypi.
 - Update the version on setup.py
 - Commit and push to Github
 - Create a new tag for the version (eg. `v2.9.0`)
-- Create a new dist with python `python setup.py sdist`
-- Upload the new distributable with twine `twine upload dist/stream-chat-VERSION-NAME.tar.gz`
+- Create a new dist with python `python setup.py sdist bdist_wheel`
+- Upload the new distributable with twine `twine upload dist/*`
 
 If unsure you can also test using the Pypi test servers `twine upload --repository-url https://test.pypi.org/legacy/ dist/stream-chat-VERSION-NAME.tar.gz`

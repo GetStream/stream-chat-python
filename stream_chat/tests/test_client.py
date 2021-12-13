@@ -1,17 +1,19 @@
 import sys
 from operator import itemgetter
 from contextlib import suppress
+from typing import Dict, List
 
 import jwt
 import pytest
 import time
 import uuid
 from stream_chat import StreamChat
+from stream_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
 
 
 class TestClient(object):
-    def test_normalize_sort(self, client):
+    def test_normalize_sort(self, client: StreamChat):
         expected = [
             {"field": "field1", "direction": 1},
             {"field": "field2", "direction": -1},
@@ -32,7 +34,7 @@ class TestClient(object):
             # Compare elements regardless of the order
             assert sorted(actual, key=itemgetter("field")) == expected
 
-    def test_mute_user(self, client, random_users):
+    def test_mute_user(self, client: StreamChat, random_users: List[Dict]):
         response = client.mute_user(random_users[0]["id"], random_users[1]["id"])
         assert "mute" in response
         assert "expires" not in response["mute"]
@@ -40,7 +42,7 @@ class TestClient(object):
         assert response["mute"]["user"]["id"] == random_users[1]["id"]
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
-    def test_mute_user_with_timeout(self, client, random_users):
+    def test_mute_user_with_timeout(self, client: StreamChat, random_users: List[Dict]):
         response = client.mute_user(
             random_users[0]["id"], random_users[1]["id"], timeout=10
         )
@@ -50,7 +52,7 @@ class TestClient(object):
         assert response["mute"]["user"]["id"] == random_users[1]["id"]
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
-    def test_get_message(self, client, channel, random_user):
+    def test_get_message(self, client: StreamChat, channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id)
@@ -64,55 +66,55 @@ class TestClient(object):
         with pytest.raises(StreamAPIException):
             client.get_channel_type("team")
 
-    def test_get_channel_types(self, client):
+    def test_get_channel_types(self, client: StreamChat):
         response = client.get_channel_type("team")
         assert "permissions" in response
 
-    def test_list_channel_types(self, client):
+    def test_list_channel_types(self, client: StreamChat):
         response = client.list_channel_types()
         assert "channel_types" in response
 
-    def test_update_channel_type(self, client):
+    def test_update_channel_type(self, client: StreamChat):
         response = client.update_channel_type("team", commands=["ban", "unban"])
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
 
-    def test_get_command(self, client, command):
+    def test_get_command(self, client: StreamChat, command):
         response = client.get_command(command["name"])
         assert command["name"] == response["name"]
 
-    def test_update_command(self, client, command):
+    def test_update_command(self, client: StreamChat, command):
         response = client.update_command(command["name"], description="My new command")
         assert "command" in response
         assert "My new command" == response["command"]["description"]
 
-    def test_list_commands(self, client):
+    def test_list_commands(self, client: StreamChat):
         response = client.list_commands()
         assert "commands" in response
 
-    def test_create_token(self, client):
+    def test_create_token(self, client: StreamChat):
         token = client.create_token("tommaso")
         assert type(token) is str
         payload = jwt.decode(token, client.api_secret, algorithms=["HS256"])
         assert payload.get("user_id") == "tommaso"
 
-    def test_get_app_settings(self, client):
+    def test_get_app_settings(self, client: StreamChat):
         configs = client.get_app_settings()
         assert "app" in configs
 
-    def test_update_user(self, client):
+    def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
         response = client.update_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
 
-    def test_update_users(self, client):
+    def test_update_users(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
         response = client.update_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
 
-    def test_update_user_partial(self, client):
+    def test_update_user_partial(self, client: StreamChat):
         user_id = str(uuid.uuid4())
         client.update_user({"id": user_id, "field": "value"})
 
@@ -124,12 +126,12 @@ class TestClient(object):
         assert user_id in response["users"]
         assert response["users"][user_id]["field"] == "updated"
 
-    def test_delete_user(self, client, random_user):
+    def test_delete_user(self, client: StreamChat, random_user: Dict):
         response = client.delete_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
-    def test_delete_users(self, client, random_user):
+    def test_delete_users(self, client: StreamChat, random_user: Dict):
         response = client.delete_users(
             [random_user["id"]], "hard", conversations="hard", messages="hard"
         )
@@ -144,14 +146,14 @@ class TestClient(object):
 
             time.sleep(1)
 
-        assert False, "task did not succeed"
+        pytest.fail("task did not succeed")
 
-    def test_deactivate_user(self, client, random_user):
+    def test_deactivate_user(self, client: StreamChat, random_user: Dict):
         response = client.deactivate_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
-    def test_reactivate_user(self, client, random_user):
+    def test_reactivate_user(self, client: StreamChat, random_user: Dict):
         response = client.deactivate_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
@@ -159,12 +161,14 @@ class TestClient(object):
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
-    def test_export_user(self, client, fellowship_of_the_ring):
+    def test_export_user(self, client: StreamChat, fellowship_of_the_ring):
         response = client.export_user("gandalf")
         assert "user" in response
         assert response["user"]["name"] == "Gandalf the Grey"
 
-    def test_shadow_ban(self, client, random_user, server_user, channel):
+    def test_shadow_ban(
+        self, client: StreamChat, random_user, server_user, channel: Channel
+    ):
         msg_id = str(uuid.uuid4())
         response = channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -195,24 +199,24 @@ class TestClient(object):
         response = client.get_message(msg_id)
         assert not response["message"]["shadowed"]
 
-    def test_ban_user(self, client, random_user, server_user):
+    def test_ban_user(self, client: StreamChat, random_user, server_user: Dict):
         client.ban_user(random_user["id"], user_id=server_user["id"])
 
-    def test_unban_user(self, client, random_user, server_user):
+    def test_unban_user(self, client: StreamChat, random_user, server_user: Dict):
         client.ban_user(random_user["id"], user_id=server_user["id"])
         client.unban_user(random_user["id"], user_id=server_user["id"])
 
-    def test_flag_user(self, client, random_user, server_user):
+    def test_flag_user(self, client: StreamChat, random_user, server_user: Dict):
         client.flag_user(random_user["id"], user_id=server_user["id"])
 
-    def test_unflag_user(self, client, random_user, server_user):
+    def test_unflag_user(self, client: StreamChat, random_user, server_user: Dict):
         client.flag_user(random_user["id"], user_id=server_user["id"])
         client.unflag_user(random_user["id"], user_id=server_user["id"])
 
-    def test_mark_all_read(self, client, random_user):
+    def test_mark_all_read(self, client: StreamChat, random_user: Dict):
         client.mark_all_read(random_user["id"])
 
-    def test_pin_unpin_message(self, client, channel, random_user):
+    def test_pin_unpin_message(self, client: StreamChat, channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         response = channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -226,7 +230,7 @@ class TestClient(object):
         assert response["message"]["pinned_at"] is None
         assert response["message"]["pinned_by"] is None
 
-    def test_update_message(self, client, channel, random_user):
+    def test_update_message(self, client: StreamChat, channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         response = channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -241,7 +245,9 @@ class TestClient(object):
             }
         )
 
-    def test_update_message_partial(self, client, channel, random_user):
+    def test_update_message_partial(
+        self, client: StreamChat, channel, random_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         response = channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -255,7 +261,7 @@ class TestClient(object):
         assert response["message"]["text"] == "helloworld"
         assert response["message"]["awesome"] is True
 
-    def test_delete_message(self, client, channel, random_user):
+    def test_delete_message(self, client: StreamChat, channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id)
@@ -263,12 +269,16 @@ class TestClient(object):
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id, hard=True)
 
-    def test_flag_message(self, client, channel, random_user, server_user):
+    def test_flag_message(
+        self, client: StreamChat, channel, random_user, server_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.flag_message(msg_id, user_id=server_user["id"])
 
-    def test_query_message_flags(self, client, channel, random_user, server_user):
+    def test_query_message_flags(
+        self, client: StreamChat, channel, random_user, server_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.flag_message(msg_id, user_id=server_user["id"])
@@ -277,18 +287,22 @@ class TestClient(object):
         response = client.query_message_flags({"user_id": {"$in": [random_user["id"]]}})
         assert len(response["flags"]) == 1
 
-    def test_unflag_message(self, client, channel, random_user, server_user):
+    def test_unflag_message(
+        self, client: StreamChat, channel, random_user, server_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.flag_message(msg_id, user_id=server_user["id"])
         client.unflag_message(msg_id, user_id=server_user["id"])
 
-    def test_query_users_young_hobbits(self, client, fellowship_of_the_ring):
+    def test_query_users_young_hobbits(
+        self, client: StreamChat, fellowship_of_the_ring
+    ):
         response = client.query_users({"race": {"$eq": "Hobbit"}}, {"age": -1})
         assert len(response["users"]) == 4
         assert [50, 38, 36, 28] == [u["age"] for u in response["users"]]
 
-    def test_devices(self, client, random_user):
+    def test_devices(self, client: StreamChat, random_user: Dict):
         response = client.get_devices(random_user["id"])
         assert "devices" in response
         assert len(response["devices"]) == 0
@@ -302,7 +316,7 @@ class TestClient(object):
         response = client.get_devices(random_user["id"])
         assert len(response["devices"]) == 1
 
-    def test_get_rate_limits(self, client):
+    def test_get_rate_limits(self, client: StreamChat):
         response = client.get_rate_limits()
         assert "server_side" in response
         assert "android" in response
@@ -334,7 +348,7 @@ class TestClient(object):
         )
 
     @pytest.mark.xfail
-    def test_search_with_sort(self, client, channel, random_user):
+    def test_search_with_sort(self, client: StreamChat, channel, random_user: Dict):
         text = str(uuid.uuid4())
         ids = ["0" + text, "1" + text]
         channel.send_message(
@@ -360,7 +374,7 @@ class TestClient(object):
         assert response["next"] is None
         assert ids[0] == response["results"][0]["message"]["id"]
 
-    def test_search(self, client, channel, random_user):
+    def test_search(self, client: StreamChat, channel, random_user: Dict):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
             {"text": f"How many syllables are there in {query}?"},
@@ -381,7 +395,9 @@ class TestClient(object):
         for message in response["results"]:
             assert query not in message["message"]["text"]
 
-    def test_search_message_filters(self, client, channel, random_user):
+    def test_search_message_filters(
+        self, client: StreamChat, channel, random_user: Dict
+    ):
         query = "supercalifragilisticexpialidocious"
         channel.send_message(
             {"text": f"How many syllables are there in {query}?"},
@@ -401,7 +417,7 @@ class TestClient(object):
         assert len(response["results"]) >= 1
         assert query in response["results"][0]["message"]["text"]
 
-    def test_search_offset_with_sort(self, client):
+    def test_search_offset_with_sort(self, client: StreamChat):
         query = "supercalifragilisticexpialidocious"
         with pytest.raises(ValueError):
             client.search(
@@ -410,51 +426,53 @@ class TestClient(object):
                 **{"limit": 2, "offset": 1, "sort": [{"created_at": -1}]},
             )
 
-    def test_search_offset_with_next(self, client):
+    def test_search_offset_with_next(self, client: StreamChat):
         query = "supercalifragilisticexpialidocious"
         with pytest.raises(ValueError):
             client.search(
                 {"type": "messaging"}, query, **{"limit": 2, "offset": 1, "next": query}
             )
 
-    def test_query_channels_members_in(self, client, fellowship_of_the_ring):
+    def test_query_channels_members_in(
+        self, client: StreamChat, fellowship_of_the_ring
+    ):
         response = client.query_channels({"members": {"$in": ["gimli"]}}, {"id": 1})
         assert len(response["channels"]) == 1
         assert response["channels"][0]["channel"]["id"] == "fellowship-of-the-ring"
         assert len(response["channels"][0]["members"]) == 9
 
-    def test_create_blocklist(self, client):
+    def test_create_blocklist(self, client: StreamChat):
         client.create_blocklist(name="Foo", words=["fudge", "heck"])
 
-    def test_list_blocklists(self, client):
+    def test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()
         assert len(response["blocklists"]) == 2
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
-    def test_get_blocklist(self, client):
+    def test_get_blocklist(self, client: StreamChat):
         response = client.get_blocklist("Foo")
         assert response["blocklist"]["name"] == "Foo"
         assert response["blocklist"]["words"] == ["fudge", "heck"]
 
-    def test_update_blocklist(self, client):
+    def test_update_blocklist(self, client: StreamChat):
         client.update_blocklist("Foo", words=["dang"])
         response = client.get_blocklist("Foo")
         assert response["blocklist"]["words"] == ["dang"]
 
-    def test_delete_blocklist(self, client):
+    def test_delete_blocklist(self, client: StreamChat):
         client.delete_blocklist("Foo")
 
-    def test_check_sqs(self, client):
+    def test_check_sqs(self, client: StreamChat):
         response = client.check_sqs("key", "secret", "https://foo.com/bar")
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
 
     @pytest.mark.skip(reason="slow and flaky due to waits")
-    def test_custom_permission_and_roles(self, client):
+    def test_custom_permission_and_roles(self, client: StreamChat):
         id, role = "my-custom-permission", "god"
 
-        def wait():
+        def wait() -> None:
             time.sleep(3)
 
         with suppress(Exception):
@@ -510,7 +528,7 @@ class TestClient(object):
         response = client.list_roles()
         assert role not in response["roles"]
 
-    def test_delete_channels(self, client, channel):
+    def test_delete_channels(self, client: StreamChat, channel: Channel):
         response = client.delete_channels([channel.cid])
         assert "task_id" in response
 
@@ -523,4 +541,4 @@ class TestClient(object):
 
             time.sleep(1)
 
-        assert False, "task did not succeed"
+        pytest.fail("task did not succeed")
