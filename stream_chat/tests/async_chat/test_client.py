@@ -1,17 +1,19 @@
 import sys
 from contextlib import suppress
 from operator import itemgetter
+from typing import Dict, List
 
 import jwt
 import pytest
 import time
 import uuid
+from stream_chat.async_chat.channel import Channel
 from stream_chat.async_chat import StreamChatAsync
 from stream_chat.base.exceptions import StreamAPIException
 
 
 class TestClient(object):
-    def test_normalize_sort(self, client):
+    def test_normalize_sort(self, client: StreamChatAsync):
         expected = [
             {"field": "field1", "direction": 1},
             {"field": "field2", "direction": -1},
@@ -33,7 +35,7 @@ class TestClient(object):
             assert sorted(actual, key=itemgetter("field")) == expected
 
     @pytest.mark.asyncio
-    async def test_mute_user(self, client, random_users):
+    async def test_mute_user(self, client: StreamChatAsync, random_users: List[Dict]):
         response = await client.mute_user(random_users[0]["id"], random_users[1]["id"])
         assert "mute" in response
         assert "expires" not in response["mute"]
@@ -42,7 +44,9 @@ class TestClient(object):
         await client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
     @pytest.mark.asyncio
-    async def test_mute_user_with_timeout(self, client, random_users):
+    async def test_mute_user_with_timeout(
+        self, client: StreamChatAsync, random_users: List[Dict]
+    ):
         response = await client.mute_user(
             random_users[0]["id"], random_users[1]["id"], timeout=10
         )
@@ -53,7 +57,9 @@ class TestClient(object):
         await client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
     @pytest.mark.asyncio
-    async def test_get_message(self, client, channel, random_user):
+    async def test_get_message(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         await channel.send_message(
             {"id": msg_id, "text": "helloworld"}, random_user["id"]
@@ -73,28 +79,28 @@ class TestClient(object):
                 await client.get_channel_type("team")
 
     @pytest.mark.asyncio
-    async def test_get_channel_types(self, client):
+    async def test_get_channel_types(self, client: StreamChatAsync):
         response = await client.get_channel_type("team")
         assert "permissions" in response
 
     @pytest.mark.asyncio
-    async def test_list_channel_types(self, client):
+    async def test_list_channel_types(self, client: StreamChatAsync):
         response = await client.list_channel_types()
         assert "channel_types" in response
 
     @pytest.mark.asyncio
-    async def test_update_channel_type(self, client):
+    async def test_update_channel_type(self, client: StreamChatAsync):
         response = await client.update_channel_type("team", commands=["ban", "unban"])
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
 
     @pytest.mark.asyncio
-    async def test_get_command(self, client, command):
+    async def test_get_command(self, client: StreamChatAsync, command: Dict):
         response = await client.get_command(command["name"])
         assert command["name"] == response["name"]
 
     @pytest.mark.asyncio
-    async def test_update_command(self, client, command):
+    async def test_update_command(self, client: StreamChatAsync, command: Dict):
         response = await client.update_command(
             command["name"], description="My new command"
         )
@@ -102,7 +108,7 @@ class TestClient(object):
         assert "My new command" == response["command"]["description"]
 
     @pytest.mark.asyncio
-    async def test_list_commands(self, client):
+    async def test_list_commands(self, client: StreamChatAsync):
         response = await client.list_commands()
         assert "commands" in response
 
@@ -113,26 +119,26 @@ class TestClient(object):
         assert payload.get("user_id") == "tommaso"
 
     @pytest.mark.asyncio
-    async def test_get_app_settings(self, client):
+    async def test_get_app_settings(self, client: StreamChatAsync):
         configs = await client.get_app_settings()
         assert "app" in configs
 
     @pytest.mark.asyncio
-    async def test_update_user(self, client):
+    async def test_update_user(self, client: StreamChatAsync):
         user = {"id": str(uuid.uuid4())}
         response = await client.update_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
 
     @pytest.mark.asyncio
-    async def test_update_users(self, client):
+    async def test_update_users(self, client: StreamChatAsync):
         user = {"id": str(uuid.uuid4())}
         response = await client.update_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
 
     @pytest.mark.asyncio
-    async def test_update_user_partial(self, client):
+    async def test_update_user_partial(self, client: StreamChatAsync):
         user_id = str(uuid.uuid4())
         await client.update_user({"id": user_id, "field": "value"})
 
@@ -145,13 +151,13 @@ class TestClient(object):
         assert response["users"][user_id]["field"] == "updated"
 
     @pytest.mark.asyncio
-    async def test_delete_user(self, client, random_user):
+    async def test_delete_user(self, client: StreamChatAsync, random_user: Dict):
         response = await client.delete_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
     @pytest.mark.asyncio
-    async def test_delete_users(self, client, random_user):
+    async def test_delete_users(self, client: StreamChatAsync, random_user: Dict):
         response = await client.delete_users(
             [random_user["id"]], "hard", conversations="hard", messages="hard"
         )
@@ -166,16 +172,16 @@ class TestClient(object):
 
             time.sleep(1)
 
-        assert False, "task did not succeed"
+        pytest.fail("task did not succeed")
 
     @pytest.mark.asyncio
-    async def test_deactivate_user(self, client, random_user):
+    async def test_deactivate_user(self, client: StreamChatAsync, random_user: Dict):
         response = await client.deactivate_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
     @pytest.mark.asyncio
-    async def test_reactivate_user(self, client, random_user):
+    async def test_reactivate_user(self, client: StreamChatAsync, random_user: Dict):
         response = await client.deactivate_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
@@ -184,17 +190,21 @@ class TestClient(object):
         assert random_user["id"] == response["user"]["id"]
 
     @pytest.mark.asyncio
-    async def test_export_user(self, client, fellowship_of_the_ring):
+    async def test_export_user(self, client: StreamChatAsync, fellowship_of_the_ring):
         response = await client.export_user("gandalf")
         assert "user" in response
         assert response["user"]["name"] == "Gandalf the Grey"
 
     @pytest.mark.asyncio
-    async def test_ban_user(self, client, random_user, server_user):
+    async def test_ban_user(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
         await client.ban_user(random_user["id"], user_id=server_user["id"])
 
     @pytest.mark.asyncio
-    async def test_shadow_ban(self, client, random_user, server_user, channel):
+    async def test_shadow_ban(
+        self, client: StreamChatAsync, random_user, server_user, channel: Channel
+    ):
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -226,25 +236,33 @@ class TestClient(object):
         assert not response["message"]["shadowed"]
 
     @pytest.mark.asyncio
-    async def test_unban_user(self, client, random_user, server_user):
+    async def test_unban_user(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
         await client.ban_user(random_user["id"], user_id=server_user["id"])
         await client.unban_user(random_user["id"], user_id=server_user["id"])
 
     @pytest.mark.asyncio
-    async def test_flag_user(self, client, random_user, server_user):
+    async def test_flag_user(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
         await client.flag_user(random_user["id"], user_id=server_user["id"])
 
     @pytest.mark.asyncio
-    async def test_unflag_user(self, client, random_user, server_user):
+    async def test_unflag_user(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
         await client.flag_user(random_user["id"], user_id=server_user["id"])
         await client.unflag_user(random_user["id"], user_id=server_user["id"])
 
     @pytest.mark.asyncio
-    async def test_mark_all_read(self, client, random_user):
+    async def test_mark_all_read(self, client: StreamChatAsync, random_user: Dict):
         await client.mark_all_read(random_user["id"])
 
     @pytest.mark.asyncio
-    async def test_pin_unpin_message(self, client, channel, random_user):
+    async def test_pin_unpin_message(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -259,7 +277,9 @@ class TestClient(object):
         assert response["message"]["pinned_by"] is None
 
     @pytest.mark.asyncio
-    async def test_update_message(self, client, channel, random_user):
+    async def test_update_message(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -275,7 +295,9 @@ class TestClient(object):
         )
 
     @pytest.mark.asyncio
-    async def test_update_message_partial(self, client, channel, random_user):
+    async def test_update_message_partial(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
             {"id": msg_id, "text": "hello world"}, random_user["id"]
@@ -290,7 +312,9 @@ class TestClient(object):
         assert response["message"]["awesome"] is True
 
     @pytest.mark.asyncio
-    async def test_delete_message(self, client, channel, random_user):
+    async def test_delete_message(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         await channel.send_message(
             {"id": msg_id, "text": "helloworld"}, random_user["id"]
@@ -303,7 +327,9 @@ class TestClient(object):
         await client.delete_message(msg_id, hard=True)
 
     @pytest.mark.asyncio
-    async def test_flag_message(self, client, channel, random_user, server_user):
+    async def test_flag_message(
+        self, client: StreamChatAsync, channel: Channel, random_user, server_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         await channel.send_message(
             {"id": msg_id, "text": "helloworld"}, random_user["id"]
@@ -311,7 +337,9 @@ class TestClient(object):
         await client.flag_message(msg_id, user_id=server_user["id"])
 
     @pytest.mark.asyncio
-    async def test_query_message_flags(self, client, channel, random_user, server_user):
+    async def test_query_message_flags(
+        self, client: StreamChatAsync, channel: Channel, random_user, server_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         await channel.send_message(
             {"id": msg_id, "text": "helloworld"}, random_user["id"]
@@ -325,7 +353,9 @@ class TestClient(object):
         assert len(response["flags"]) == 1
 
     @pytest.mark.asyncio
-    async def test_unflag_message(self, client, channel, random_user, server_user):
+    async def test_unflag_message(
+        self, client: StreamChatAsync, channel: Channel, random_user, server_user: Dict
+    ):
         msg_id = str(uuid.uuid4())
         await channel.send_message(
             {"id": msg_id, "text": "helloworld"}, random_user["id"]
@@ -334,13 +364,15 @@ class TestClient(object):
         await client.unflag_message(msg_id, user_id=server_user["id"])
 
     @pytest.mark.asyncio
-    async def test_query_users_young_hobbits(self, client, fellowship_of_the_ring):
+    async def test_query_users_young_hobbits(
+        self, client: StreamChatAsync, fellowship_of_the_ring
+    ):
         response = await client.query_users({"race": {"$eq": "Hobbit"}}, {"age": -1})
         assert len(response["users"]) == 4
         assert [50, 38, 36, 28] == [u["age"] for u in response["users"]]
 
     @pytest.mark.asyncio
-    async def test_devices(self, client, random_user):
+    async def test_devices(self, client: StreamChatAsync, random_user: Dict):
         response = await client.get_devices(random_user["id"])
         assert "devices" in response
         assert len(response["devices"]) == 0
@@ -355,7 +387,7 @@ class TestClient(object):
         assert len(response["devices"]) == 1
 
     @pytest.mark.asyncio
-    async def test_get_rate_limits(self, client):
+    async def test_get_rate_limits(self, client: StreamChatAsync):
         response = await client.get_rate_limits()
         assert "server_side" in response
         assert "android" in response
@@ -388,7 +420,9 @@ class TestClient(object):
 
     @pytest.mark.xfail
     @pytest.mark.asyncio
-    async def test_search_with_sort(self, client, channel, random_user):
+    async def test_search_with_sort(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         text = str(uuid.uuid4())
         ids = ["0" + text, "1" + text]
         await channel.send_message(
@@ -415,7 +449,9 @@ class TestClient(object):
         assert ids[0] == response["results"][0]["message"]["id"]
 
     @pytest.mark.asyncio
-    async def test_search(self, client, channel, random_user):
+    async def test_search(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         query = "supercalifragilisticexpialidocious"
         await channel.send_message(
             {"text": f"How many syllables are there in {query}?"},
@@ -437,7 +473,9 @@ class TestClient(object):
             assert query not in message["message"]["text"]
 
     @pytest.mark.asyncio
-    async def test_search_message_filters(self, client, channel, random_user):
+    async def test_search_message_filters(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
         query = "supercalifragilisticexpialidocious"
         await channel.send_message(
             {"text": f"How many syllables are there in {query}?"},
@@ -458,7 +496,7 @@ class TestClient(object):
         assert query in response["results"][0]["message"]["text"]
 
     @pytest.mark.asyncio
-    async def test_search_offset_with_sort(self, client):
+    async def test_search_offset_with_sort(self, client: StreamChatAsync):
         query = "supercalifragilisticexpialidocious"
         with pytest.raises(ValueError):
             await client.search(
@@ -468,7 +506,7 @@ class TestClient(object):
             )
 
     @pytest.mark.asyncio
-    async def test_search_offset_with_next(self, client):
+    async def test_search_offset_with_next(self, client: StreamChatAsync):
         query = "supercalifragilisticexpialidocious"
         with pytest.raises(ValueError):
             await client.search(
@@ -476,7 +514,9 @@ class TestClient(object):
             )
 
     @pytest.mark.asyncio
-    async def test_query_channels_members_in(self, client, fellowship_of_the_ring):
+    async def test_query_channels_members_in(
+        self, client: StreamChatAsync, fellowship_of_the_ring
+    ):
         response = await client.query_channels(
             {"members": {"$in": ["gimli"]}}, {"id": 1}
         )
@@ -485,44 +525,44 @@ class TestClient(object):
         assert len(response["channels"][0]["members"]) == 9
 
     @pytest.mark.asyncio
-    async def test_create_blocklist(self, client):
+    async def test_create_blocklist(self, client: StreamChatAsync):
         await client.create_blocklist(name="Foo", words=["fudge", "heck"])
 
     @pytest.mark.asyncio
-    async def test_list_blocklists(self, client):
+    async def test_list_blocklists(self, client: StreamChatAsync):
         response = await client.list_blocklists()
         assert len(response["blocklists"]) == 2
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
     @pytest.mark.asyncio
-    async def test_get_blocklist(self, client):
+    async def test_get_blocklist(self, client: StreamChatAsync):
         response = await client.get_blocklist("Foo")
         assert response["blocklist"]["name"] == "Foo"
         assert response["blocklist"]["words"] == ["fudge", "heck"]
 
     @pytest.mark.asyncio
-    async def test_update_blocklist(self, client):
+    async def test_update_blocklist(self, client: StreamChatAsync):
         await client.update_blocklist("Foo", words=["dang"])
         response = await client.get_blocklist("Foo")
         assert response["blocklist"]["words"] == ["dang"]
 
     @pytest.mark.asyncio
-    async def test_delete_blocklist(self, client):
+    async def test_delete_blocklist(self, client: StreamChatAsync):
         await client.delete_blocklist("Foo")
 
     @pytest.mark.asyncio
-    async def test_check_sqs(self, client):
+    async def test_check_sqs(self, client: StreamChatAsync):
         response = await client.check_sqs("key", "secret", "https://foo.com/bar")
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
 
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="slow and flaky due to waits")
-    async def test_custom_permission_and_roles(self, client):
+    async def test_custom_permission_and_roles(self, client: StreamChatAsync):
         id, role = "my-custom-permission", "god"
 
-        def wait():
+        def wait() -> None:
             time.sleep(3)
 
         with suppress(Exception):
@@ -579,7 +619,7 @@ class TestClient(object):
         assert role not in response["roles"]
 
     @pytest.mark.asyncio
-    async def test_delete_channels(self, client, channel):
+    async def test_delete_channels(self, client: StreamChatAsync, channel: Channel):
         response = await client.delete_channels([channel.cid])
         assert "task_id" in response
 
@@ -592,4 +632,4 @@ class TestClient(object):
 
             time.sleep(1)
 
-        assert False, "task did not succeed"
+        pytest.fail("task did not succeed")

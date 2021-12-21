@@ -22,6 +22,7 @@ var/
 .installed.cfg
 *.egg
 include/
+.DS_Store
 
 # Installer logs
 pip-log.txt
@@ -42,6 +43,7 @@ coverage.xml
 .mr.developer.cfg
 .project
 .pydevproject
+.coverage*
 
 # Rope
 .ropeproject
@@ -62,6 +64,7 @@ pip-selfcheck.json
 .idea
 .vscode
 *,cover
+.mypy_cache
 .eggs
 .env
 .envrc

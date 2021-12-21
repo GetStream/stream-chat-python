@@ -1,5 +1,6 @@
 import asyncio
 import os
+from typing import Dict, List
 import uuid
 
 import pytest
@@ -18,7 +19,7 @@ def pytest_runtest_setup(item):
     if "incremental" in item.keywords:
         previousfailed = getattr(item.parent, "_previousfailed", None)
         if previousfailed is not None:
-            pytest.xfail("previous test failed (%s)" % previousfailed.name)
+            pytest.xfail(f"previous test failed ({previousfailed.name})")
 
 
 def pytest_configure(config):
@@ -46,7 +47,7 @@ async def client():
 
 
 @pytest.fixture(scope="function")
-async def random_user(client):
+async def random_user(client: StreamChatAsync):
     user = {"id": str(uuid.uuid4())}
     response = await client.update_user(user)
     assert "users" in response
@@ -55,7 +56,7 @@ async def random_user(client):
 
 
 @pytest.fixture(scope="function")
-async def server_user(client):
+async def server_user(client: StreamChatAsync):
     user = {"id": str(uuid.uuid4())}
     response = await client.update_user(user)
     assert "users" in response
@@ -64,7 +65,7 @@ async def server_user(client):
 
 
 @pytest.fixture(scope="function")
-async def random_users(client):
+async def random_users(client: StreamChatAsync):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
     await client.update_users([user1, user2])
@@ -72,7 +73,7 @@ async def random_users(client):
 
 
 @pytest.fixture(scope="function")
-async def channel(client, random_user):
+async def channel(client, random_user: Dict):
     channel = client.channel(
         "messaging", str(uuid.uuid4()), {"test": True, "language": "python"}
     )
@@ -81,7 +82,7 @@ async def channel(client, random_user):
 
 
 @pytest.fixture(scope="function")
-async def command(client):
+async def command(client: StreamChatAsync):
     response = await client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
     )
@@ -92,8 +93,8 @@ async def command(client):
 
 
 @pytest.fixture(scope="module")
-async def fellowship_of_the_ring(client):
-    members = [
+async def fellowship_of_the_ring(client: StreamChatAsync):
+    members: List[Dict] = [
         {"id": "frodo-baggins", "name": "Frodo Baggins", "race": "Hobbit", "age": 50},
         {"id": "sam-gamgee", "name": "Samwise Gamgee", "race": "Hobbit", "age": 38},
         {"id": "gandalf", "name": "Gandalf the Grey", "race": "Istari"},

@@ -2,8 +2,12 @@ name: build
 on:
   push:
     branches:
-      - 'master'
+      - "master"
   pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -11,16 +15,12 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9, '3.10']
+        python: [3.6, 3.7, 3.8, 3.9, "3.10"]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-
-      - name: Add pip bin to PATH
-        run: |
-          echo "/home/runner/.local/bin" >> $GITHUB_PATH
 
       - name: Install deps with ${{ matrix.python }}
         run: pip install ".[test, ci]"
@@ -33,6 +33,5 @@ jobs:
         env:
           STREAM_KEY: ${{ secrets.STREAM_KEY }}
           STREAM_SECRET: ${{ secrets.STREAM_SECRET }}
-        run: |
-          python setup.py install
-          make test
+          PYTHONPATH: ${{ github.workspace }}
+        run: make test

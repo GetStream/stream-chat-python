@@ -1,74 +1,40 @@
 import json
+from typing import Any, Dict, Iterable, List, Union
 
 from stream_chat.base.channel import ChannelInterface, add_user_id
+from stream_chat.types.stream_response import StreamResponse
 
 
 class Channel(ChannelInterface):
-    def send_message(self, message, user_id, **options):
-        """
-        Send a message to this channel
-
-        :param message: the Message object
-        :param user_id: the ID of the user that created the message
-        :return: the Server Response
-        """
+    def send_message(
+        self, message: Dict, user_id: str, **options: Any
+    ) -> StreamResponse:
         payload = {"message": add_user_id(message, user_id), **options}
         return self.client.post(f"{self.url}/message", data=payload)
 
-    def send_event(self, event, user_id):
-        """
-        Send an event on this channel
-
-        :param event: event data, ie {type: 'message.read'}
-        :param user_id: the ID of the user sending the event
-        :return: the Server Response
-        """
+    def send_event(self, event: Dict, user_id: str) -> StreamResponse:
         payload = {"event": add_user_id(event, user_id)}
         return self.client.post(f"{self.url}/event", data=payload)
 
-    def send_reaction(self, message_id, reaction, user_id):
-        """
-        Send a reaction about a message
-
-        :param message_id: the message id
-        :param reaction: the reaction object, ie {type: 'love'}
-        :param user_id: the ID of the user that created the reaction
-        :return: the Server Response
-        """
+    def send_reaction(
+        self, message_id: str, reaction: Dict, user_id: str
+    ) -> StreamResponse:
         payload = {"reaction": add_user_id(reaction, user_id)}
         return self.client.post(f"messages/{message_id}/reaction", data=payload)
 
-    def delete_reaction(self, message_id, reaction_type, user_id):
-        """
-        Delete a reaction by user and type
-
-        :param message_id: the id of the message from which te remove the reaction
-        :param reaction_type: the type of reaction that should be removed
-        :param user_id: the id of the user
-        :return: the Server Response
-        """
+    def delete_reaction(
+        self, message_id: str, reaction_type: str, user_id: str
+    ) -> StreamResponse:
         return self.client.delete(
             f"messages/{message_id}/reaction/{reaction_type}",
             params={"user_id": user_id},
         )
 
-    def create(self, user_id):
-        """
-        Create the channel
-
-        :param user_id: the ID of the user creating this channel
-        :return:
-        """
+    def create(self, user_id: str) -> StreamResponse:
         self.custom_data["created_by"] = {"id": user_id}
         return self.query(watch=False, state=False, presence=False)
 
-    def query(self, **options):
-        """
-        Query the API for this channel, get messages, members or other channel fields
-
-        :param options: the query options, check docs on https://getstream.io/chat/docs/
-        :return: Returns a query response
-        """
+    def query(self, **options: Any) -> StreamResponse:
         payload = {"state": True, "data": self.custom_data, **options}
 
         url = f"channels/{self.channel_type}"
@@ -78,26 +44,13 @@ class Channel(ChannelInterface):
         state = self.client.post(f"{url}/query", data=payload)
 
         if self.id is None:
-            self.id = state["channel"]["id"]
+            self.id: str = state["channel"]["id"]
 
         return state
 
-    def query_members(self, filter_conditions, sort=None, **options):
-        """
-        Query the API for this channel to filter, sort and paginate its members efficiently.
-
-        :param filter_conditions: filters, checks docs on https://getstream.io/chat/docs/
-        :param sort: sorting field and direction slice, check docs on https://getstream.io/chat/docs/
-        :param options: pagination or members based channel searching details
-        :return: Returns members response
-
-        eg.
-        channel.query_members(filter_conditions={"name": "tommaso"},
-                              sort=[{"created_at": -1}, {"updated_at": 1}],
-                              offset=0,
-                              limit=10)
-        """
-
+    def query_members(
+        self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
+    ) -> List[Dict]:
         payload = {
             "id": self.id,
             "type": self.channel_type,
@@ -105,219 +58,130 @@ class Channel(ChannelInterface):
             "sort": self.client.normalize_sort(sort),
             **options,
         }
-        response = self.client.get("members", params={"payload": json.dumps(payload)})
+        response: StreamResponse = self.client.get(
+            "members", params={"payload": json.dumps(payload)}
+        )
         return response["members"]
 
-    def update(self, channel_data, update_message=None):
-        """
-        Edit the channel's custom properties
-
-        :param channel_data: the object to update the custom properties of this channel with
-        :param update_message: optional update message
-        :return: The server response
-        """
+    def update(self, channel_data: Dict, update_message: Dict = None) -> StreamResponse:
         payload = {"data": channel_data, "message": update_message}
         return self.client.post(self.url, data=payload)
 
-    def update_partial(self, to_set=None, to_unset=None):
-        """
-        Update channel partially
-
-        :param to_set: a dictionary of key/value pairs to set or to override
-        :param to_unset: a list of keys to clear
-        """
+    def update_partial(
+        self, to_set: Dict = None, to_unset: Iterable[str] = None
+    ) -> StreamResponse:
         payload = {"set": to_set or {}, "unset": to_unset or []}
         return self.client.patch(self.url, data=payload)
 
-    def delete(self):
-        """
-        Delete the channel. Messages are permanently removed.
-
-        :return: The server response
-        """
+    def delete(self) -> StreamResponse:
         return self.client.delete(self.url)
 
-    def truncate(self, **options):
-        """
-        Removes all messages from the channel
-
-        :param options: the query options, check docs on https://getstream.io/chat/docs/python/channel_delete/?language=python#truncating-a-channel
-        :return: The server response
-        """
+    def truncate(self, **options: Any) -> StreamResponse:
         return self.client.post(f"{self.url}/truncate", data=options)
 
-    def add_members(self, members, message=None, **options):
-        """
-        Adds members to the channel
-
-        :param members: member objects to add
-        :param message: An optional to show
-        :param options: additional options such as hide_history
-        :return:
-        """
+    def add_members(
+        self, members: Iterable[Dict], message: Dict = None, **options: Any
+    ) -> StreamResponse:
         payload = {"add_members": members, "message": message, **options}
         return self.client.post(self.url, data=payload)
 
-    def assign_roles(self, members, message=None):
-        """
-        Assigns new roles to specified channel members
-
-        :param members: member objects with role information
-        :param message: An optional to show
-        :return:
-        """
+    def assign_roles(
+        self, members: Iterable[Dict], message: Dict = None
+    ) -> StreamResponse:
         return self.client.post(
             self.url, data={"assign_roles": members, "message": message}
         )
 
-    def invite_members(self, user_ids, message=None):
-        """
-        invite members to the channel
-
-        :param user_ids: user IDs to invite
-        :param message: An optional to show
-        :return:
-        """
+    def invite_members(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> StreamResponse:
         return self.client.post(
             self.url, data={"invites": user_ids, "message": message}
         )
 
-    def add_moderators(self, user_ids, message=None):
-        """
-        Adds moderators to the channel
-
-        :param user_ids: user IDs to add as moderators
-        :param message: An optional to show
-        :return:
-        """
+    def add_moderators(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> StreamResponse:
         return self.client.post(
             self.url, data={"add_moderators": user_ids, "message": message}
         )
 
-    def remove_members(self, user_ids, message=None):
-        """
-        Remove members from the channel
-
-        :param user_ids: user IDs to remove from the member list
-        :param message: An optional to show
-        :return:
-        """
+    def remove_members(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> StreamResponse:
         return self.client.post(
             self.url, data={"remove_members": user_ids, "message": message}
         )
 
-    def demote_moderators(self, user_ids, message=None):
-        """
-        Demotes moderators from the channel
-
-        :param user_ids: user IDs to demote
-        :param message: An optional to show
-        :return:
-        """
+    def demote_moderators(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> StreamResponse:
         return self.client.post(
             self.url, data={"demote_moderators": user_ids, "message": message}
         )
 
-    def mark_read(self, user_id, **data):
-        """
-        Send the mark read event for this user, only works if the `read_events` setting is enabled
-
-        :param user_id: the user ID for the event
-        :param data: additional data, ie {"message_id": last_message_id}
-        :return: The server response
-        """
+    def mark_read(self, user_id: str, **data: Any) -> StreamResponse:
         payload = add_user_id(data, user_id)
         return self.client.post(f"{self.url}/read", data=payload)
 
-    def get_replies(self, parent_id, **options):
-        """
-        List the message replies for a parent message
-
-        :param parent_id: The message parent id, ie the top of the thread
-        :param options: Pagination params, ie {limit:10, id_lte: 10}
-        :return: A response with a list of messages
-        """
+    def get_replies(self, parent_id: str, **options: Any) -> StreamResponse:
         return self.client.get(f"messages/{parent_id}/replies", params=options)
 
-    def get_reactions(self, message_id, **options):
-        """
-        List the reactions, supports pagination
-
-        :param message_id: The message id
-        :param options: Pagination params, ie {"limit":10, "id_lte": 10}
-        :return: A response with a list of reactions
-        """
+    def get_reactions(self, message_id: str, **options: Any) -> StreamResponse:
         return self.client.get(f"messages/{message_id}/reactions", params=options)
 
-    def ban_user(self, target_id, **options):
-        """
-        Bans a user from this channel
-
-        :param target_id: the ID of the user to ban
-        :param options: additional ban options, ie {"timeout": 3600, "reason": "offensive language is not allowed here"}
-        :return: The server response
-        """
-        return self.client.ban_user(
+    def ban_user(self, target_id: str, **options: Any) -> StreamResponse:
+        return self.client.ban_user(  # type: ignore
             target_id, type=self.channel_type, id=self.id, **options
         )
 
-    def unban_user(self, target_id, **options):
-        """
-        Removes the ban for a user on this channel
-
-        :param target_id: the ID of the user to unban
-        :return: The server response
-        """
-        return self.client.unban_user(
+    def unban_user(self, target_id: str, **options: Any) -> StreamResponse:
+        return self.client.unban_user(  # type: ignore
             target_id, type=self.channel_type, id=self.id, **options
         )
 
-    def accept_invite(self, user_id, **data):
+    def accept_invite(self, user_id: str, **data: Any) -> StreamResponse:
         payload = add_user_id(data, user_id)
         payload["accept_invite"] = True
         response = self.client.post(self.url, data=payload)
         self.custom_data = response["channel"]
         return response
 
-    def reject_invite(self, user_id, **data):
+    def reject_invite(self, user_id: str, **data: Any) -> StreamResponse:
         payload = add_user_id(data, user_id)
         payload["reject_invite"] = True
         response = self.client.post(self.url, data=payload)
         self.custom_data = response["channel"]
         return response
 
-    def send_file(self, url, name, user, content_type=None):
-        return self.client.send_file(
+    def send_file(
+        self, url: str, name: str, user: Dict, content_type: str = None
+    ) -> StreamResponse:
+        return self.client.send_file(  # type: ignore
             f"{self.url}/file", url, name, user, content_type=content_type
         )
 
-    def send_image(self, url, name, user, content_type=None):
-        return self.client.send_file(
+    def send_image(
+        self, url: str, name: str, user: Dict, content_type: str = None
+    ) -> StreamResponse:
+        return self.client.send_file(  # type: ignore
             f"{self.url}/image", url, name, user, content_type=content_type
         )
 
-    def delete_file(self, url):
+    def delete_file(self, url: str) -> StreamResponse:
         return self.client.delete(f"{self.url}/file", {"url": url})
 
-    def delete_image(self, url):
+    def delete_image(self, url: str) -> StreamResponse:
         return self.client.delete(f"{self.url}/image", {"url": url})
 
-    def hide(self, user_id):
+    def hide(self, user_id: str) -> StreamResponse:
         return self.client.post(f"{self.url}/hide", data={"user_id": user_id})
 
-    def show(self, user_id):
+    def show(self, user_id: str) -> StreamResponse:
         return self.client.post(f"{self.url}/show", data={"user_id": user_id})
 
-    def mute(self, user_id, expiration=None):
-        """
-        Mutes the channel for the given user for an optional expiration in milliseconds
-
-        :param user_id: the id of the user muting the channel
-        :param expiration: optional expiration in ms. If not given, mute doesn't expire until unmutes
-        :return: The server response
-        """
-
-        params = {
+    def mute(self, user_id: str, expiration: int = None) -> StreamResponse:
+        params: Dict[str, Union[str, int]] = {
             "user_id": user_id,
             "channel_cid": self.cid,
         }
@@ -325,14 +189,7 @@ class Channel(ChannelInterface):
             params["expiration"] = expiration
         return self.client.post("moderation/mute/channel", data=params)
 
-    def unmute(self, user_id):
-        """
-        Unmutes the channel for the given user
-
-        :param user_id: the id of the user unmuting the channel
-        :return: The server response
-        """
-
+    def unmute(self, user_id: str) -> StreamResponse:
         params = {
             "user_id": user_id,
             "channel_cid": self.cid,

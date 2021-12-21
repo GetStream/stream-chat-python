@@ -1,31 +1,40 @@
 import abc
+from typing import Any, Awaitable, Dict, Iterable, List, Union
 
 from stream_chat.base.exceptions import StreamChannelException
+from stream_chat.types.stream_response import StreamResponse
+from stream_chat.base.client import StreamChatInterface
 
 
 class ChannelInterface(abc.ABC):
-    def __init__(self, client, channel_type, channel_id=None, custom_data=None):
+    def __init__(
+        self,
+        client: StreamChatInterface,
+        channel_type: str,
+        channel_id: str = None,
+        custom_data: Dict = None,
+    ):
         self.channel_type = channel_type
         self.id = channel_id
         self.client = client
-        self.custom_data = custom_data
-        if self.custom_data is None:
-            self.custom_data = {}
+        self.custom_data = custom_data or {}
 
     @property
-    def url(self):
+    def url(self) -> str:
         if self.id is None:
             raise StreamChannelException("channel does not have an id")
         return f"channels/{self.channel_type}/{self.id}"
 
     @property
-    def cid(self):
+    def cid(self) -> str:
         if self.id is None:
             raise StreamChannelException("channel does not have an id")
         return f"{self.channel_type}:{self.id}"
 
     @abc.abstractmethod
-    def send_message(self, message, user_id, **options):
+    def send_message(
+        self, message: Dict, user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Send a message to this channel
 
@@ -36,7 +45,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def send_event(self, event, user_id):
+    def send_event(
+        self, event: Dict, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Send an event on this channel
 
@@ -47,7 +58,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def send_reaction(self, message_id, reaction, user_id):
+    def send_reaction(
+        self, message_id: str, reaction: Dict, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Send a reaction about a message
 
@@ -59,7 +72,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete_reaction(self, message_id, reaction_type, user_id):
+    def delete_reaction(
+        self, message_id: str, reaction_type: str, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Delete a reaction by user and type
 
@@ -71,7 +86,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def create(self, user_id):
+    def create(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create the channel
 
@@ -81,7 +96,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def query(self, **options):
+    def query(self, **options: Any) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query the API for this channel, get messages, members or other channel fields
 
@@ -91,7 +106,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def query_members(self, filter_conditions, sort=None, **options):
+    def query_members(
+        self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
+    ) -> Union[List[Dict], Awaitable[List[Dict]]]:
         """
         Query the API for this channel to filter, sort and paginate its members efficiently.
 
@@ -109,7 +126,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update(self, channel_data, update_message=None):
+    def update(
+        self, channel_data: Dict, update_message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Edit the channel's custom properties
 
@@ -120,7 +139,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update_partial(self, to_set=None, to_unset=None):
+    def update_partial(
+        self, to_set: Dict = None, to_unset: Iterable[str] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update channel partially
 
@@ -130,7 +151,7 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete(self):
+    def delete(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Delete the channel. Messages are permanently removed.
 
@@ -139,7 +160,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def truncate(self, **options):
+    def truncate(
+        self, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Removes all messages from the channel
 
@@ -149,7 +172,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_members(self, members, message=None, **options):
+    def add_members(
+        self, members: Iterable[Dict], message: Dict = None, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Adds members to the channel
 
@@ -161,7 +186,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def assign_roles(self, members, message=None):
+    def assign_roles(
+        self, members: Iterable[Dict], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Assigns new roles to specified channel members
 
@@ -172,7 +199,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def invite_members(self, user_ids, message=None):
+    def invite_members(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         invite members to the channel
 
@@ -183,7 +212,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def add_moderators(self, user_ids, message=None):
+    def add_moderators(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Adds moderators to the channel
 
@@ -194,7 +225,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def remove_members(self, user_ids, message=None):
+    def remove_members(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Remove members from the channel
 
@@ -205,7 +238,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def demote_moderators(self, user_ids, message=None):
+    def demote_moderators(
+        self, user_ids: Iterable[str], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Demotes moderators from the channel
 
@@ -216,7 +251,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def mark_read(self, user_id, **data):
+    def mark_read(
+        self, user_id: str, **data: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Send the mark read event for this user, only works if the `read_events` setting is enabled
 
@@ -227,7 +264,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_replies(self, parent_id, **options):
+    def get_replies(
+        self, parent_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         List the message replies for a parent message
 
@@ -238,7 +277,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_reactions(self, message_id, **options):
+    def get_reactions(
+        self, message_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         List the reactions, supports pagination
 
@@ -249,7 +290,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def ban_user(self, target_id, **options):
+    def ban_user(
+        self, target_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Bans a user from this channel
 
@@ -260,7 +303,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def unban_user(self, target_id, **options):
+    def unban_user(
+        self, target_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Removes the ban for a user on this channel
 
@@ -270,45 +315,57 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def accept_invite(self, user_id, **data):
+    def accept_invite(
+        self, user_id: str, **data: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def reject_invite(self, user_id, **data):
+    def reject_invite(
+        self, user_id: str, **data: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def send_file(self, url, name, user, content_type=None):
+    def send_file(
+        self, url: str, name: str, user: Dict, content_type: str = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def send_image(self, url, name, user, content_type=None):
+    def send_image(
+        self, url: str, name: str, user: Dict, content_type: str = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def delete_file(self, url):
+    def delete_file(self, url: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def delete_image(self, url):
+    def delete_image(
+        self, url: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def hide(self, user_id):
+    def hide(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def show(self, user_id):
+    def show(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def mute(self, user_id, expiration=None):
+    def mute(
+        self, user_id: str, expiration: int = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def unmute(self, user_id):
+    def unmute(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
 
-def add_user_id(payload, user_id):
+def add_user_id(payload: Dict, user_id: str) -> Dict:
     return {**payload, "user": {"id": user_id}}

@@ -1,14 +1,17 @@
+from typing import Dict, List
 import uuid
 import time
 
 import pytest
 
+from stream_chat.channel import Channel
+from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental
 class TestChannel(object):
-    def test_ban_user(self, channel, random_user, server_user):
+    def test_ban_user(self, channel: Channel, random_user, server_user: Dict):
         channel.ban_user(random_user["id"], user_id=server_user["id"])
         channel.ban_user(
             random_user["id"],
@@ -18,7 +21,7 @@ class TestChannel(object):
         )
         channel.unban_user(random_user["id"])
 
-    def test_create_without_id(self, client, random_users):
+    def test_create_without_id(self, client: StreamChat, random_users: List[Dict]):
         channel = client.channel(
             "messaging", data={"members": [u["id"] for u in random_users]}
         )
@@ -27,19 +30,19 @@ class TestChannel(object):
         channel.create(random_users[0]["id"])
         assert channel.id is not None
 
-    def test_send_message_with_options(self, channel, random_user):
+    def test_send_message_with_options(self, channel: Channel, random_user: Dict):
         response = channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
         )
         assert "message" in response
         assert response["message"]["text"] == "hi"
 
-    def test_send_event(self, channel, random_user):
+    def test_send_event(self, channel: Channel, random_user: Dict):
         response = channel.send_event({"type": "typing.start"}, random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "typing.start"
 
-    def test_send_reaction(self, channel, random_user):
+    def test_send_reaction(self, channel: Channel, random_user: Dict):
         msg = channel.send_message({"text": "hi"}, random_user["id"])
         response = channel.send_reaction(
             msg["message"]["id"], {"type": "love"}, random_user["id"]
@@ -48,7 +51,7 @@ class TestChannel(object):
         assert len(response["message"]["latest_reactions"]) == 1
         assert response["message"]["latest_reactions"][0]["type"] == "love"
 
-    def test_delete_reaction(self, channel, random_user):
+    def test_delete_reaction(self, channel: Channel, random_user: Dict):
         msg = channel.send_message({"text": "hi"}, random_user["id"])
         channel.send_reaction(msg["message"]["id"], {"type": "love"}, random_user["id"])
         response = channel.delete_reaction(
@@ -57,12 +60,12 @@ class TestChannel(object):
         assert "message" in response
         assert len(response["message"]["latest_reactions"]) == 0
 
-    def test_update(self, channel):
+    def test_update(self, channel: Channel):
         response = channel.update({"motd": "one apple a day..."})
         assert "channel" in response
         assert response["channel"]["motd"] == "one apple a day..."
 
-    def test_update_partial(self, channel):
+    def test_update_partial(self, channel: Channel):
         response = channel.update({"color": "blue", "age": 30})
         assert "channel" in response
         assert response["channel"]["color"] == "blue"
@@ -73,16 +76,16 @@ class TestChannel(object):
         assert response["channel"]["color"] == "red"
         assert "age" not in response["channel"]
 
-    def test_delete(self, channel):
+    def test_delete(self, channel: Channel):
         response = channel.delete()
         assert "channel" in response
         assert response["channel"].get("deleted_at") is not None
 
-    def test_truncate(self, channel):
+    def test_truncate(self, channel: Channel):
         response = channel.truncate()
         assert "channel" in response
 
-    def test_truncate_with_options(self, channel, random_user):
+    def test_truncate_with_options(self, channel: Channel, random_user: Dict):
         response = channel.truncate(
             skip_push=True,
             message={
@@ -92,7 +95,7 @@ class TestChannel(object):
         )
         assert "channel" in response
 
-    def test_add_members(self, channel, random_user):
+    def test_add_members(self, channel: Channel, random_user: Dict):
         response = channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
 
@@ -100,14 +103,16 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert not response["members"][0].get("is_moderator", False)
 
-    def test_add_members_with_additional_options(self, channel, random_user):
+    def test_add_members_with_additional_options(
+        self, channel: Channel, random_user: Dict
+    ):
         response = channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
 
         response = channel.add_members([random_user["id"]], hide_history=True)
         assert len(response["members"]) == 1
 
-    def test_invite_members(self, channel, random_user):
+    def test_invite_members(self, channel: Channel, random_user: Dict):
         response = channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
 
@@ -115,14 +120,14 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert response["members"][0].get("invited", True)
 
-    def test_add_moderators(self, channel, random_user):
+    def test_add_moderators(self, channel: Channel, random_user: Dict):
         response = channel.add_moderators([random_user["id"]])
         assert response["members"][0]["is_moderator"]
 
         response = channel.demote_moderators([random_user["id"]])
         assert not response["members"][0].get("is_moderator", False)
 
-    def test_assign_roles_moderators(self, channel, random_user):
+    def test_assign_roles_moderators(self, channel: Channel, random_user: Dict):
         member = {"user_id": random_user["id"], "channel_role": "channel_moderator"}
         response = channel.add_members([member])
         assert len(response["members"]) == 1
@@ -133,12 +138,12 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert response["members"][0]["channel_role"] == "channel_member"
 
-    def test_mark_read(self, channel, random_user):
+    def test_mark_read(self, channel: Channel, random_user: Dict):
         response = channel.mark_read(random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "message.read"
 
-    def test_get_replies(self, channel, random_user):
+    def test_get_replies(self, channel: Channel, random_user: Dict):
         msg = channel.send_message({"text": "hi"}, random_user["id"])
         response = channel.get_replies(msg["message"]["id"])
         assert "messages" in response
@@ -159,7 +164,7 @@ class TestChannel(object):
         assert len(response["messages"]) == 3
         assert response["messages"][0]["index"] == 7
 
-    def test_get_reactions(self, channel, random_user):
+    def test_get_reactions(self, channel: Channel, random_user: Dict):
         msg = channel.send_message({"text": "hi"}, random_user["id"])
         response = channel.get_reactions(msg["message"]["id"])
 
@@ -180,13 +185,13 @@ class TestChannel(object):
 
         assert response["reactions"][0]["count"] == 42
 
-    def test_send_and_delete_file(self, channel, random_user):
+    def test_send_and_delete_file(self, channel: Channel, random_user: Dict):
         url = "helloworld.jpg"
         resp = channel.send_file(url, "helloworld.jpg", random_user)
         assert "helloworld.jpg" in resp["file"]
         channel.delete_file(resp["file"])
 
-    def test_send_and_delete_image(self, channel, random_user):
+    def test_send_and_delete_image(self, channel: Channel, random_user: Dict):
         url = "helloworld.jpg"
         resp = channel.send_image(
             url, "helloworld.jpg", random_user, content_type="image/jpeg"
@@ -194,7 +199,9 @@ class TestChannel(object):
         assert "helloworld.jpg" in resp["file"]
         channel.delete_image(resp["file"])
 
-    def test_channel_hide_show(self, client, channel, random_users):
+    def test_channel_hide_show(
+        self, client: StreamChat, channel: Channel, random_users
+    ):
         # setup
         channel.add_members([u["id"] for u in random_users])
         # verify
@@ -235,7 +242,7 @@ class TestChannel(object):
         )
         assert len(response["channels"]) == 1
 
-    def test_invites(self, client, channel):
+    def test_invites(self, client: StreamChat, channel: Channel):
         members = ["john", "paul", "george", "pete", "ringo", "eric"]
         client.update_users([{"id": m} for m in members])
         channel = client.channel(
@@ -264,7 +271,7 @@ class TestChannel(object):
         # cannot reject again, noop
         channel.reject_invite("eric")
 
-    def test_query_members(self, client, channel):
+    def test_query_members(self, client: StreamChat, channel: Channel):
         members = ["paul", "george", "john", "jessica", "john2"]
         client.update_users([{"id": m, "name": m} for m in members])
         for member in members:
@@ -281,7 +288,9 @@ class TestChannel(object):
         assert response[0]["user"]["id"] == "jessica"
         assert response[1]["user"]["id"] == "john2"
 
-    def test_mute_unmute(self, client, channel, random_users):
+    def test_mute_unmute(
+        self, client: StreamChat, channel: Channel, random_users: List[Dict]
+    ):
         user_id = random_users[0]["id"]
         response = channel.mute(user_id, expiration=30000)
         assert "channel_mute" in response
@@ -301,14 +310,16 @@ class TestChannel(object):
         )
         assert len(response["channels"]) == 0
 
-    def test_export_channel_status(self, client, channel):
+    def test_export_channel_status(self, client: StreamChat, channel: Channel):
         with pytest.raises(StreamAPIException, match=r".*Can't find task.*"):
             client.get_export_channel_status(str(uuid.uuid4()))
 
         with pytest.raises(StreamAPIException, match=r".*Can't find channel.*"):
             client.export_channel("messaging", str(uuid.uuid4()))
 
-    def test_export_channel(self, client, channel, random_users):
+    def test_export_channel(
+        self, client: StreamChat, channel: Channel, random_users: List[Dict]
+    ):
         channel.send_message({"text": "Hey Joni"}, random_users[0]["id"])
 
         resp = client.export_channel(channel.channel_type, channel.id)
