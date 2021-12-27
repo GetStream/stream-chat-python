@@ -33,6 +33,7 @@ pip install stream-chat
 - User devices
 - User search
 - Channel search
+- Rate limit information
 - Campaign API (alpha - susceptible changes and even won't be available in some regions yet)
 
 ### Quickstart
@@ -57,6 +58,13 @@ def main():
 
     # add a first message to the channel
     channel.send_message({"text": "AMA about kung-fu"}, "chuck")
+
+    # all responses contain rate limit information under "rate_limit" key
+    response = channel.update({"motd": "one apple a day..."})
+    print(response["rate_limit"])
+
+    # Prints:
+    # {'limit': 300, 'remaining': 299, 'reset': datetime.datetime(2021, 12, 27, 16, 11, tzinfo=datetime.timezone.utc)}
 
 
 if __name__ == '__main__':

@@ -44,7 +44,7 @@ class StreamChat(StreamChatInterface):
             raise StreamAPIException(response.text, response.status_code)
         if response.status_code >= 399:
             raise StreamAPIException(response.text, response.status_code)
-        return parsed_result
+        return self._enrich_response(response, parsed_result)
 
     def _make_request(
         self,

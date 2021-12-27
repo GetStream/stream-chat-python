@@ -56,7 +56,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             raise StreamAPIException(text, response.status)
         if response.status >= 399:
             raise StreamAPIException(text, response.status)
-        return parsed_result
+        return self._enrich_response(response, parsed_result)
 
     async def _make_request(
         self,

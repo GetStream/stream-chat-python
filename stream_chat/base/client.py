@@ -5,6 +5,8 @@ import hashlib
 import hmac
 from typing import Any, Awaitable, Dict, Iterable, List, Union, TypeVar
 
+import aiohttp
+import requests
 import jwt
 
 from stream_chat.types.stream_response import StreamResponse
@@ -25,6 +27,30 @@ class StreamChatInterface(abc.ABC):
         self.auth_token = jwt.encode(
             {"server": True}, self.api_secret, algorithm="HS256"
         )
+
+    def _enrich_response(
+        self,
+        response: Union[aiohttp.ClientResponse, requests.Response],
+        resp_body: StreamResponse,
+    ) -> StreamResponse:
+        resp_headers: Dict[str, Any] = dict(response.headers)  # type: ignore
+
+        limit, remaining, reset = (
+            resp_headers.get("x-ratelimit-limit"),
+            resp_headers.get("x-ratelimit-remaining"),
+            resp_headers.get("x-ratelimit-reset"),
+        )
+
+        if limit and remaining and reset:
+            resp_body["rate_limit"] = dict(
+                limit=int(limit),
+                remaining=int(remaining),
+                reset=datetime.datetime.fromtimestamp(
+                    float(reset), datetime.timezone.utc
+                ),
+            )
+
+        return resp_body
 
     def get_default_params(self) -> Dict[str, str]:
         return {"api_key": self.api_key}

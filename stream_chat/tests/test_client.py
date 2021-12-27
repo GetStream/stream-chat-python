@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 from operator import itemgetter
 from contextlib import suppress
@@ -542,3 +543,10 @@ class TestClient(object):
             time.sleep(1)
 
         pytest.fail("task did not succeed")
+
+    def test_response_contains_rate_limit(self, client: StreamChat):
+        resp = client.get_app_settings()
+
+        assert resp["rate_limit"]["limit"] > 0
+        assert resp["rate_limit"]["remaining"] > 0
+        assert type(resp["rate_limit"]["reset"]) is datetime

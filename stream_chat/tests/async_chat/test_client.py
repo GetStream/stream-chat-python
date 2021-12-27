@@ -1,5 +1,6 @@
 import sys
 from contextlib import suppress
+from datetime import datetime
 from operator import itemgetter
 from typing import Dict, List
 
@@ -633,3 +634,11 @@ class TestClient(object):
             time.sleep(1)
 
         pytest.fail("task did not succeed")
+
+    @pytest.mark.asyncio
+    async def test_response_contains_rate_limit(self, client: StreamChatAsync):
+        resp = await client.get_app_settings()
+
+        assert resp["rate_limit"]["limit"] > 0
+        assert resp["rate_limit"]["remaining"] > 0
+        assert type(resp["rate_limit"]["reset"]) is datetime
