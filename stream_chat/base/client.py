@@ -211,7 +211,9 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def query_flag_reports(self, **options: Any) -> StreamResponse:
+    def query_flag_reports(
+        self, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Note: Do not use this.
         It is present for internal usage only.
@@ -222,7 +224,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def review_flag_report(
         self, report_id: int, review_result: str, user_id: str, **details: Any
-    ) -> StreamResponse:
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Note: Do not use this.
         It is present for internal usage only.
