@@ -211,28 +211,6 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def query_flag_reports(
-        self, **options: Any
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Note: Do not use this.
-        It is present for internal usage only.
-        This function can, and will, break and/or be removed at any point in time.
-        """
-        pass
-
-    @abc.abstractmethod
-    def review_flag_report(
-        self, report_id: int, review_result: str, user_id: str, **details: Any
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Note: Do not use this.
-        It is present for internal usage only.
-        This function can, and will, break and/or be removed at any point in time.
-        """
-        pass
-
-    @abc.abstractmethod
     def mute_user(
         self, target_id: str, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:

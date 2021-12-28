@@ -175,7 +175,7 @@ class StreamChat(StreamChatInterface):
         data = {"target_user_id": target_id, **options}
         return self.post("moderation/unflag", data=data)
 
-    def query_flag_reports(self, **options: Any) -> StreamResponse:
+    def _query_flag_reports(self, **options: Any) -> StreamResponse:
         """
         Note: Do not use this.
         It is present for internal usage only.
@@ -184,7 +184,7 @@ class StreamChat(StreamChatInterface):
         data = {"filter_conditions": options}
         return self.post("moderation/reports", data=data)
 
-    def review_flag_report(
+    def _review_flag_report(
         self, report_id: int, review_result: str, user_id: str, **details: Any
     ) -> StreamResponse:
         """
