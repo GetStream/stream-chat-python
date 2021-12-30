@@ -371,7 +371,7 @@ class TestClient(object):
         await channel.send_message(msg, random_user["id"])
         await client.flag_message(msg["id"], user_id=server_user["id"])
 
-        response = await client._query_flag_reports(message_id=msg["id"])
+        response = await client._query_flag_reports(message_id=msg["id"], user_id=random_user["id"])
         report = response["flag_reports"][0]
 
         assert report["id"] is not None
@@ -386,7 +386,7 @@ class TestClient(object):
         await channel.send_message(msg, random_user["id"])
         await client.flag_message(msg["id"], user_id=server_user["id"])
 
-        response = await client._query_flag_reports(message_id=msg["id"])
+        response = await client._query_flag_reports(message_id=msg["id"], user_id=random_user["id"])
         response = await client._review_flag_report(
             report_id=response["flag_reports"][0]["id"],
             review_result="reviewed",
