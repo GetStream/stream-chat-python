@@ -220,7 +220,9 @@ class TestClient(object):
         channel.send_message(msg, random_user["id"])
         client.flag_message(msg["id"], user_id=server_user["id"])
 
-        response = client._query_flag_reports(message_id=msg["id"], user_id=random_user["id"])
+        response = client._query_flag_reports(
+            message_id=msg["id"], user_id=random_user["id"]
+        )
 
         print(response)
 
@@ -238,7 +240,9 @@ class TestClient(object):
         channel.send_message(msg, random_user["id"])
         client.flag_message(msg["id"], user_id=server_user["id"])
 
-        response = client._query_flag_reports(message_id=msg["id"], user_id=random_user["id"])
+        response = client._query_flag_reports(
+            message_id=msg["id"], user_id=random_user["id"]
+        )
         response = client._review_flag_report(
             report_id=response["flag_reports"][0]["id"],
             review_result="reviewed",
