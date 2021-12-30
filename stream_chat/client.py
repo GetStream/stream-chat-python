@@ -175,13 +175,13 @@ class StreamChat(StreamChatInterface):
         data = {"target_user_id": target_id, **options}
         return self.post("moderation/unflag", data=data)
 
-    def _query_flag_reports(self, user_id: str, **options: Any) -> StreamResponse:
+    def _query_flag_reports(self, **options: Any) -> StreamResponse:
         """
         Note: Do not use this.
         It is present for internal usage only.
         This function can, and will, break and/or be removed at any point in time.
         """
-        data = {"filter_conditions": options, "user_id": user_id}
+        data = {"filter_conditions": options}
         return self.post("moderation/reports", data=data)
 
     def _review_flag_report(
