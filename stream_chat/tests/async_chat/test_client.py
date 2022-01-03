@@ -364,6 +364,46 @@ class TestClient(object):
         await client.unflag_message(msg_id, user_id=server_user["id"])
 
     @pytest.mark.asyncio
+    async def test_query_flag_reports(
+        self, client: StreamChatAsync, channel, random_user, server_user: Dict
+    ):
+        msg = {"id": str(uuid.uuid4()), "text": "hello world"}
+        await channel.send_message(msg, random_user["id"])
+        await client.flag_message(msg["id"], user_id=server_user["id"])
+
+        response = await client._query_flag_reports(message_id=msg["id"])
+        report = response["flag_reports"][0]
+
+        assert report["id"] is not None
+        assert report["message"]["id"] == msg["id"]
+        assert report["message"]["text"] == msg["text"]
+
+    @pytest.mark.asyncio
+    async def test_review_flag_report(
+        self, client: StreamChatAsync, channel, random_user, server_user: Dict
+    ):
+        msg = {"id": str(uuid.uuid4()), "text": "hello world"}
+        await channel.send_message(msg, random_user["id"])
+        await client.flag_message(msg["id"], user_id=server_user["id"])
+
+        response = await client._query_flag_reports(message_id=msg["id"])
+        response = await client._review_flag_report(
+            report_id=response["flag_reports"][0]["id"],
+            review_result="reviewed",
+            user_id=random_user["id"],
+            custom="reason_a",
+        )
+
+        report = response["flag_report"]
+
+        assert report["id"] is not None
+        assert report["message"]["id"] == msg["id"]
+        assert report["message"]["text"] == msg["text"]
+
+        assert report["review_result"] == "reviewed"
+        assert report["review_details"]["custom"] == "reason_a"
+
+    @pytest.mark.asyncio
     async def test_query_users_young_hobbits(
         self, client: StreamChatAsync, fellowship_of_the_ring
     ):

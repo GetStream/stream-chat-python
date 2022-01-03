@@ -175,6 +175,30 @@ class StreamChat(StreamChatInterface):
         data = {"target_user_id": target_id, **options}
         return self.post("moderation/unflag", data=data)
 
+    def _query_flag_reports(self, **options: Any) -> StreamResponse:
+        """
+        Note: Do not use this.
+        It is present for internal usage only.
+        This function can, and will, break and/or be removed at any point in time.
+        """
+        data = {"filter_conditions": options}
+        return self.post("moderation/reports", data=data)
+
+    def _review_flag_report(
+        self, report_id: int, review_result: str, user_id: str, **details: Any
+    ) -> StreamResponse:
+        """
+        Note: Do not use this.
+        It is present for internal usage only.
+        This function can, and will, break and/or be removed at any point in time.
+        """
+        data = {
+            "review_result": review_result,
+            "user_id": user_id,
+            "review_details": details,
+        }
+        return self.patch(f"moderation/reports/{report_id}", data=data)
+
     def mute_user(self, target_id: str, user_id: str, **options: Any) -> StreamResponse:
         data = {"target_id": target_id, "user_id": user_id, **options}
         return self.post("moderation/mute", data=data)

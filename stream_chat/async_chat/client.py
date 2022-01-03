@@ -190,6 +190,30 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         data = {"target_user_id": target_id, **options}
         return await self.post("moderation/unflag", data=data)
 
+    async def _query_flag_reports(self, **options: Any) -> StreamResponse:
+        """
+        Note: Do not use this.
+        It is present for internal usage only.
+        This function can, and will, break and/or be removed at any point in time.
+        """
+        data = {"filter_conditions": options}
+        return await self.post("moderation/reports", data=data)
+
+    async def _review_flag_report(
+        self, report_id: int, review_result: str, user_id: str, **details: Any
+    ) -> StreamResponse:
+        """
+        Note: Do not use this.
+        It is present for internal usage only.
+        This function can, and will, break and/or be removed at any point in time.
+        """
+        data = {
+            "review_result": review_result,
+            "user_id": user_id,
+            "review_details": details,
+        }
+        return await self.patch(f"moderation/reports/{report_id}", data=data)
+
     async def mute_user(
         self, target_id: str, user_id: str, **options: Any
     ) -> StreamResponse:
