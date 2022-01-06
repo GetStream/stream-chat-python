@@ -1,10 +1,10 @@
+import datetime
 import json
 from typing import Any, Callable, Dict, Iterable, List, Union
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 import requests
-import datetime
 
 from stream_chat.__pkg__ import __version__
 from stream_chat.base.client import StreamChatInterface

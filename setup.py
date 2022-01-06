@@ -12,6 +12,7 @@ tests_require = ["pytest", "pytest-asyncio"]
 ci_require = [
     "black",
     "flake8",
+    "flake8-isort",
     "flake8-bugbear",
     "pytest-cov",
     "mypy",

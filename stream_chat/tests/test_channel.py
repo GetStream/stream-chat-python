@@ -1,12 +1,12 @@
-from typing import Dict, List
-import uuid
 import time
+import uuid
+from typing import Dict, List
 
 import pytest
 
-from stream_chat.channel import Channel
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.channel import Channel
 
 
 @pytest.mark.incremental

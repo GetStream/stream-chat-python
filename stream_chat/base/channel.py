@@ -1,9 +1,9 @@
 import abc
 from typing import Any, Awaitable, Dict, Iterable, List, Union
 
+from stream_chat.base.client import StreamChatInterface
 from stream_chat.base.exceptions import StreamChannelException
 from stream_chat.types.stream_response import StreamResponse
-from stream_chat.base.client import StreamChatInterface
 
 
 class ChannelInterface(abc.ABC):

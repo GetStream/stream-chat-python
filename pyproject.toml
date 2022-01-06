@@ -24,6 +24,11 @@ exclude = '''
 )/
 '''
 
+[tool.isort]
+profile = "black"
+src_paths = ["stream_chat"]
+known_first_party = ["stream_chat"]
+
 [tool.mypy]
 disallow_untyped_defs = true
 disallow_untyped_calls = true

@@ -1,15 +1,16 @@
-from datetime import datetime
 import sys
+import time
+import uuid
 from contextlib import suppress
+from datetime import datetime
 from operator import itemgetter
 from typing import Dict, List
 
 import jwt
 import pytest
-import time
-import uuid
-from stream_chat.async_chat.channel import Channel
+
 from stream_chat.async_chat import StreamChatAsync
+from stream_chat.async_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
 
 

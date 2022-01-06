@@ -1,10 +1,11 @@
-from typing import Dict, List
-import uuid
 import time
+import uuid
+from typing import Dict, List
+
 import pytest
 
-from stream_chat.async_chat.client import StreamChatAsync
 from stream_chat.async_chat.channel import Channel
+from stream_chat.async_chat.client import StreamChatAsync
 from stream_chat.base.exceptions import StreamAPIException
 
 
