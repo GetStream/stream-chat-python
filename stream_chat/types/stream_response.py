@@ -1,15 +1,33 @@
-from collections.abc import MutableMapping
 from datetime import datetime, timezone
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Optional
 
 from stream_chat.types.rate_limit import RateLimitInfo
 
 
-class StreamResponse(MutableMapping):
+class StreamResponse(dict):
+    """
+    A custom dictionary where you can access the response data the same way
+    as a normal dictionary. Additionally, we expose some methods to access other metadata.
+
+    ::
+
+        resp = client.get_app_settings()
+        print(resp["app"]["webhook_url"])
+        # "https://mycompany.com/webhook"
+        rate_limit = resp.rate_limit()
+        print(rate_limit.remaining)
+        # 99
+        headers = resp.headers()
+        print(headers["content-type"])
+        # "application/json;charset=utf-8"
+        status_code = resp.status_code()
+        print(status_code)
+        # 200
+    """
+
     def __init__(
         self, response_dict: Dict[str, Any], headers: Dict[str, Any], status_code: int
     ) -> None:
-        self.__response_dict = response_dict
         self.__headers = headers
         self.__status_code = status_code
         self.__rate_limit: Optional[RateLimitInfo] = None
@@ -25,39 +43,16 @@ class StreamResponse(MutableMapping):
                 reset=datetime.fromtimestamp(float(reset), timezone.utc),
             )
 
+        super(StreamResponse, self).__init__(response_dict)
+
     def rate_limit(self) -> Optional[RateLimitInfo]:
+        """Returns the ratelimit info of your API operation."""
         return self.__rate_limit
 
     def headers(self) -> Dict[str, Any]:
+        """Returns the headers of the response."""
         return self.__headers
 
     def status_code(self) -> int:
+        """Returns the HTTP status code of the response."""
         return self.__status_code
-
-    def __setitem__(self, key: Any, value: Any) -> None:
-        self.__response_dict[key] = value
-
-    def __getitem__(self, key: Any) -> Any:
-        return self.__response_dict[key]
-
-    def __delitem__(self, key: Any) -> None:
-        del self.__response_dict[key]
-
-    def __iter__(self) -> Iterator[Any]:
-        return iter(self.__response_dict)
-
-    def __len__(self) -> int:
-        return len(self.__response_dict)
-
-    def __str__(self) -> str:
-        return str(self.__response_dict)
-
-    def __repr__(self) -> str:
-        copied = self.__response_dict.copy()
-        copied["headers"] = self.__headers
-        copied["status_code"] = self.__status_code
-        copied["rate_limit"] = (
-            self.__rate_limit.as_dict() if self.__rate_limit else None
-        )
-
-        return copied.__repr__()

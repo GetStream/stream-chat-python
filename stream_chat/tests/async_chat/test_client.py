@@ -1,3 +1,4 @@
+import json
 import sys
 import time
 import uuid
@@ -12,6 +13,7 @@ import pytest
 from stream_chat.async_chat import StreamChatAsync
 from stream_chat.async_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.tests.utils import wait_for_async
 
 
 class TestClient:
@@ -373,6 +375,10 @@ class TestClient:
         await channel.send_message(msg, random_user["id"])
         await client.flag_message(msg["id"], user_id=server_user["id"])
 
+        await wait_for_async(
+            client._query_flag_reports, timeout=10, message_id=msg["id"]
+        )
+
         response = await client._query_flag_reports(message_id=msg["id"])
         report = response["flag_reports"][0]
 
@@ -387,6 +393,10 @@ class TestClient:
         msg = {"id": str(uuid.uuid4()), "text": "hello world"}
         await channel.send_message(msg, random_user["id"])
         await client.flag_message(msg["id"], user_id=server_user["id"])
+
+        await wait_for_async(
+            client._query_flag_reports, timeout=10, message_id=msg["id"]
+        )
 
         response = await client._query_flag_reports(message_id=msg["id"])
         response = await client._review_flag_report(
@@ -679,6 +689,12 @@ class TestClient:
     @pytest.mark.asyncio
     async def test_stream_response(self, client: StreamChatAsync):
         resp = await client.get_app_settings()
+
+        dumped = json.dumps(resp)
+        assert '{"app":' in dumped
+        assert "rate_limit" not in dumped
+        assert "headers" not in dumped
+        assert "status_code" not in dumped
 
         assert len(resp.headers()) > 0
         assert resp.status_code() == 200
