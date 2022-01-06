@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 from operator import itemgetter
 from contextlib import suppress
@@ -12,7 +13,7 @@ from stream_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
 
 
-class TestClient(object):
+class TestClient:
     def test_normalize_sort(self, client: StreamChat):
         expected = [
             {"field": "field1", "direction": 1},
@@ -582,3 +583,14 @@ class TestClient(object):
             time.sleep(1)
 
         pytest.fail("task did not succeed")
+
+    def test_stream_response(self, client: StreamChat):
+        resp = client.get_app_settings()
+
+        assert len(resp.headers()) > 0
+        assert resp.status_code() == 200
+
+        rate_limit = resp.rate_limit()
+        assert rate_limit.limit > 0
+        assert rate_limit.remaining > 0
+        assert type(rate_limit.reset) is datetime

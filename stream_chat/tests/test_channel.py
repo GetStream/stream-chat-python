@@ -10,7 +10,7 @@ from stream_chat.base.exceptions import StreamAPIException
 
 
 @pytest.mark.incremental
-class TestChannel(object):
+class TestChannel:
     def test_ban_user(self, channel: Channel, random_user, server_user: Dict):
         channel.ban_user(random_user["id"], user_id=server_user["id"])
         channel.ban_user(
