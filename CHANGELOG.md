@@ -1,3 +1,11 @@
+## Jan 6, 2022 - 3.17.0
+
+- Add options support into channel truncate
+- Add options support into add members
+- Add type hints
+- Add internal flag report query and review endpoint support
+- Improve tests and docs
+
 ## Nov 15, 2021 - 3.16.0
 
 - Add support for assign_roles feature
