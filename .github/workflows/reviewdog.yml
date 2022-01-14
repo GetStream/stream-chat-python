@@ -8,6 +8,7 @@ concurrency:
 
 jobs:
   reviewdog:
+    name: 🐶 Reviewdog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
