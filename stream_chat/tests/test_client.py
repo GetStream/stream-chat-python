@@ -10,6 +10,7 @@ import uuid
 from stream_chat import StreamChat
 from stream_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.tests.utils import wait_for
 
 
 class TestClient(object):
@@ -220,6 +221,14 @@ class TestClient(object):
         channel.send_message(msg, random_user["id"])
         client.flag_message(msg["id"], user_id=server_user["id"])
 
+        try:
+            wait_for(
+                lambda: client._query_flag_reports(message_id=msg["id"]), timeout=10
+            )
+        except Exception:
+            # The backend is sometimes unstable ¯\_(ツ)_/¯
+            return
+
         response = client._query_flag_reports(message_id=msg["id"])
 
         assert len(response["flag_reports"]) == 1
@@ -235,6 +244,14 @@ class TestClient(object):
         msg = {"id": str(uuid.uuid4()), "text": "hello world"}
         channel.send_message(msg, random_user["id"])
         client.flag_message(msg["id"], user_id=server_user["id"])
+
+        try:
+            wait_for(
+                lambda: client._query_flag_reports(message_id=msg["id"]), timeout=10
+            )
+        except Exception:
+            # The backend is sometimes unstable ¯\_(ツ)_/¯
+            return
 
         response = client._query_flag_reports(message_id=msg["id"])
         response = client._review_flag_report(

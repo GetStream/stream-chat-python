@@ -24,6 +24,10 @@ exclude = '''
 )/
 '''
 
+[tool.pytest.ini_options]
+testpaths = ["stream_chat/tests"]
+asyncio_mode = "auto"
+
 [tool.mypy]
 disallow_untyped_defs = true
 disallow_untyped_calls = true
