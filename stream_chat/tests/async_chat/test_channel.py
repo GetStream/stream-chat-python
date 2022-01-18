@@ -10,7 +10,6 @@ from stream_chat.base.exceptions import StreamAPIException
 
 @pytest.mark.incremental
 class TestChannel(object):
-    @pytest.mark.asyncio
     async def test_ban_user(
         self, channel: Channel, random_user: Dict, server_user: Dict
     ):
@@ -23,7 +22,6 @@ class TestChannel(object):
         )
         await channel.unban_user(random_user["id"])
 
-    @pytest.mark.asyncio
     async def test_create_without_id(
         self, client: StreamChatAsync, random_users: List[Dict]
     ):
@@ -35,7 +33,6 @@ class TestChannel(object):
         await channel.create(random_users[0]["id"])
         assert channel.id is not None
 
-    @pytest.mark.asyncio
     async def test_send_message_with_options(self, channel: Channel, random_user: Dict):
         response = await channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
@@ -43,13 +40,11 @@ class TestChannel(object):
         assert "message" in response
         assert response["message"]["text"] == "hi"
 
-    @pytest.mark.asyncio
     async def test_send_event(self, channel: Channel, random_user: Dict):
         response = await channel.send_event({"type": "typing.start"}, random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "typing.start"
 
-    @pytest.mark.asyncio
     async def test_send_reaction(self, channel: Channel, random_user: Dict):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         response = await channel.send_reaction(
@@ -59,7 +54,6 @@ class TestChannel(object):
         assert len(response["message"]["latest_reactions"]) == 1
         assert response["message"]["latest_reactions"][0]["type"] == "love"
 
-    @pytest.mark.asyncio
     async def test_delete_reaction(self, channel: Channel, random_user: Dict):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         await channel.send_reaction(
@@ -71,13 +65,11 @@ class TestChannel(object):
         assert "message" in response
         assert len(response["message"]["latest_reactions"]) == 0
 
-    @pytest.mark.asyncio
     async def test_update(self, channel: Channel):
         response = await channel.update({"motd": "one apple a day..."})
         assert "channel" in response
         assert response["channel"]["motd"] == "one apple a day..."
 
-    @pytest.mark.asyncio
     async def test_update_partial(self, channel: Channel):
         response = await channel.update({"color": "blue", "age": 30})
         assert "channel" in response
@@ -91,18 +83,15 @@ class TestChannel(object):
         assert response["channel"]["color"] == "red"
         assert "age" not in response["channel"]
 
-    @pytest.mark.asyncio
     async def test_delete(self, channel: Channel):
         response = await channel.delete()
         assert "channel" in response
         assert response["channel"].get("deleted_at") is not None
 
-    @pytest.mark.asyncio
     async def test_truncate(self, channel: Channel):
         response = await channel.truncate()
         assert "channel" in response
 
-    @pytest.mark.asyncio
     async def test_truncate_with_options(self, channel: Channel, random_user: Dict):
         response = await channel.truncate(
             skip_push=True,
@@ -113,7 +102,6 @@ class TestChannel(object):
         )
         assert "channel" in response
 
-    @pytest.mark.asyncio
     async def test_add_members(self, channel: Channel, random_user: Dict):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
@@ -122,7 +110,6 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert not response["members"][0].get("is_moderator", False)
 
-    @pytest.mark.asyncio
     async def test_add_members_with_options(self, channel: Channel, random_user: Dict):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
@@ -130,7 +117,6 @@ class TestChannel(object):
         response = await channel.add_members([random_user["id"]], hide_history=True)
         assert len(response["members"]) == 1
 
-    @pytest.mark.asyncio
     async def test_invite_members(self, channel: Channel, random_user: Dict):
         response = await channel.remove_members([random_user["id"]])
         assert len(response["members"]) == 0
@@ -139,7 +125,6 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert response["members"][0].get("invited", True)
 
-    @pytest.mark.asyncio
     async def test_add_moderators(self, channel: Channel, random_user: Dict):
         response = await channel.add_moderators([random_user["id"]])
         assert response["members"][0]["is_moderator"]
@@ -147,7 +132,6 @@ class TestChannel(object):
         response = await channel.demote_moderators([random_user["id"]])
         assert not response["members"][0].get("is_moderator", False)
 
-    @pytest.mark.asyncio
     async def test_assign_roles_moderators(self, channel: Channel, random_user: Dict):
         member = {"user_id": random_user["id"], "channel_role": "channel_moderator"}
         response = await channel.add_members([member])
@@ -159,13 +143,11 @@ class TestChannel(object):
         assert len(response["members"]) == 1
         assert response["members"][0]["channel_role"] == "channel_member"
 
-    @pytest.mark.asyncio
     async def test_mark_read(self, channel: Channel, random_user: Dict):
         response = await channel.mark_read(random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "message.read"
 
-    @pytest.mark.asyncio
     async def test_get_replies(self, channel: Channel, random_user: Dict):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         response = await channel.get_replies(msg["message"]["id"])
@@ -187,7 +169,6 @@ class TestChannel(object):
         assert len(response["messages"]) == 3
         assert response["messages"][0]["index"] == 7
 
-    @pytest.mark.asyncio
     async def test_get_reactions(self, channel: Channel, random_user: Dict):
         msg = await channel.send_message({"text": "hi"}, random_user["id"])
         response = await channel.get_reactions(msg["message"]["id"])
@@ -211,14 +192,12 @@ class TestChannel(object):
 
         assert response["reactions"][0]["count"] == 42
 
-    @pytest.mark.asyncio
     async def test_send_and_delete_file(self, channel: Channel, random_user: Dict):
         url = "helloworld.jpg"
         resp = await channel.send_file(url, "helloworld.jpg", random_user)
         assert "helloworld.jpg" in resp["file"]
         await channel.delete_file(resp["file"])
 
-    @pytest.mark.asyncio
     async def test_send_and_delete_image(self, channel: Channel, random_user: Dict):
         url = "helloworld.jpg"
         resp = await channel.send_image(
@@ -227,7 +206,6 @@ class TestChannel(object):
         assert "helloworld.jpg" in resp["file"]
         await channel.delete_image(resp["file"])
 
-    @pytest.mark.asyncio
     async def test_channel_hide_show(
         self, client: StreamChatAsync, channel: Channel, random_users: List[Dict]
     ):
@@ -271,7 +249,6 @@ class TestChannel(object):
         )
         assert len(response["channels"]) == 1
 
-    @pytest.mark.asyncio
     async def test_invites(self, client: StreamChatAsync, channel: Channel):
         members = ["john", "paul", "george", "pete", "ringo", "eric"]
         await client.update_users([{"id": m} for m in members])
@@ -301,7 +278,6 @@ class TestChannel(object):
         # can reject again, noop
         await channel.reject_invite("eric")
 
-    @pytest.mark.asyncio
     async def test_query_members(self, client: StreamChatAsync, channel: Channel):
         members = ["paul", "george", "john", "jessica", "john2"]
         await client.update_users([{"id": m, "name": m} for m in members])
@@ -319,7 +295,6 @@ class TestChannel(object):
         assert response[0]["user"]["id"] == "jessica"
         assert response[1]["user"]["id"] == "john2"
 
-    @pytest.mark.asyncio
     async def test_mute_unmute(
         self, client: StreamChatAsync, channel: Channel, random_users: List[Dict]
     ):
@@ -342,7 +317,6 @@ class TestChannel(object):
         )
         assert len(response["channels"]) == 0
 
-    @pytest.mark.asyncio
     async def test_export_channel_status(
         self, client: StreamChatAsync, channel: Channel
     ):
@@ -352,7 +326,6 @@ class TestChannel(object):
         with pytest.raises(StreamAPIException, match=r".*Can't find channel.*"):
             await client.export_channel("messaging", str(uuid.uuid4()))
 
-    @pytest.mark.asyncio
     async def test_export_channel(
         self, client: StreamChatAsync, channel: Channel, random_users: List[Dict]
     ):

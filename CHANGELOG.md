@@ -1,4 +1,8 @@
-## Jan 6, 2022 - 3.17.0
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [3.17.0](https://github.com/GetStream/stream-chat-python/compare/v3.16.0...v3.17.0) (2022-01-06)
 
 - Add options support into channel truncate
 - Add options support into add members
