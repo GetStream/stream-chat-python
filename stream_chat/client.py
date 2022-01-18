@@ -1,10 +1,10 @@
+import datetime
 import json
 from typing import Any, Callable, Dict, Iterable, List, Union
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 import requests
-import datetime
 
 from stream_chat.__pkg__ import __version__
 from stream_chat.base.client import StreamChatInterface
@@ -44,7 +44,10 @@ class StreamChat(StreamChatInterface):
             raise StreamAPIException(response.text, response.status_code)
         if response.status_code >= 399:
             raise StreamAPIException(response.text, response.status_code)
-        return parsed_result
+
+        return StreamResponse(
+            parsed_result, dict(response.headers), response.status_code
+        )
 
     def _make_request(
         self,

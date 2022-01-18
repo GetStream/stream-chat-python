@@ -12,6 +12,7 @@ tests_require = ["pytest", "pytest-asyncio"]
 ci_require = [
     "black",
     "flake8",
+    "flake8-isort",
     "flake8-bugbear",
     "pytest-cov",
     "mypy",
@@ -47,7 +48,7 @@ setup(
     install_requires=install_requires,
     extras_require={"test": tests_require, "ci": ci_require},
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
@@ -56,7 +57,6 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

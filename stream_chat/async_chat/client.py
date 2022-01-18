@@ -1,5 +1,5 @@
-import json
 import datetime
+import json
 from types import TracebackType
 from typing import (
     Any,
@@ -56,7 +56,8 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             raise StreamAPIException(text, response.status)
         if response.status >= 399:
             raise StreamAPIException(text, response.status)
-        return parsed_result
+
+        return StreamResponse(parsed_result, dict(response.headers), response.status)
 
     async def _make_request(
         self,

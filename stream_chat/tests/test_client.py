@@ -1,19 +1,22 @@
+import json
 import sys
-from operator import itemgetter
+import time
+import uuid
 from contextlib import suppress
+from datetime import datetime
+from operator import itemgetter
 from typing import Dict, List
 
 import jwt
 import pytest
-import time
-import uuid
+
 from stream_chat import StreamChat
-from stream_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.channel import Channel
 from stream_chat.tests.utils import wait_for
 
 
-class TestClient(object):
+class TestClient:
     def test_normalize_sort(self, client: StreamChat):
         expected = [
             {"field": "field1", "direction": 1},
@@ -599,3 +602,38 @@ class TestClient(object):
             time.sleep(1)
 
         pytest.fail("task did not succeed")
+
+    def test_stream_response_contains_metadata(self, client: StreamChat):
+        resp = client.get_app_settings()
+
+        assert len(resp.headers()) > 0
+        assert resp.status_code() == 200
+
+        rate_limit = resp.rate_limit()
+        assert rate_limit.limit > 0
+        assert rate_limit.remaining > 0
+        assert type(rate_limit.reset) is datetime
+
+    def test_stream_response_can_serialize(self, client: StreamChat):
+        resp = client.get_app_settings()
+
+        assert len(resp) == 2
+        del resp["duration"]
+        assert '{"app":' in json.dumps(resp)
+
+    def test_stream_response(self, client: StreamChat):
+        resp = client.get_app_settings()
+
+        dumped = json.dumps(resp)
+        assert '{"app":' in dumped
+        assert "rate_limit" not in dumped
+        assert "headers" not in dumped
+        assert "status_code" not in dumped
+
+        assert len(resp.headers()) > 0
+        assert resp.status_code() == 200
+
+        rate_limit = resp.rate_limit()
+        assert rate_limit.limit > 0
+        assert rate_limit.remaining > 0
+        assert type(rate_limit.reset) is datetime

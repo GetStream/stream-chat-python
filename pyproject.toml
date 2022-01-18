@@ -24,6 +24,11 @@ exclude = '''
 )/
 '''
 
+[tool.isort]
+profile = "black"
+src_paths = ["stream_chat"]
+known_first_party = ["stream_chat"]
+
 [tool.pytest.ini_options]
 testpaths = ["stream_chat/tests"]
 asyncio_mode = "auto"

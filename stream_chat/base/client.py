@@ -3,12 +3,11 @@ import collections
 import datetime
 import hashlib
 import hmac
-from typing import Any, Awaitable, Dict, Iterable, List, Union, TypeVar
+from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union
 
 import jwt
 
 from stream_chat.types.stream_response import StreamResponse
-
 
 TChannel = TypeVar("TChannel")
 

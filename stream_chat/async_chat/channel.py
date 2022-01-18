@@ -1,7 +1,6 @@
 import json
 from typing import Any, Dict, Iterable, List, Union
 
-
 from stream_chat.base.channel import ChannelInterface, add_user_id
 from stream_chat.types.stream_response import StreamResponse
 

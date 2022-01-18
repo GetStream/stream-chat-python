@@ -16,6 +16,7 @@ lint:  ## Run linters
 
 lint-fix:
 	black stream_chat
+	isort stream_chat
 
 test:  ## Run tests
 	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) pytest --cov=stream_chat --cov-report=xml stream_chat/tests

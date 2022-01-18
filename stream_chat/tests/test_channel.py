@@ -1,16 +1,16 @@
-from typing import Dict, List
-import uuid
 import time
+import uuid
+from typing import Dict, List
 
 import pytest
 
-from stream_chat.channel import Channel
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.channel import Channel
 
 
 @pytest.mark.incremental
-class TestChannel(object):
+class TestChannel:
     def test_ban_user(self, channel: Channel, random_user, server_user: Dict):
         channel.ban_user(random_user["id"], user_id=server_user["id"])
         channel.ban_user(

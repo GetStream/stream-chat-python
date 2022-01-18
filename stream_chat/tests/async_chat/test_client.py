@@ -1,19 +1,22 @@
+import json
 import sys
+import time
+import uuid
 from contextlib import suppress
+from datetime import datetime
 from operator import itemgetter
 from typing import Dict, List
 
 import jwt
 import pytest
-import time
-import uuid
-from stream_chat.async_chat.channel import Channel
+
 from stream_chat.async_chat import StreamChatAsync
+from stream_chat.async_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
 from stream_chat.tests.utils import wait_for_async
 
 
-class TestClient(object):
+class TestClient:
     def test_normalize_sort(self, client: StreamChatAsync):
         expected = [
             {"field": "field1", "direction": 1},
@@ -639,3 +642,21 @@ class TestClient(object):
             time.sleep(1)
 
         pytest.fail("task did not succeed")
+
+    @pytest.mark.asyncio
+    async def test_stream_response(self, client: StreamChatAsync):
+        resp = await client.get_app_settings()
+
+        dumped = json.dumps(resp)
+        assert '{"app":' in dumped
+        assert "rate_limit" not in dumped
+        assert "headers" not in dumped
+        assert "status_code" not in dumped
+
+        assert len(resp.headers()) > 0
+        assert resp.status_code() == 200
+
+        rate_limit = resp.rate_limit()
+        assert rate_limit.limit > 0
+        assert rate_limit.remaining > 0
+        assert type(rate_limit.reset) is datetime
