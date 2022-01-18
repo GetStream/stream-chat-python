@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/GetStream/stream-chat-python/compare/v3.17.0...v4.0.0) (2022-01-18)
+
+
+### Features
+
+* Add ratelimit info to response object, Plus remove Python 3.6 support ([c472c0b](https://github.com/GetStream/stream-chat-python/commit/c472c0b7c43d7741a092d29920a1d31a413e9dc0))
+> The returned response objects are instances of `StreamResponse` class. It inherits from `dict`, so it's fully backward compatible. Additionally, it provides other benefits such as rate limit information (`resp.rate_limit()`), response headers (`resp.headers()`) or status code (`resp.status_code()`).
+
 ## [3.17.0](https://github.com/GetStream/stream-chat-python/compare/v3.16.0...v3.17.0) (2022-01-06)
 
 - Add options support into channel truncate
