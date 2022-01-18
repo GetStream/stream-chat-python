@@ -16,7 +16,7 @@ def wait_for(condition: Callable[[], Any], timeout: int = 5):
         except Exception:
             pass
 
-        time.sleep(0.5)
+        time.sleep(1)
 
 
 async def wait_for_async(
@@ -34,4 +34,4 @@ async def wait_for_async(
         except Exception:
             pass
 
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1)
