@@ -96,6 +96,18 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def get_messages(
+        self, message_ids: List[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Gets many messages
+
+        :param message_ids: list of message ids to returns
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
     def query(self, **options: Any) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query the API for this channel, get messages, members or other channel fields

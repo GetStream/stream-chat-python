@@ -3,6 +3,7 @@ import collections
 import datetime
 import hashlib
 import hmac
+import os
 from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union
 
 import jwt
@@ -19,8 +20,18 @@ class StreamChatInterface(abc.ABC):
         self.api_key = api_key
         self.api_secret = api_secret
         self.timeout = timeout
+
+        if os.getenv("STREAM_CHAT_TIMEOUT"):
+            self.timeout = float(os.environ["STREAM_CHAT_TIMEOUT"])
+
         self.options = options
-        self.base_url = options.get("base_url", "https://chat.stream-io-api.com")
+        self.base_url = "https://chat.stream-io-api.com"
+
+        if options.get("base_url"):
+            self.base_url = options["base_url"]
+        elif os.getenv("STREAM_CHAT_URL"):
+            self.base_url = os.environ["STREAM_CHAT_URL"]
+
         self.auth_token = jwt.encode(
             {"server": True}, self.api_secret, algorithm="HS256"
         )
@@ -91,6 +102,18 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def get_app_settings(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def set_guest_user(
+        self, guest_user: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Sets up a new guest user
+
+        :param guest_user: the guest user data
+        :return:
+        """
         pass
 
     @abc.abstractmethod
@@ -180,6 +203,18 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def query_banned_users(
+        self, query_conditions: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def run_message_action(
+        self, message_id: str, data: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
     def flag_message(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -241,6 +276,19 @@ class StreamChatInterface(abc.ABC):
     def mark_all_read(
         self, user_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def translate_message(
+        self, message_id: str, language: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Translates a message
+
+        :param message_id: Id of the message to be translated
+        :param language: Target language of the translation
+        :return:
+        """
         pass
 
     @abc.abstractmethod
@@ -502,6 +550,18 @@ class StreamChatInterface(abc.ABC):
         """Delete a blocklist by name
 
         :param: the name of the blocklist
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def check_push(
+        self, push_data: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Check push notification settings
+
+        :param push_data: Test data for testing push notification settings
         :return:
         """
         pass

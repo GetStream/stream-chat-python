@@ -210,6 +210,15 @@ class TestClient:
         client.ban_user(random_user["id"], user_id=server_user["id"])
         client.unban_user(random_user["id"], user_id=server_user["id"])
 
+    def test_query_banned_user(
+        self, client: StreamChat, random_user, server_user: Dict
+    ):
+        client.ban_user(random_user["id"], user_id=server_user["id"], reason="because")
+        resp = client.query_banned_users(
+            {"filter_conditions": {"reason": "because"}, "limit": 1}
+        )
+        assert len(resp["bans"]) == 1
+
     def test_flag_user(self, client: StreamChat, random_user, server_user: Dict):
         client.flag_user(random_user["id"], user_id=server_user["id"])
 
@@ -523,10 +532,53 @@ class TestClient:
     def test_delete_blocklist(self, client: StreamChat):
         client.delete_blocklist("Foo")
 
+    def test_check_push(self, client: StreamChat, channel: Channel, random_user: Dict):
+        msg = {"id": str(uuid.uuid4()), "text": "/giphy wave"}
+        channel.send_message(msg, random_user["id"])
+        resp = client.check_push(
+            {
+                "message_id": msg["id"],
+                "skip_devices": True,
+                "user_id": random_user["id"],
+            }
+        )
+
+        assert len(resp["rendered_message"]) > 0
+
     def test_check_sqs(self, client: StreamChat):
         response = client.check_sqs("key", "secret", "https://foo.com/bar")
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
+
+    def test_guest_user(self, client: StreamChat, random_user: Dict):
+        try:
+            response = client.set_guest_user({"user": {"id": str(uuid.uuid4())}})
+            assert "access_token" in response
+        except StreamAPIException:
+            # Guest user isn't turned on for every test app
+            pass
+
+    def test_run_message_actions(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
+        msg = {"id": str(uuid.uuid4()), "text": "/giphy wave"}
+        channel.send_message(msg, random_user["id"])
+        client.run_message_action(
+            msg["id"],
+            {
+                "user": {"id": random_user["id"]},
+                "form_data": {"image_action": "shuffle"},
+            },
+        )
+
+    def test_translate_message(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
+        msg = {"id": str(uuid.uuid4()), "text": "hello world"}
+        channel.send_message(msg, random_user["id"])
+        resp = client.translate_message(msg["id"], "hu")
+
+        assert len(resp["message"]) > 0
 
     @pytest.mark.skip(reason="slow and flaky due to waits")
     def test_custom_permission_and_roles(self, client: StreamChat):

@@ -144,6 +144,14 @@ class TestChannel:
         assert len(response["members"]) == 1
         assert response["members"][0]["channel_role"] == "channel_member"
 
+    async def test_get_messages(self, channel: Channel, random_user: Dict):
+        msg_id = str(uuid.uuid4())
+        await channel.send_message(
+            {"id": msg_id, "text": "helloworld"}, random_user["id"]
+        )
+        resp = await channel.get_messages([msg_id])
+        assert len(resp["messages"]) == 1
+
     async def test_mark_read(self, channel: Channel, random_user: Dict):
         response = await channel.mark_read(random_user["id"])
         assert "event" in response

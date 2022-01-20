@@ -164,6 +164,14 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         params = {"target_user_id": target_id, **options}
         return await self.delete("moderation/ban", params)
 
+    async def query_banned_users(self, query_conditions: Dict) -> StreamResponse:
+        return await self.get(
+            "query_banned_users", params={"payload": json.dumps(query_conditions)}
+        )
+
+    async def run_message_action(self, message_id: str, data: Dict) -> StreamResponse:
+        return await self.post(f"messages/{message_id}/action", data=data)
+
     async def flag_message(self, target_id: str, **options: Any) -> StreamResponse:
         data = {"target_message_id": target_id, **options}
         return await self.post("moderation/flag", data=data)
@@ -227,6 +235,11 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def mark_all_read(self, user_id: str) -> StreamResponse:
         return await self.post("channels/read", data={"user": {"id": user_id}})
+
+    async def translate_message(self, message_id: str, language: str) -> StreamResponse:
+        return await self.post(
+            f"messages/{message_id}/translate", data={"language": language}
+        )
 
     async def pin_message(
         self, message_id: str, user_id: str, expiration: int = None
@@ -422,11 +435,17 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def delete_blocklist(self, name: str) -> StreamResponse:
         return await self.delete(f"blocklists/{name}")
 
+    async def check_push(self, push_data: Dict) -> StreamResponse:
+        return await self.post("check_push", data=push_data)
+
     async def check_sqs(
         self, sqs_key: str = None, sqs_secret: str = None, sqs_url: str = None
     ) -> StreamResponse:
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return await self.post("check_sqs", data=data)
+
+    async def set_guest_user(self, guest_user: Dict) -> StreamResponse:
+        return await self.post("guest", data=dict(user=guest_user))
 
     async def get_permission(self, id: str) -> StreamResponse:
         return await self.get(f"permissions/{id}")

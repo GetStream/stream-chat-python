@@ -34,6 +34,11 @@ class Channel(ChannelInterface):
         self.custom_data["created_by"] = {"id": user_id}
         return self.query(watch=False, state=False, presence=False)
 
+    def get_messages(self, message_ids: List[str]) -> StreamResponse:
+        return self.client.get(
+            f"{self.url}/messages", params={"ids": ",".join(message_ids)}
+        )
+
     def query(self, **options: Any) -> StreamResponse:
         payload = {"state": True, "data": self.custom_data, **options}
 
