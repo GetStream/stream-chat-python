@@ -17,9 +17,17 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        python: [3.7, 3.8, 3.9, "3.10"]
+        python: ["3.7", "3.8", "3.9", "3.10"]
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # gives the commit message linter access to all previous commits
+
+      - name: Commit lint
+        if: ${{ matrix.python == '3.7' }}
+        uses: wagoid/commitlint-github-action@v4
+
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
@@ -28,7 +36,7 @@ jobs:
         run: pip install ".[test, ci]"
 
       - name: Lint with ${{ matrix.python }}
-        if: ${{ matrix.python == '3.8' }}
+        if: ${{ matrix.python == '3.7' }}
         run: make lint
 
       - name: Install, test and code coverage with ${{ matrix.python }}

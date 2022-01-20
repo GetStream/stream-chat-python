@@ -136,7 +136,7 @@ Install deps
 pip install .[test, ci]
 ```
 
-First, make sure you can run the test suite. Tests are run via py.test
+First, make sure you can run the test suite. Tests are run via pytest.
 
 ```bash
 export STREAM_KEY=my_api_key
@@ -145,23 +145,17 @@ export STREAM_SECRET=my_api_secret
 make test
 ```
 
+> 💡 If you're on a Unix system, you could also use [direnv](https://direnv.net/) to set up these env vars.
+
 Run linters
 
 ```bash
 make lint
 ```
 
+## We are hiring!
 
-### Releasing a new version
+We've recently closed a [$38 million Series B funding round](https://techcrunch.com/2021/03/04/stream-raises-38m-as-its-chat-and-activity-feed-apis-power-communications-for-1b-users/) and we keep actively growing.
+Our APIs are used by more than a billion end-users, and you'll have a chance to make a huge impact on the product within a team of the strongest engineers all over the world.
 
-In order to release new version you need to be a maintainer on Pypi.
-
-- Update CHANGELOG
-- Make sure you have twine installed (pip install twine)
-- Update the version on setup.py
-- Commit and push to Github
-- Create a new tag for the version (eg. `v2.9.0`)
-- Create a new dist with python `python setup.py sdist bdist_wheel`
-- Upload the new distributable with twine `twine upload dist/*`
-
-If unsure you can also test using the Pypi test servers `twine upload --repository-url https://test.pypi.org/legacy/ dist/stream-chat-VERSION-NAME.tar.gz`
+Check out our current openings and apply via [Stream's website](https://getstream.io/team/#jobs).

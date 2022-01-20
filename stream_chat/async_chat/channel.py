@@ -12,6 +12,11 @@ class Channel(ChannelInterface):
         payload = {"message": add_user_id(message, user_id), **options}
         return await self.client.post(f"{self.url}/message", data=payload)
 
+    async def get_messages(self, message_ids: List[str]) -> StreamResponse:
+        return await self.client.get(
+            f"{self.url}/messages", params={"ids": ",".join(message_ids)}
+        )
+
     async def send_event(self, event: Dict, user_id: str) -> StreamResponse:
         payload = {"event": add_user_id(event, user_id)}
         return await self.client.post(f"{self.url}/event", data=payload)

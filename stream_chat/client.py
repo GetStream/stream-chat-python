@@ -9,9 +9,8 @@ import requests
 from stream_chat.__pkg__ import __version__
 from stream_chat.base.client import StreamChatInterface
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.channel import Channel
 from stream_chat.types.stream_response import StreamResponse
-
-from .channel import Channel
 
 
 def get_user_agent() -> str:
@@ -106,6 +105,9 @@ class StreamChat(StreamChatInterface):
     def get_app_settings(self) -> StreamResponse:
         return self.get("app")
 
+    def set_guest_user(self, guest_user: Dict) -> StreamResponse:
+        return self.post("guest", data=dict(user=guest_user))
+
     def update_users(self, users: List[Dict]) -> StreamResponse:
         return self.post("users", data={"users": {u["id"]: u for u in users}})
 
@@ -150,6 +152,14 @@ class StreamChat(StreamChatInterface):
     def unban_user(self, target_id: str, **options: Any) -> StreamResponse:
         params = {"target_user_id": target_id, **options}
         return self.delete("moderation/ban", params)
+
+    def query_banned_users(self, query_conditions: Dict) -> StreamResponse:
+        return self.get(
+            "query_banned_users", params={"payload": json.dumps(query_conditions)}
+        )
+
+    def run_message_action(self, message_id: str, data: Dict) -> StreamResponse:
+        return self.post(f"messages/{message_id}/action", data=data)
 
     def flag_message(self, target_id: str, **options: Any) -> StreamResponse:
         data = {"target_message_id": target_id, **options}
@@ -212,6 +222,11 @@ class StreamChat(StreamChatInterface):
 
     def mark_all_read(self, user_id: str) -> StreamResponse:
         return self.post("channels/read", data={"user": {"id": user_id}})
+
+    def translate_message(self, message_id: str, language: str) -> StreamResponse:
+        return self.post(
+            f"messages/{message_id}/translate", data={"language": language}
+        )
 
     def pin_message(
         self, message_id: str, user_id: str, expiration: int = None
@@ -399,6 +414,9 @@ class StreamChat(StreamChatInterface):
 
     def delete_blocklist(self, name: str) -> StreamResponse:
         return self.delete(f"blocklists/{name}")
+
+    def check_push(self, push_data: Dict) -> StreamResponse:
+        return self.post("check_push", data=push_data)
 
     def check_sqs(
         self, sqs_key: str = None, sqs_secret: str = None, sqs_url: str = None

@@ -143,6 +143,12 @@ class TestChannel:
         assert "event" in response
         assert response["event"]["type"] == "message.read"
 
+    def test_get_messages(self, channel: Channel, random_user: Dict):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        resp = channel.get_messages([msg_id])
+        assert len(resp["messages"]) == 1
+
     def test_get_replies(self, channel: Channel, random_user: Dict):
         msg = channel.send_message({"text": "hi"}, random_user["id"])
         response = channel.get_replies(msg["message"]["id"])
