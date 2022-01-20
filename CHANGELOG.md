@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/GetStream/stream-chat-python/compare/v4.0.0...v4.1.0) (2022-01-20)
+
+
+### Features
+
+* add full feature parity ([#98](https://github.com/GetStream/stream-chat-python/issues/98)) ([02ea360](https://github.com/GetStream/stream-chat-python/commit/02ea3602df45ec6ff0a34f27cc3b2ecdb8c33faa))
+
 ## [4.0.0](https://github.com/GetStream/stream-chat-python/compare/v3.17.0...v4.0.0) (2022-01-18)
 
 
