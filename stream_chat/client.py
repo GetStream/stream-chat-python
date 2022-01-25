@@ -524,6 +524,7 @@ class StreamChat(StreamChatInterface):
         channel_id: str,
         messages_since: Union[str, datetime.datetime] = None,
         messages_until: Union[str, datetime.datetime] = None,
+        **options: Any,
     ) -> StreamResponse:
         if isinstance(messages_since, datetime.datetime):
             messages_since = messages_since.isoformat()
@@ -538,11 +539,14 @@ class StreamChat(StreamChatInterface):
                     "messages_since": messages_since,
                     "messages_until": messages_until,
                 }
-            ]
+            ],
+            **options,
         )
 
-    def export_channels(self, channels: Iterable[Dict]) -> StreamResponse:
-        return self.post("export_channels", data={"channels": channels})
+    def export_channels(
+        self, channels: Iterable[Dict], **options: Any
+    ) -> StreamResponse:
+        return self.post("export_channels", data={"channels": channels, **options})
 
     def get_export_channel_status(self, task_id: str) -> StreamResponse:
         return self.get(f"export_channels/{task_id}")

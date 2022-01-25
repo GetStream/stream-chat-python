@@ -340,7 +340,9 @@ class TestChannel:
     ):
         await channel.send_message({"text": "Hey Joni"}, random_users[0]["id"])
 
-        resp = await client.export_channel(channel.channel_type, channel.id)
+        resp = await client.export_channel(
+            channel.channel_type, channel.id, include_truncated_messages=False
+        )
         task_id = resp["task_id"]
         assert task_id != ""
 

@@ -552,6 +552,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         channel_id: str,
         messages_since: Union[str, datetime.datetime] = None,
         messages_until: Union[str, datetime.datetime] = None,
+        **options: Any,
     ) -> StreamResponse:
         if isinstance(messages_since, datetime.datetime):
             messages_since = messages_since.isoformat()
@@ -566,11 +567,16 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
                     "messages_since": messages_since,
                     "messages_until": messages_until,
                 }
-            ]
+            ],
+            **options,
         )
 
-    async def export_channels(self, channels: Iterable[Dict]) -> StreamResponse:
-        return await self.post("export_channels", data={"channels": channels})
+    async def export_channels(
+        self, channels: Iterable[Dict], **options: Any
+    ) -> StreamResponse:
+        return await self.post(
+            "export_channels", data={"channels": channels, **options}
+        )
 
     async def get_export_channel_status(self, task_id: str) -> StreamResponse:
         return await self.get(f"export_channels/{task_id}")
