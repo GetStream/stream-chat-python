@@ -823,6 +823,7 @@ class StreamChatInterface(abc.ABC):
         channel_id: str,
         messages_since: Union[str, datetime.datetime] = None,
         messages_until: Union[str, datetime.datetime] = None,
+        **options: Any,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Requests a channel export
@@ -831,7 +832,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def export_channels(
-        self, channels: Iterable[Dict]
+        self, channels: Iterable[Dict], **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Requests a channels export
