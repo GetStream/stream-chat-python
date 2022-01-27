@@ -45,7 +45,8 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             api_key=api_key, api_secret=api_secret, timeout=timeout, **options
         )
         self.session = aiohttp.ClientSession(
-            connector=aiohttp.TCPConnector(keepalive_timeout=3.9)
+            base_url=self.base_url,
+            connector=aiohttp.TCPConnector(keepalive_timeout=59.0),
         )
 
     async def _parse_response(self, response: aiohttp.ClientResponse) -> StreamResponse:
@@ -78,13 +79,11 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         headers["Authorization"] = self.auth_token
         headers["stream-auth-type"] = "jwt"
 
-        url = f"{self.base_url}/{relative_url}"
-
         if method.__name__ in ["post", "put", "patch"]:
             serialized = json.dumps(data)
 
         async with method(
-            url,
+            "/" + relative_url.lstrip("/"),
             data=serialized,
             headers=headers,
             params=default_params,
@@ -413,7 +412,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         data.add_field("user", json.dumps(user))
         data.add_field("file", content, filename=name, content_type=content_type)
         async with self.session.post(
-            f"{self.base_url}/{uri}",
+            "/" + uri.lstrip("/"),
             params=self.get_default_params(),
             data=data,
             headers=headers,
