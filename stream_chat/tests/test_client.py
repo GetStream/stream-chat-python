@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 import time
 import uuid
@@ -9,6 +10,7 @@ from typing import Dict, List
 
 import jwt
 import pytest
+import requests
 
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
@@ -689,3 +691,18 @@ class TestClient:
         assert rate_limit.limit > 0
         assert rate_limit.remaining > 0
         assert type(rate_limit.reset) is datetime
+
+    def test_swap_http_client(self):
+        client = StreamChat(
+            api_key=os.environ["STREAM_KEY"], api_secret=os.environ["STREAM_SECRET"]
+        )
+
+        session = requests.Session()
+        session.proxies = {"https": "https://getstream.io"}
+        client.set_http_session(session)
+        with pytest.raises(requests.exceptions.ProxyError):
+            client.get_app_settings()
+
+        client.set_http_session(requests.Session())
+        resp = client.get_app_settings()
+        assert resp.status_code() == 200

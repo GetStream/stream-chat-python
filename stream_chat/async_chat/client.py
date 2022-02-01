@@ -49,6 +49,14 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             connector=aiohttp.TCPConnector(keepalive_timeout=59.0),
         )
 
+    def set_http_session(self, session: aiohttp.ClientSession) -> None:
+        """
+        You can use your own `aiohttp.ClientSession` instance. This instance
+        will be used for underlying HTTP requests.
+        Make sure you set up a `base_url` for the session.
+        """
+        self.session = session
+
     async def _parse_response(self, response: aiohttp.ClientResponse) -> StreamResponse:
         text = await response.text()
         try:
