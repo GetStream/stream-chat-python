@@ -36,6 +36,13 @@ class StreamChat(StreamChatInterface):
         self.session.mount("http://", requests.adapters.HTTPAdapter(max_retries=1))
         self.session.mount("https://", requests.adapters.HTTPAdapter(max_retries=1))
 
+    def set_http_session(self, session: requests.Session) -> None:
+        """
+        You can use your own `requests.Session` instance. This instance
+        will be used for underlying HTTP requests.
+        """
+        self.session = session
+
     def _parse_response(self, response: requests.Response) -> StreamResponse:
         try:
             parsed_result = json.loads(response.text) if response.text else {}

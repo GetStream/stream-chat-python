@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 import time
 import uuid
@@ -7,6 +8,7 @@ from datetime import datetime
 from operator import itemgetter
 from typing import Dict, List
 
+import aiohttp
 import jwt
 import pytest
 
@@ -716,3 +718,18 @@ class TestClient:
         assert rate_limit.limit > 0
         assert rate_limit.remaining > 0
         assert type(rate_limit.reset) is datetime
+
+    async def test_swap_http_client(self):
+        client = StreamChatAsync(
+            api_key=os.environ["STREAM_KEY"], api_secret=os.environ["STREAM_SECRET"]
+        )
+
+        client.set_http_session(aiohttp.ClientSession(base_url="https://getstream.io"))
+        with pytest.raises(StreamAPIException):
+            await client.get_app_settings()
+
+        client.set_http_session(
+            aiohttp.ClientSession(base_url="https://chat.stream-io-api.com")
+        )
+        resp = await client.get_app_settings()
+        assert resp.status_code() == 200
