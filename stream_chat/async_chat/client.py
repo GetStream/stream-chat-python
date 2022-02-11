@@ -591,6 +591,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def get_task(self, task_id: str) -> StreamResponse:
         return await self.get(f"tasks/{task_id}")
 
+    async def send_user_custom_event(self, user_id: str, event: Dict) -> StreamResponse:
+        return await self.post(f"users/{user_id}/event", data={"event": event})
+
     async def close(self) -> None:
         await self.session.close()
 

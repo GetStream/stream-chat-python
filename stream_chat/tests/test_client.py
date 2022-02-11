@@ -657,6 +657,11 @@ class TestClient:
 
         pytest.fail("task did not succeed")
 
+    def test_send_user_custom_event(self, client: StreamChat, random_user: Dict):
+        client.send_user_custom_event(
+            random_user["id"], {"type": "friendship_request", "text": "testtext"}
+        )
+
     def test_stream_response_contains_metadata(self, client: StreamChat):
         resp = client.get_app_settings()
 

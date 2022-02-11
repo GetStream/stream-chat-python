@@ -701,6 +701,13 @@ class TestClient:
 
         pytest.fail("task did not succeed")
 
+    async def test_send_user_custom_event(
+        self, client: StreamChatAsync, random_user: Dict
+    ):
+        await client.send_user_custom_event(
+            random_user["id"], {"type": "friendship_request", "text": "testtext"}
+        )
+
     @pytest.mark.asyncio
     async def test_stream_response(self, client: StreamChatAsync):
         resp = await client.get_app_settings()

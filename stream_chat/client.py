@@ -560,3 +560,6 @@ class StreamChat(StreamChatInterface):
 
     def get_task(self, task_id: str) -> StreamResponse:
         return self.get(f"tasks/{task_id}")
+
+    def send_user_custom_event(self, user_id: str, event: Dict) -> StreamResponse:
+        return self.post(f"users/{user_id}/event", data={"event": event})
