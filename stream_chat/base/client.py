@@ -857,6 +857,15 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def send_user_custom_event(
+        self, user_id: str, event: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Allows you to send custom events to a connected user.
+        """
+        pass
+
     #####################
     #  Private methods  #
     #####################
