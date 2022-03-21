@@ -216,7 +216,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.post("moderation/reports", data=data)
 
     async def _review_flag_report(
-        self, report_id: int, review_result: str, user_id: str, **details: Any
+        self, report_id: str, review_result: str, user_id: str, **details: Any
     ) -> StreamResponse:
         """
         Note: Do not use this.
