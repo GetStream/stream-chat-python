@@ -205,7 +205,7 @@ class StreamChat(StreamChatInterface):
         return self.post("moderation/reports", data=data)
 
     def _review_flag_report(
-        self, report_id: int, review_result: str, user_id: str, **details: Any
+        self, report_id: str, review_result: str, user_id: str, **details: Any
     ) -> StreamResponse:
         """
         Note: Do not use this.
