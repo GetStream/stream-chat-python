@@ -594,6 +594,19 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def send_user_custom_event(self, user_id: str, event: Dict) -> StreamResponse:
         return await self.post(f"users/{user_id}/event", data={"event": event})
 
+    async def upsert_push_provider(self, push_provider_config: Dict) -> StreamResponse:
+        return await self.post(
+            "push_providers", data={"push_provider": push_provider_config}
+        )
+
+    async def delete_push_provider(
+        self, provider_type: str, name: str
+    ) -> StreamResponse:
+        return await self.delete(f"push_providers/{provider_type}/{name}")
+
+    async def list_push_providers(self) -> StreamResponse:
+        return await self.get("push_providers")
+
     async def close(self) -> None:
         await self.session.close()
 

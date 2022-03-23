@@ -563,3 +563,12 @@ class StreamChat(StreamChatInterface):
 
     def send_user_custom_event(self, user_id: str, event: Dict) -> StreamResponse:
         return self.post(f"users/{user_id}/event", data={"event": event})
+
+    def upsert_push_provider(self, push_provider_config: Dict) -> StreamResponse:
+        return self.post("push_providers", data={"push_provider": push_provider_config})
+
+    def delete_push_provider(self, provider_type: str, name: str) -> StreamResponse:
+        return self.delete(f"push_providers/{provider_type}/{name}")
+
+    def list_push_providers(self) -> StreamResponse:
+        return self.get("push_providers")
