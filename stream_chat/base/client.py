@@ -866,6 +866,31 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def upsert_push_provider(
+        self, push_provider_config: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Create or update a push provider.
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_push_provider(
+        self, provider_type: str, name: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Delete a push provider.
+        """
+        pass
+
+    @abc.abstractmethod
+    def list_push_providers(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Get all push providers in the app.
+        """
+        pass
+
     #####################
     #  Private methods  #
     #####################
