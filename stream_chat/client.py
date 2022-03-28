@@ -334,11 +334,20 @@ class StreamChat(StreamChatInterface):
         return self.put(f"commands/{name}", data=settings)
 
     def add_device(
-        self, device_id: str, push_provider: str, user_id: str
+        self,
+        device_id: str,
+        push_provider: str,
+        user_id: str,
+        push_provider_name: str = None,
     ) -> StreamResponse:
         return self.post(
             "devices",
-            data={"id": device_id, "push_provider": push_provider, "user_id": user_id},
+            data={
+                "id": device_id,
+                "push_provider": push_provider,
+                "user_id": user_id,
+                "push_provider_name": push_provider_name,
+            },
         )
 
     def delete_device(self, device_id: str, user_id: str) -> StreamResponse:

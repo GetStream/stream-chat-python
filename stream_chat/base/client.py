@@ -423,7 +423,11 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def add_device(
-        self, device_id: str, push_provider: str, user_id: str
+        self,
+        device_id: str,
+        push_provider: str,
+        user_id: str,
+        push_provider_name: str = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Add a device to a user
