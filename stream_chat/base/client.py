@@ -129,6 +129,18 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def upsert_users(
+        self, users: List[Dict]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def upsert_user(
+        self, user: Dict
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
     def update_users_partial(
         self, updates: List[Dict]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:

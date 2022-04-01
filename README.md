@@ -47,7 +47,7 @@ from stream_chat import StreamChat
 chat = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
 
 # add a user
-chat.update_user({"id": "chuck", "name": "Chuck"})
+chat.upsert_user({"id": "chuck", "name": "Chuck"})
 
 # create a channel about kung-fu
 channel = chat.channel("messaging", "kung-fu")
@@ -83,7 +83,7 @@ from stream_chat import StreamChatAsync
 async def main():
     async with StreamChatAsync(api_key="STREAM_KEY", api_secret="STREAM_SECRET") as chat:
         # add a user
-        await chat.update_user({"id": "chuck", "name": "Chuck"})
+        await chat.upsert_user({"id": "chuck", "name": "Chuck"})
 
         # create a channel about kung-fu
         channel = chat.channel("messaging", "kung-fu")

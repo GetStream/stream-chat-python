@@ -1,5 +1,6 @@
 import datetime
 import json
+import warnings
 from typing import Any, Callable, Dict, Iterable, List, Union
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -116,10 +117,26 @@ class StreamChat(StreamChatInterface):
         return self.post("guest", data=dict(user=guest_user))
 
     def update_users(self, users: List[Dict]) -> StreamResponse:
-        return self.post("users", data={"users": {u["id"]: u for u in users}})
+        warnings.warn(
+            "This method is deprecated. Use upsert_users instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.upsert_users(users)
 
     def update_user(self, user: Dict) -> StreamResponse:
-        return self.update_users([user])
+        warnings.warn(
+            "This method is deprecated. Use upsert_user instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.upsert_user(user)
+
+    def upsert_users(self, users: List[Dict]) -> StreamResponse:
+        return self.post("users", data={"users": {u["id"]: u for u in users}})
+
+    def upsert_user(self, user: Dict) -> StreamResponse:
+        return self.upsert_users([user])
 
     def update_users_partial(self, updates: List[Dict]) -> StreamResponse:
         return self.patch("users", data={"users": updates})

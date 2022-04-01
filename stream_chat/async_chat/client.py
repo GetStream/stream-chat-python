@@ -1,5 +1,6 @@
 import datetime
 import json
+import warnings
 from types import TracebackType
 from typing import (
     Any,
@@ -127,10 +128,26 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.get("app")
 
     async def update_users(self, users: List[Dict]) -> StreamResponse:
-        return await self.post("users", data={"users": {u["id"]: u for u in users}})
+        warnings.warn(
+            "This method is deprecated. Use upsert_users instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return await self.upsert_users(users)
 
     async def update_user(self, user: Dict) -> StreamResponse:
-        return await self.update_users([user])
+        warnings.warn(
+            "This method is deprecated. Use upsert_user instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return await self.upsert_user(user)
+
+    async def upsert_users(self, users: List[Dict]) -> StreamResponse:
+        return await self.post("users", data={"users": {u["id"]: u for u in users}})
+
+    async def upsert_user(self, user: Dict) -> StreamResponse:
+        return await self.upsert_users([user])
 
     async def update_users_partial(self, updates: List[Dict]) -> StreamResponse:
         return await self.patch("users", data={"users": updates})
