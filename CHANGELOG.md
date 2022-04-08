@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/GetStream/stream-chat-python/compare/v4.1.0...v4.2.0) (2022-04-08)
+
+
+### Features
+
+* add custom event endpoint ([#103](https://github.com/GetStream/stream-chat-python/issues/103)) ([b619130](https://github.com/GetStream/stream-chat-python/commit/b61913091409f4aba2f8fa2b0f2fe97ed6da9ab0))
+* add device fields ([#107](https://github.com/GetStream/stream-chat-python/issues/107)) ([3b582f5](https://github.com/GetStream/stream-chat-python/commit/3b582f51e5b9f81e618f0a6a5e81356bebc9bb3f))
+* add options to export channel ([#100](https://github.com/GetStream/stream-chat-python/issues/100)) ([82f07ff](https://github.com/GetStream/stream-chat-python/commit/82f07ff5364dd1a5ee8be1b5f983cf156dcc84f3))
+* add provider management ([#106](https://github.com/GetStream/stream-chat-python/issues/106)) ([9710a90](https://github.com/GetStream/stream-chat-python/commit/9710a9099d6c3d2e73a347aada07aabf4f4515d4))
+* set keepalive timeout to 59s ([#101](https://github.com/GetStream/stream-chat-python/issues/101)) ([e7707ea](https://github.com/GetStream/stream-chat-python/commit/e7707ea9d500e3eb48dac38f08b2c8c33db456d3))
+* swappable http client ([#102](https://github.com/GetStream/stream-chat-python/issues/102)) ([1343f43](https://github.com/GetStream/stream-chat-python/commit/1343f43caf82e415fccc6f82e8db1f42a0ca969b))
+* **upser_user:** deprecated update_user in favor of upsert_user ([#109](https://github.com/GetStream/stream-chat-python/issues/109)) ([0b2a8aa](https://github.com/GetStream/stream-chat-python/commit/0b2a8aa627f386da8bcaa6a2b11e8ebe91f36f22))
+
+
+### Bug Fixes
+
+* report_id is is a uuid ([#105](https://github.com/GetStream/stream-chat-python/issues/105)) ([c4a5e24](https://github.com/GetStream/stream-chat-python/commit/c4a5e24fc658a9cebcf17ed9e3200b10f6caf94b))
+
 ## [4.1.0](https://github.com/GetStream/stream-chat-python/compare/v4.0.0...v4.1.0) (2022-01-20)
 
 
