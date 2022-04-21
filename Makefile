@@ -19,7 +19,7 @@ lint-fix:
 	isort stream_chat
 
 test:  ## Run tests
-	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) pytest --cov=stream_chat --cov-report=xml stream_chat/tests
+	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) pytest --cov=stream_chat stream_chat/tests
 
 check: lint test  ## Run linters + tests
 
