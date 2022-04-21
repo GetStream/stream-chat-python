@@ -55,6 +55,14 @@ class StreamChatInterface(abc.ABC):
     def create_token(
         self, user_id: str, exp: int = None, iat: int = None, **claims: Any
     ) -> str:
+        """
+        Creates a JWT for a user.
+        Stream uses JWT (JSON Web Tokens) to authenticate chat users, enabling them to login.
+        Knowing whether a user is authorized to perform certain actions is managed
+        separately via a role based permissions system.
+        By default, user tokens are valid indefinitely. You can set an `exp`
+        or issued at (`iat`) claim as well.
+        """
         payload: Dict[str, Any] = {**claims, "user_id": user_id}
         if exp:
             payload["exp"] = exp
@@ -98,10 +106,16 @@ class StreamChatInterface(abc.ABC):
     def update_app_settings(
         self, **settings: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Update the app settings.
+        """
         pass
 
     @abc.abstractmethod
     def get_app_settings(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Get the app settings.
+        """
         pass
 
     @abc.abstractmethod
@@ -120,42 +134,63 @@ class StreamChatInterface(abc.ABC):
     def update_users(
         self, users: List[Dict]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        DEPRECATED: Use upsert_users instead.
+        """
         pass
 
     @abc.abstractmethod
     def update_user(
         self, user: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        DEPRECATED: Use upsert_user instead.
+        """
         pass
 
     @abc.abstractmethod
     def upsert_users(
         self, users: List[Dict]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Creates new or updates existing users.
+        """
         pass
 
     @abc.abstractmethod
     def upsert_user(
         self, user: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Creates a new or updates an existing user.
+        """
         pass
 
     @abc.abstractmethod
     def update_users_partial(
         self, updates: List[Dict]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates multiple users partially.
+        """
         pass
 
     @abc.abstractmethod
     def update_user_partial(
         self, update: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates a user partially.
+        """
         pass
 
     @abc.abstractmethod
     def delete_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes a user synchronously. Use delete_users for batch delete.
+        """
         pass
 
     @abc.abstractmethod
@@ -163,7 +198,7 @@ class StreamChatInterface(abc.ABC):
         self, user_ids: Iterable[str], delete_type: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Delete users asynchronously
+        Delete users asynchronously. Use `get_task` to check the status of the task.
 
         :param user_ids: a list of user IDs to delete
         :param delete_type: type of user delete (hard|soft)
@@ -176,84 +211,157 @@ class StreamChatInterface(abc.ABC):
     def deactivate_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deactivates a user.
+        Deactivated users cannot connect to Stream Chat, and can't send or receive messages.
+        To reactivate a user, use `reactivate_user` method.
+        """
         pass
 
     @abc.abstractmethod
     def reactivate_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Reactivates a deactivated user. Use `deactivate_user` to deactivate a user.
+        """
         pass
 
     @abc.abstractmethod
     def export_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Exports a user. It exports a user and returns an object
+        containing all of it's data.
+        """
         pass
 
     @abc.abstractmethod
     def ban_user(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Bans a user. Users can be banned from an app entirely or from a channel.
+        When a user is banned, they will not be allowed to post messages until the
+        ban is removed or expired but will be able to connect to Chat and to channels as before.
+        To unban a user, use `unban_user` method.
+        """
         pass
 
     @abc.abstractmethod
     def shadow_ban(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Shadow ban a user.
+        When a user is shadow banned, they will still be allowed to post messages,
+        but any message sent during the will only be visible to the messages author
+        and invisible to other users of the App.
+        To remove a shadow ban, use `remove_shadow_ban` method.
+        """
         pass
 
     @abc.abstractmethod
     def remove_shadow_ban(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Removes a shadow ban of a user.
+        When a user is shadow banned, they will still be allowed to post messages,
+        but any message sent during the will only be visible to the messages author
+        and invisible to other users of the App.
+        To shadow ban a user, use `shadow_ban` method.
+        """
         pass
 
     @abc.abstractmethod
     def unban_user(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unbans a user. Users can be banned from an app entirely or from a channel.
+        When a user is banned, they will not be allowed to post messages until the
+        ban is removed or expired but will be able to connect to Chat and to channels as before.
+        To ban a user, use `ban_user` method.
+        """
         pass
 
     @abc.abstractmethod
     def query_banned_users(
         self, query_conditions: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Queries banned users.
+        Banned users can be retrieved in different ways:
+        1) Using the dedicated query bans endpoint
+        2) User Search: you can add the banned:true condition to your search. Please note that
+        this will only return users that were banned at the app-level and not the ones
+        that were banned only on channels.
+        """
         pass
 
     @abc.abstractmethod
     def run_message_action(
         self, message_id: str, data: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Runs a message command action.
+        """
         pass
 
     @abc.abstractmethod
     def flag_message(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Flags a message.
+        Any user is allowed to flag a message. This triggers the message.flagged
+        webhook event and adds the message to the inbox of your
+        Stream Dashboard Chat Moderation view.
+        """
         pass
 
     @abc.abstractmethod
     def unflag_message(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unflags a message.
+        Any user is allowed to flag a message. This triggers the message.flagged
+        webhook event and adds the message to the inbox of your
+        Stream Dashboard Chat Moderation view.
+        """
         pass
 
     @abc.abstractmethod
     def query_message_flags(
         self, filter_conditions: Dict, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Queries message flags.
+        If you prefer to build your own in app moderation dashboard, rather than use the Stream
+        dashboard, then the query message flags endpoint lets you get flagged messages. Similar
+        to other queries in Stream Chat, you can filter the flags using query operators.
+        """
         pass
 
     @abc.abstractmethod
     def flag_user(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Flags a user.
+        """
         pass
 
     @abc.abstractmethod
     def unflag_user(
         self, target_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unflags a user.
+        """
         pass
 
     @abc.abstractmethod
@@ -288,6 +396,9 @@ class StreamChatInterface(abc.ABC):
     def mark_all_read(
         self, user_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Marks all messages as read for a user.
+        """
         pass
 
     @abc.abstractmethod
@@ -307,70 +418,122 @@ class StreamChatInterface(abc.ABC):
     def pin_message(
         self, message_id: str, user_id: str, expiration: int = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Pins a message.
+        Pinned messages allow users to highlight important messages, make announcements, or temporarily
+        promote content. Pinning a message is, by default, restricted to certain user roles,
+        but this is flexible. Each channel can have multiple pinned messages and these can be created
+        or updated with or without an expiration.
+        """
         pass
 
     @abc.abstractmethod
     def unpin_message(
         self, message_id: str, user_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unpins a message.
+        Pinned messages allow users to highlight important messages, make announcements, or temporarily
+        promote content. Pinning a message is, by default, restricted to certain user roles,
+        but this is flexible. Each channel can have multiple pinned messages and these can be created
+        or updated with or without an expiration.
+        """
         pass
 
     @abc.abstractmethod
     def update_message(
         self, message: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates a message. Fully overwrites a message.
+        For partial update, use `update_message_partial` method.
+        """
         pass
 
     @abc.abstractmethod
     def update_message_partial(
         self, message_id: str, updates: Dict, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates a message partially.
+        A partial update can be used to set and unset specific fields when
+        it is necessary to retain additional data fields on the object. AKA a patch style update.
+        """
         pass
 
     @abc.abstractmethod
     def delete_message(
         self, message_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes a message.
+        """
         pass
 
     @abc.abstractmethod
     def get_message(
         self, message_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Returns a single message.
+        """
         pass
 
     @abc.abstractmethod
     def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Allows you to search for users and see if they are online/offline.
+        You can filter and sort on the custom fields you've set for your user, the user id, and when the user was last active.
+        """
         pass
 
     @abc.abstractmethod
     def query_channels(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Queries channels.
+        You can query channels based on built-in fields as well as any custom field you add to channels.
+        Multiple filters can be combined using AND, OR logical operators, each filter can use its
+        comparison (equality, inequality, greater than, greater or equal, etc.).
+        You can find the complete list of supported operators in the query syntax section of the docs.
+        """
         pass
 
     @abc.abstractmethod
     def create_channel_type(
         self, data: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Creates a channel type.
+        """
         pass
 
     @abc.abstractmethod
     def get_channel_type(
         self, channel_type: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Returns a channel type.
+        """
         pass
 
     @abc.abstractmethod
     def list_channel_types(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Returns a list of channel types.
+        """
         pass
 
     @abc.abstractmethod
     def update_channel_type(
         self, channel_type: str, **settings: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates a channel type.
+        """
         pass
 
     @abc.abstractmethod
@@ -403,34 +566,68 @@ class StreamChatInterface(abc.ABC):
     def delete_channels(
         self, cids: Iterable[str], **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes multiple channels. This is an asynchronous operation and the returned value is a task Id.
+        You can use `get_task` method to check the status of the task.
+        """
         pass
 
     @abc.abstractmethod
     def list_commands(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Returns a list of commands.
+        By using custom commands, you can receive all messages sent using a specific slash command,
+        eg. /ticket, in your application. When configured, every slash command message happening
+        in a Stream Chat application will propagate to an endpoint via an HTTP POST request.
+        """
         pass
 
     @abc.abstractmethod
     def create_command(
         self, data: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Creates a command.
+        By using custom commands, you can receive all messages sent using a specific slash command,
+        eg. /ticket, in your application. When configured, every slash command message happening
+        in a Stream Chat application will propagate to an endpoint via an HTTP POST request.
+        """
         pass
 
     @abc.abstractmethod
     def delete_command(
         self, name: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes a command.
+        By using custom commands, you can receive all messages sent using a specific slash command,
+        eg. /ticket, in your application. When configured, every slash command message happening
+        in a Stream Chat application will propagate to an endpoint via an HTTP POST request.
+        """
         pass
 
     @abc.abstractmethod
     def get_command(
         self, name: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Returns a command.
+        By using custom commands, you can receive all messages sent using a specific slash command,
+        eg. /ticket, in your application. When configured, every slash command message happening
+        in a Stream Chat application will propagate to an endpoint via an HTTP POST request.
+        """
         pass
 
     @abc.abstractmethod
     def update_command(
         self, name: str, **settings: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates a command.
+        By using custom commands, you can receive all messages sent using a specific slash command,
+        eg. /ticket, in your application. When configured, every slash command message happening
+        in a Stream Chat application will propagate to an endpoint via an HTTP POST request.
+        """
         pass
 
     @abc.abstractmethod
@@ -505,12 +702,22 @@ class StreamChatInterface(abc.ABC):
         sort: List[Dict] = None,
         **options: Any,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Searches for messages.
+        You can enable and/or disable the search indexing on a per channel
+        type through the Stream Dashboard.
+        """
         pass
 
     @abc.abstractmethod
     def send_file(
         self, uri: str, url: str, name: str, user: Dict, content_type: str = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Uploads a file.
+        This functionality defaults to using the Stream CDN. If you would like, you can
+        easily change the logic to upload to your own CDN of choice.
+        """
         pass
 
     @abc.abstractmethod
@@ -842,7 +1049,10 @@ class StreamChatInterface(abc.ABC):
         **options: Any,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Requests a channel export
+        Requests a channel export.
+        Channel exports are created asynchronously, you can use the Task ID returned by
+        the APIs to keep track of the status and to download the final result when it is ready.
+        Use `get_task` to check the status of the export.
         """
         pass
 

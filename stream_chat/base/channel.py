@@ -330,52 +330,98 @@ class ChannelInterface(abc.ABC):
     def accept_invite(
         self, user_id: str, **data: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Accepts an invitation to this channel.
+        """
         pass
 
     @abc.abstractmethod
     def reject_invite(
         self, user_id: str, **data: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Rejects an invitation to this channel.
+        """
         pass
 
     @abc.abstractmethod
     def send_file(
         self, url: str, name: str, user: Dict, content_type: str = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Uploads a file.
+        This functionality defaults to using the Stream CDN. If you would like, you can
+        easily change the logic to upload to your own CDN of choice.
+        """
         pass
 
     @abc.abstractmethod
     def send_image(
         self, url: str, name: str, user: Dict, content_type: str = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Uploads an image.
+        Stream supported image types are: image/bmp, image/gif, image/jpeg, image/png, image/webp,
+        image/heic, image/heic-sequence, image/heif, image/heif-sequence, image/svg+xml.
+        You can set a more restrictive list for your application if needed.
+        The maximum file size is 100MB.
+        """
         pass
 
     @abc.abstractmethod
     def delete_file(self, url: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes a file by file url.
+        """
         pass
 
     @abc.abstractmethod
     def delete_image(
         self, url: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes an image by image url.
+        """
         pass
 
     @abc.abstractmethod
     def hide(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Removes a channel from query channel requests for that user until a new message is added.
+        Use `show` to cancel this operation.
+        """
         pass
 
     @abc.abstractmethod
     def show(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Shows a previously hidden channel.
+        Use `hide` to hide a channel.
+        """
         pass
 
     @abc.abstractmethod
     def mute(
         self, user_id: str, expiration: int = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Mutes a channel.
+        Messages added to a muted channel will not trigger push notifications, nor change the
+        unread count for the users that muted it. By default, mutes stay in place indefinitely
+        until the user removes it; however, you can optionally set an expiration time. The list
+        of muted channels and their expiration time is returned when the user connects.
+        """
         pass
 
     @abc.abstractmethod
     def unmute(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unmutes a channel.
+        Messages added to a muted channel will not trigger push notifications, nor change the
+        unread count for the users that muted it. By default, mutes stay in place indefinitely
+        until the user removes it; however, you can optionally set an expiration time. The list
+        of muted channels and their expiration time is returned when the user connects.
+        """
         pass
 
 
