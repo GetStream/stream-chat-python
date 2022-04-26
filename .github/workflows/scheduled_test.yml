@@ -1,0 +1,43 @@
+name: Scheduled tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monday at 9:00 UTC
+    - cron: "0 9 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install deps with ${{ matrix.python }}
+        run: pip install ".[test, ci]"
+
+      - name: Test
+        env:
+          STREAM_KEY: ${{ secrets.STREAM_KEY }}
+          STREAM_SECRET: ${{ secrets.STREAM_SECRET }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          # Retry 3 times because tests can be flaky
+          for _ in 1 2 3;
+          do
+              # make test && break
+              test -f 'nonexistingfile.yml' && break
+          done
+
+      - name: Notify Slack if failed
+        uses: voxmedia/github-action-slack-notify-build@v1
+        if: failure()
+        with:
+          channel_id: C02RPDF7T63
+          color: danger
+          status: FAILED
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
