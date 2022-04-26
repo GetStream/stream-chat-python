@@ -28,8 +28,7 @@ jobs:
           # Retry 3 times because tests can be flaky
           for _ in 1 2 3;
           do
-              # make test && break
-              test -f 'nonexistingfile.yml' && break
+              make test && break
           done
 
       - name: Notify Slack if failed
