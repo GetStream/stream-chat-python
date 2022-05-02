@@ -126,7 +126,7 @@ class TestClient:
 
     async def test_update_users(self, client: StreamChatAsync):
         user = {"id": str(uuid.uuid4())}
-        response = await client.update_users([user])
+        response = await client.upsert_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
 

@@ -43,7 +43,8 @@ def random_user(client: StreamChat):
     response = client.update_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
-    return user
+    yield user
+    hard_delete_users(client, [user["id"]])
 
 
 @pytest.fixture(scope="function")
@@ -52,7 +53,8 @@ def server_user(client: StreamChat):
     response = client.update_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
-    return user
+    yield user
+    hard_delete_users(client, [user["id"]])
 
 
 @pytest.fixture(scope="function")
@@ -60,7 +62,8 @@ def random_users(client: StreamChat):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
     client.update_users([user1, user2])
-    return [user1, user2]
+    yield [user1, user2]
+    hard_delete_users(client, [user1["id"], user2["id"]])
 
 
 @pytest.fixture(scope="function")
@@ -69,7 +72,13 @@ def channel(client: StreamChat, random_user: Dict):
         "messaging", str(uuid.uuid4()), {"test": True, "language": "python"}
     )
     channel.create(random_user["id"])
-    return channel
+
+    yield channel
+
+    try:
+        channel.delete()
+    except Exception:
+        pass
 
 
 @pytest.fixture(scope="function")
@@ -106,3 +115,18 @@ def fellowship_of_the_ring(client: StreamChat):
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
     )
     channel.create("gandalf")
+
+    yield
+
+    try:
+        channel.delete()
+    except Exception:
+        pass
+    hard_delete_users(client, [m["id"] for m in members])
+
+
+def hard_delete_users(client: StreamChat, user_ids: List[str]):
+    try:
+        client.delete_users(user_ids, "hard", conversations="hard", messages="hard")
+    except Exception:
+        pass

@@ -52,7 +52,8 @@ async def random_user(client: StreamChatAsync):
     response = await client.update_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
-    return user
+    yield user
+    await hard_delete_users(client, [user["id"]])
 
 
 @pytest.fixture(scope="function")
@@ -61,24 +62,31 @@ async def server_user(client: StreamChatAsync):
     response = await client.update_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
-    return user
+    yield user
+    await hard_delete_users(client, [user["id"]])
 
 
 @pytest.fixture(scope="function")
 async def random_users(client: StreamChatAsync):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
-    await client.update_users([user1, user2])
-    return [user1, user2]
+    await client.upsert_users([user1, user2])
+    yield [user1, user2]
+    await hard_delete_users(client, [user1["id"], user2["id"]])
 
 
 @pytest.fixture(scope="function")
-async def channel(client, random_user: Dict):
+async def channel(client: StreamChatAsync, random_user: Dict):
     channel = client.channel(
         "messaging", str(uuid.uuid4()), {"test": True, "language": "python"}
     )
     await channel.create(random_user["id"])
-    return channel
+    yield channel
+
+    try:
+        await channel.delete()
+    except Exception:
+        pass
 
 
 @pytest.fixture(scope="function")
@@ -110,8 +118,23 @@ async def fellowship_of_the_ring(client: StreamChatAsync):
         },
         {"id": "peregrin-took", "name": "Peregrin Took", "race": "Hobbit", "age": 28},
     ]
-    await client.update_users(members)
+    await client.upsert_users(members)
     channel = client.channel(
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
     )
     await channel.create("gandalf")
+    yield
+    try:
+        await channel.delete()
+    except Exception:
+        pass
+    await hard_delete_users(client, [m["id"] for m in members])
+
+
+async def hard_delete_users(client: StreamChatAsync, user_ids: List[str]):
+    try:
+        await client.delete_users(
+            user_ids, "hard", conversations="hard", messages="hard"
+        )
+    except Exception:
+        pass
