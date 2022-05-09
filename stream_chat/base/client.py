@@ -89,7 +89,9 @@ class StreamChatInterface(abc.ABC):
 
         return params
 
-    def verify_webhook(self, request_body: bytes, x_signature: str) -> bool:
+    def verify_webhook(
+        self, request_body: bytes, x_signature: Union[str, bytes]
+    ) -> bool:
         """
         Verify the signature added to a webhook event
 
@@ -97,6 +99,9 @@ class StreamChatInterface(abc.ABC):
         :param x_signature: the x-signature header included in the request
         :return: bool
         """
+        if isinstance(x_signature, bytes):
+            x_signature = x_signature.decode()
+
         signature = hmac.new(
             key=self.api_secret.encode(), msg=request_body, digestmod=hashlib.sha256
         ).hexdigest()

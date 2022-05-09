@@ -153,7 +153,7 @@ class TestClient:
         )
         assert "task_id" in response
 
-        for _ in range(10):
+        for _ in range(20):
             response = await client.get_task(response["task_id"])
             if response["status"] == "completed" and response["result"][
                 random_user["id"]
@@ -690,7 +690,7 @@ class TestClient:
         response = await client.delete_channels([channel.cid])
         assert "task_id" in response
 
-        for _ in range(10):
+        for _ in range(20):
             response = await client.get_task(response["task_id"])
             if response["status"] == "completed" and response["result"][
                 channel.cid
