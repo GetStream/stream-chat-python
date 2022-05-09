@@ -428,7 +428,7 @@ class StreamChat(StreamChatInterface):
             f"{self.base_url}/{uri}",
             params=self.get_default_params(),
             data={"user": json.dumps(user)},
-            files={"file": (name, content, content_type)},
+            files={"file": (name, content, content_type)},  # type: ignore
             headers=headers,
         )
         return self._parse_response(response)
