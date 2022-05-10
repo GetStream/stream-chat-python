@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.2.2](https://github.com/GetStream/stream-chat-python/compare/v4.2.1...v4.2.2) (2022-05-10)
+
+
+### Features
+
+* **verify_webhook:** bytes as signature header ([#119](https://github.com/GetStream/stream-chat-python/issues/119)) ([1658d0b](https://github.com/GetStream/stream-chat-python/commit/1658d0b2374a7edc2b9c006f4af3171e3ee85965))
+
 ### [4.2.1](https://github.com/GetStream/stream-chat-python/compare/v4.2.0...v4.2.1) (2022-04-21)
 
 ### Features
