@@ -643,9 +643,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.post("import_urls", data={"filename": filename})
 
     async def create_import(
-        self, filepath: str, mode: Literal["insert", "upsert"] = "upsert"
+        self, path: str, mode: Literal["insert", "upsert"] = "upsert"
     ) -> StreamResponse:
-        return await self.post("imports", data={"path": filepath, "mode": mode})
+        return await self.post("imports", data={"path": path, "mode": mode})
 
     async def get_import(self, id: str) -> StreamResponse:
         return await self.get(f"imports/{id}")

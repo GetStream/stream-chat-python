@@ -1151,7 +1151,7 @@ class StreamChatInterface(abc.ABC):
         pass
 
     def create_import(
-        self, filepath: str, mode: Literal["insert", "upsert"] = "upsert"
+        self, path: str, mode: Literal["insert", "upsert"] = "upsert"
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create an import task.

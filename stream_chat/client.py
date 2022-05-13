@@ -610,9 +610,9 @@ class StreamChat(StreamChatInterface):
         return self.post("import_urls", data={"filename": filename})
 
     def create_import(
-        self, filepath: str, mode: Literal["insert", "upsert"] = "upsert"
+        self, path: str, mode: Literal["insert", "upsert"] = "upsert"
     ) -> StreamResponse:
-        return self.post("imports", data={"path": filepath, "mode": mode})
+        return self.post("imports", data={"path": path, "mode": mode})
 
     def get_import(self, id: str) -> StreamResponse:
         return self.get(f"imports/{id}")
