@@ -1,5 +1,6 @@
 import time
 import uuid
+from pathlib import Path
 from typing import Dict, List
 
 import pytest
@@ -202,13 +203,17 @@ class TestChannel:
         assert response["reactions"][0]["count"] == 42
 
     async def test_send_and_delete_file(self, channel: Channel, random_user: Dict):
-        url = "helloworld.jpg"
+        url = str(
+            Path.joinpath(Path(__file__).parent.parent, "assets", "helloworld.jpg")
+        )
         resp = await channel.send_file(url, "helloworld.jpg", random_user)
         assert "helloworld.jpg" in resp["file"]
         await channel.delete_file(resp["file"])
 
     async def test_send_and_delete_image(self, channel: Channel, random_user: Dict):
-        url = "helloworld.jpg"
+        url = str(
+            Path.joinpath(Path(__file__).parent.parent, "assets", "helloworld.jpg")
+        )
         resp = await channel.send_image(
             url, "helloworld.jpg", random_user, content_type="image/jpeg"
         )
