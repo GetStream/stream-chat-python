@@ -740,3 +740,26 @@ class TestClient:
         )
         resp = await client.get_app_settings()
         assert resp.status_code() == 200
+
+    async def test_imports_end2end(self, client: StreamChatAsync):
+        url_resp = await client.create_import_url(str(uuid.uuid4()) + ".json")
+        assert url_resp["upload_url"]
+        assert url_resp["path"]
+
+        sess = aiohttp.ClientSession()
+        async with sess.put(
+            url_resp["upload_url"],
+            data=b"{}",
+            headers={"Content-Type": "application/json"},
+        ) as resp:
+            assert resp.status == 200
+        sess.close()
+
+        create_resp = await client.create_import(url_resp["path"], "upsert")
+        assert create_resp["import_task"]["id"]
+
+        get_resp = await client.get_import(create_resp["import_task"]["id"])
+        assert get_resp["import_task"]["id"] == create_resp["import_task"]["id"]
+
+        list_resp = await client.list_imports({"limit": 1})
+        assert len(list_resp["import_tasks"]) == 1

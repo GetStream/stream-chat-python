@@ -711,3 +711,24 @@ class TestClient:
         client.set_http_session(requests.Session())
         resp = client.get_app_settings()
         assert resp.status_code() == 200
+
+    def test_imports_end2end(self, client: StreamChat):
+        url_resp = client.create_import_url(str(uuid.uuid4()) + ".json")
+        assert url_resp["upload_url"]
+        assert url_resp["path"]
+
+        upload_resp = requests.put(
+            url_resp["upload_url"],
+            data=b"{}",
+            headers={"Content-Type": "application/json"},
+        )
+        assert upload_resp.status_code == 200
+
+        create_resp = client.create_import(url_resp["path"], "upsert")
+        assert create_resp["import_task"]["id"]
+
+        get_resp = client.get_import(create_resp["import_task"]["id"])
+        assert get_resp["import_task"]["id"] == create_resp["import_task"]["id"]
+
+        list_resp = client.list_imports({"limit": 1})
+        assert len(list_resp["import_tasks"]) == 1
