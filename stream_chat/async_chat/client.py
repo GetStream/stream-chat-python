@@ -1,5 +1,6 @@
 import datetime
 import json
+import sys
 import warnings
 from types import TracebackType
 from typing import (
@@ -14,6 +15,11 @@ from typing import (
     Union,
 )
 from urllib.parse import urlparse
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 import aiohttp
 from aiofile import AIOFile
@@ -632,6 +638,20 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def list_push_providers(self) -> StreamResponse:
         return await self.get("push_providers")
+
+    async def create_import_url(self, filename: str) -> StreamResponse:
+        return await self.post("import_urls", data={"filename": filename})
+
+    async def create_import(
+        self, path: str, mode: Literal["insert", "upsert"] = "upsert"
+    ) -> StreamResponse:
+        return await self.post("imports", data={"path": path, "mode": mode})
+
+    async def get_import(self, id: str) -> StreamResponse:
+        return await self.get(f"imports/{id}")
+
+    async def list_imports(self, options: Dict = None) -> StreamResponse:
+        return await self.get("imports", params=options)
 
     async def close(self) -> None:
         await self.session.close()

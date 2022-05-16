@@ -4,7 +4,13 @@ import datetime
 import hashlib
 import hmac
 import os
+import sys
 from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 import jwt
 
@@ -1119,6 +1125,89 @@ class StreamChatInterface(abc.ABC):
     def list_push_providers(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Get all push providers in the app.
+        """
+        pass
+
+    @abc.abstractmethod
+    def create_import_url(
+        self, filename: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Create a URL to import a file.
+        Full flow:
+        ::
+
+            url_resp = client.create_import_url("myfile.json")
+
+            upload_resp = requests.put(
+                url_resp["upload_url"],
+                data=open("myfile.json", "rb"),
+                headers={"Content-Type": "application/json"},
+            )
+
+            create_resp = client.create_import(url_resp["path"], "upsert")
+            import_resp = client.get_import(create_resp["import_task"]["id"])
+        """
+        pass
+
+    def create_import(
+        self, path: str, mode: Literal["insert", "upsert"] = "upsert"
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Create an import task.
+        Full flow:
+        ::
+
+            url_resp = client.create_import_url("myfile.json")
+
+            upload_resp = requests.put(
+                url_resp["upload_url"],
+                data=open("myfile.json", "rb"),
+                headers={"Content-Type": "application/json"},
+            )
+
+            create_resp = client.create_import(url_resp["path"], "upsert")
+            import_resp = client.get_import(create_resp["import_task"]["id"])
+        """
+        pass
+
+    def get_import(self, id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Get the status of an import task.
+        Full flow:
+        ::
+
+            url_resp = client.create_import_url("myfile.json")
+
+            upload_resp = requests.put(
+                url_resp["upload_url"],
+                data=open("myfile.json", "rb"),
+                headers={"Content-Type": "application/json"},
+            )
+
+            create_resp = client.create_import(url_resp["path"], "upsert")
+            import_resp = client.get_import(create_resp["import_task"]["id"])
+        """
+        pass
+
+    def list_imports(
+        self, options: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        List all import tasks. Options can contain a "limit" and "offset" parameter.
+        Full flow:
+        ::
+
+            url_resp = client.create_import_url("myfile.json")
+
+            upload_resp = requests.put(
+                url_resp["upload_url"],
+                data=open("myfile.json", "rb"),
+                headers={"Content-Type": "application/json"},
+            )
+
+            create_resp = client.create_import(url_resp["path"], "upsert")
+            import_resp = client.get_import(create_resp["import_task"]["id"])
         """
         pass
 

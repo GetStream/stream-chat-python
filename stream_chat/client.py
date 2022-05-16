@@ -1,9 +1,16 @@
 import datetime
 import json
+import sys
 import warnings
 from typing import Any, Callable, Dict, Iterable, List, Union
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 
 import requests
 
@@ -598,3 +605,17 @@ class StreamChat(StreamChatInterface):
 
     def list_push_providers(self) -> StreamResponse:
         return self.get("push_providers")
+
+    def create_import_url(self, filename: str) -> StreamResponse:
+        return self.post("import_urls", data={"filename": filename})
+
+    def create_import(
+        self, path: str, mode: Literal["insert", "upsert"] = "upsert"
+    ) -> StreamResponse:
+        return self.post("imports", data={"path": path, "mode": mode})
+
+    def get_import(self, id: str) -> StreamResponse:
+        return self.get(f"imports/{id}")
+
+    def list_imports(self, options: Dict = None) -> StreamResponse:
+        return self.get("imports", params=options)
