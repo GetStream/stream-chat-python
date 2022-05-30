@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/GetStream/stream-chat-python/compare/v4.2.2...v4.3.0) (2022-05-30)
+
+
+### Features
+
+* **import:** add import endpoints ([#121](https://github.com/GetStream/stream-chat-python/issues/121)) ([44d1a6a](https://github.com/GetStream/stream-chat-python/commit/44d1a6a9b3bd9c29cbbcc8ac3500598de01f1897))
+
 ### [4.2.2](https://github.com/GetStream/stream-chat-python/compare/v4.2.1...v4.2.2) (2022-05-10)
 
 
