@@ -491,11 +491,8 @@ class StreamChat(StreamChatInterface):
     def create_segment(self, segment: Dict) -> StreamResponse:
         return self.post("segments", data={"segment": segment})
 
-    def get_segment(self, segment_id: str) -> StreamResponse:
-        return self.get(f"segments/{segment_id}")
-
-    def list_segments(self, **params: Any) -> StreamResponse:
-        return self.get("segments", params)
+    def query_segments(self, **params: Any) -> StreamResponse:
+        return self.post("segments", data=params)
 
     def update_segment(self, segment_id: str, data: Dict) -> StreamResponse:
         return self.put(f"segments/{segment_id}", data={"segment": data})
@@ -506,11 +503,8 @@ class StreamChat(StreamChatInterface):
     def create_campaign(self, campaign: Dict) -> StreamResponse:
         return self.post("campaigns", data={"campaign": campaign})
 
-    def get_campaign(self, campaign_id: str) -> StreamResponse:
-        return self.get(f"campaigns/{campaign_id}")
-
-    def list_campaigns(self, **params: Any) -> StreamResponse:
-        return self.get("campaigns", params)
+    def query_campaigns(self, **params: Any) -> StreamResponse:
+        return self.post("campaigns", data=params)
 
     def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
         return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
@@ -533,6 +527,9 @@ class StreamChat(StreamChatInterface):
 
     def test_campaign(self, campaign_id: str, users: Iterable[str]) -> StreamResponse:
         return self.post(f"campaigns/{campaign_id}/test", data={"users": users})
+
+    def query_recipients(self, **params: Any) -> StreamResponse:
+        return self.post("recipients", data=params)
 
     def revoke_tokens(self, since: Union[str, datetime.datetime]) -> StreamResponse:
         if isinstance(since, datetime.datetime):

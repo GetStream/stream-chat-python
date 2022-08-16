@@ -907,20 +907,11 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_segment(
-        self, segment_id: str
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Get a segment by id
-        """
-        pass
-
-    @abc.abstractmethod
-    def list_segments(
+    def query_segments(
         self, **params: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        List segments
+        Query segments
         """
         pass
 
@@ -952,20 +943,11 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_campaign(
-        self, campaign_id: str
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Get a campaign by id
-        """
-        pass
-
-    @abc.abstractmethod
-    def list_campaigns(
+    def query_campaigns(
         self, **params: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        List campaigns
+        Query campaigns
         """
         pass
 
@@ -1020,6 +1002,15 @@ class StreamChatInterface(abc.ABC):
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Trigger a test send of the given campaing to given users
+        """
+        pass
+
+    @abc.abstractmethod
+    def query_recipients(
+        self, **params: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Query recipients
         """
         pass
 
