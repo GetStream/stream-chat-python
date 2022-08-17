@@ -971,7 +971,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def schedule_campaign(
-        self, campaign_id: str, send_at: int = None
+        self, campaign_id: str, scheduled_for: int = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Schedule a campaign at given time
