@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.0](https://github.com/GetStream/stream-chat-python/compare/v4.3.0...v4.4.0) (2022-08-17)
+
+
+### Features
+
+* add new campaign endpoints ([#123](https://github.com/GetStream/stream-chat-python/issues/123)) ([a63992f](https://github.com/GetStream/stream-chat-python/commit/a63992faf1cd1ca530cc1b290e2afd28f451a06e))
+
+
+### Bug Fixes
+
+* handle broken rate limit as best effort ([#126](https://github.com/GetStream/stream-chat-python/issues/126)) ([683529d](https://github.com/GetStream/stream-chat-python/commit/683529d6684454434580c8d6768e7dd541bfa86c))
+
 ## [4.3.0](https://github.com/GetStream/stream-chat-python/compare/v4.2.2...v4.3.0) (2022-05-30)
 
 
