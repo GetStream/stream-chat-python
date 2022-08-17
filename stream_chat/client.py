@@ -489,7 +489,7 @@ class StreamChat(StreamChatInterface):
         return self.get("roles")
 
     def create_segment(self, segment: Dict) -> StreamResponse:
-        return self.post("segments", data={"segment": segment})
+        return self.post("segments/new", data={"segment": segment})
 
     def query_segments(self, **params: Any) -> StreamResponse:
         return self.post("segments", data=params)
@@ -501,7 +501,7 @@ class StreamChat(StreamChatInterface):
         return self.delete(f"segments/{segment_id}")
 
     def create_campaign(self, campaign: Dict) -> StreamResponse:
-        return self.post("campaigns", data={"campaign": campaign})
+        return self.post("campaigns/new", data={"campaign": campaign})
 
     def query_campaigns(self, **params: Any) -> StreamResponse:
         return self.post("campaigns", data=params)
@@ -513,10 +513,10 @@ class StreamChat(StreamChatInterface):
         return self.delete(f"campaigns/{campaign_id}")
 
     def schedule_campaign(
-        self, campaign_id: str, send_at: int = None
+        self, campaign_id: str, scheduled_for: int = None
     ) -> StreamResponse:
         return self.patch(
-            f"campaigns/{campaign_id}/schedule", data={"send_at": send_at}
+            f"campaigns/{campaign_id}/schedule", data={"scheduled_for": scheduled_for}
         )
 
     def stop_campaign(self, campaign_id: str) -> StreamResponse:

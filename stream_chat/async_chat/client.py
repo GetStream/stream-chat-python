@@ -511,7 +511,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.get("roles")
 
     async def create_segment(self, segment: Dict) -> StreamResponse:
-        return await self.post("segments", data={"segment": segment})
+        return await self.post("segments/new", data={"segment": segment})
 
     async def query_segments(self, **params: Any) -> StreamResponse:
         return await self.post("segments", data=params)
@@ -523,7 +523,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.delete(f"segments/{segment_id}")
 
     async def create_campaign(self, campaign: Dict) -> StreamResponse:
-        return await self.post("campaigns", data={"campaign": campaign})
+        return await self.post("campaigns/new", data={"campaign": campaign})
 
     async def query_campaigns(self, **params: Any) -> StreamResponse:
         return await self.post("campaigns", params)
@@ -536,10 +536,10 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.delete(f"campaigns/{campaign_id}")
 
     async def schedule_campaign(
-        self, campaign_id: str, send_at: int = None
+        self, campaign_id: str, scheduled_for: int = None
     ) -> StreamResponse:
         return await self.patch(
-            f"campaigns/{campaign_id}/schedule", data={"send_at": send_at}
+            f"campaigns/{campaign_id}/schedule", data={"scheduled_for": scheduled_for}
         )
 
     async def query_recipients(self, **params: Any) -> StreamResponse:
