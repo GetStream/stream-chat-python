@@ -489,10 +489,10 @@ class StreamChat(StreamChatInterface):
         return self.get("roles")
 
     def create_segment(self, segment: Dict) -> StreamResponse:
-        return self.post("segments/new", data={"segment": segment})
+        return self.post("segments", data={"segment": segment})
 
     def query_segments(self, **params: Any) -> StreamResponse:
-        return self.post("segments", data=params)
+        return self.get("segments", params={"payload": json.dumps(params)})
 
     def update_segment(self, segment_id: str, data: Dict) -> StreamResponse:
         return self.put(f"segments/{segment_id}", data={"segment": data})
@@ -501,10 +501,10 @@ class StreamChat(StreamChatInterface):
         return self.delete(f"segments/{segment_id}")
 
     def create_campaign(self, campaign: Dict) -> StreamResponse:
-        return self.post("campaigns/new", data={"campaign": campaign})
+        return self.post("campaigns", data={"campaign": campaign})
 
     def query_campaigns(self, **params: Any) -> StreamResponse:
-        return self.post("campaigns", data=params)
+        return self.get("campaigns", params={"payload": json.dumps(params)})
 
     def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
         return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
@@ -529,7 +529,7 @@ class StreamChat(StreamChatInterface):
         return self.post(f"campaigns/{campaign_id}/test", data={"users": users})
 
     def query_recipients(self, **params: Any) -> StreamResponse:
-        return self.post("recipients", data=params)
+        return self.get("recipients", params={"payload": json.dumps(params)})
 
     def revoke_tokens(self, since: Union[str, datetime.datetime]) -> StreamResponse:
         if isinstance(since, datetime.datetime):

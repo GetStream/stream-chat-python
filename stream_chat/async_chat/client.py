@@ -511,10 +511,10 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.get("roles")
 
     async def create_segment(self, segment: Dict) -> StreamResponse:
-        return await self.post("segments/new", data={"segment": segment})
+        return await self.post("segments", data={"segment": segment})
 
     async def query_segments(self, **params: Any) -> StreamResponse:
-        return await self.post("segments", data=params)
+        return await self.get("segments", params={"payload": json.dumps(params)})
 
     async def update_segment(self, segment_id: str, data: Dict) -> StreamResponse:
         return await self.put(f"segments/{segment_id}", data={"segment": data})
@@ -523,10 +523,10 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.delete(f"segments/{segment_id}")
 
     async def create_campaign(self, campaign: Dict) -> StreamResponse:
-        return await self.post("campaigns/new", data={"campaign": campaign})
+        return await self.post("campaigns", data={"campaign": campaign})
 
     async def query_campaigns(self, **params: Any) -> StreamResponse:
-        return await self.post("campaigns", params)
+        return await self.get("campaigns", params={"payload": json.dumps(params)})
 
     async def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
         return await self.put(f"campaigns/{campaign_id}", data={"campaign": data})
@@ -543,7 +543,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         )
 
     async def query_recipients(self, **params: Any) -> StreamResponse:
-        return await self.post("recipients", data=params)
+        return await self.get("recipients", params={"payload": json.dumps(params)})
 
     async def stop_campaign(self, campaign_id: str) -> StreamResponse:
         return await self.patch(f"campaigns/{campaign_id}/stop")
