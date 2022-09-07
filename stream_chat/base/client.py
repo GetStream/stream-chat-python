@@ -962,7 +962,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def delete_campaign(
-        self, campaign_id: str
+        self, campaign_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Delete a campaign by id
