@@ -531,9 +531,8 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
         return await self.put(f"campaigns/{campaign_id}", data={"campaign": data})
 
-    async def delete_campaign(self, campaign_id: str) -> StreamResponse:
-
-        return await self.delete(f"campaigns/{campaign_id}")
+    async def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
+        return await self.delete(f"campaigns/{campaign_id}", params=options)
 
     async def schedule_campaign(
         self, campaign_id: str, scheduled_for: int = None

@@ -509,8 +509,8 @@ class StreamChat(StreamChatInterface):
     def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
         return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
 
-    def delete_campaign(self, campaign_id: str) -> StreamResponse:
-        return self.delete(f"campaigns/{campaign_id}")
+    def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
+        return self.delete(f"campaigns/{campaign_id}", params=options)
 
     def schedule_campaign(
         self, campaign_id: str, scheduled_for: int = None
