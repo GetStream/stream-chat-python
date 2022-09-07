@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/GetStream/stream-chat-python/compare/v4.4.2...v4.5.0) (2022-09-07)
+
+
+### Features
+
+* add gdpr flag for campaign deletion ([#132](https://github.com/GetStream/stream-chat-python/issues/132)) ([5dc0c2e](https://github.com/GetStream/stream-chat-python/commit/5dc0c2e4bda97a5ee8f67c28eca89244bfeb5333))
+
 ### [4.4.2](https://github.com/GetStream/stream-chat-python/compare/v4.4.1...v4.4.2) (2022-08-22)
 
 ### [4.4.1](https://github.com/GetStream/stream-chat-python/compare/v4.4.0...v4.4.1) (2022-08-17)
