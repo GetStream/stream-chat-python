@@ -164,6 +164,15 @@ class TestClient:
 
         pytest.fail("task did not succeed")
 
+    async def test_restore_users(self, client: StreamChatAsync, random_user: Dict):
+        response = await client.delete_user(random_user["id"])
+        assert random_user["id"] == response["user"]["id"]
+
+        await client.restore_users([random_user["id"]])
+
+        response = await client.query_users({"id": random_user["id"]})
+        assert len(response["users"]) == 1
+
     async def test_deactivate_user(self, client: StreamChatAsync, random_user: Dict):
         response = await client.deactivate_user(random_user["id"])
         assert "user" in response

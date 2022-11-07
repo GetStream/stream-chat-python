@@ -161,6 +161,13 @@ class StreamChat(StreamChatInterface):
             "users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
         )
 
+    def restore_users(
+        self, user_ids: Iterable[str]
+    ) -> StreamResponse:
+        return self.post(
+            "users/restore", data={"user_ids": user_ids}
+        )
+
     def deactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return self.post(f"users/{user_id}/deactivate", data=options)
 

@@ -219,6 +219,15 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def restore_users(
+        self, user_ids: Iterable[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Restores soft deleted users.
+        """
+        pass
+
+    @abc.abstractmethod
     def deactivate_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
