@@ -571,7 +571,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def channel(
         self, channel_type: str, channel_id: str = None, data: Dict = None
-    ) -> TChannel:
+    ) -> TChannel:  # type: ignore[type-var]
         """
         Creates a channel object
 

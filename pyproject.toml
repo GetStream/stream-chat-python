@@ -38,6 +38,7 @@ disallow_untyped_defs = true
 disallow_untyped_calls = true
 check_untyped_defs = true
 warn_unused_configs = true
+strict_optional = false
 
 [[tool.mypy.overrides]]
 module = "stream_chat.tests.*"
