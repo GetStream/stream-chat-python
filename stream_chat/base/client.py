@@ -1150,6 +1150,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def create_import(
         self, path: str, mode: Literal["insert", "upsert"] = "upsert"
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -1171,6 +1172,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def get_import(self, id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Get the status of an import task.
@@ -1190,6 +1192,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def list_imports(
         self, options: Dict = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
