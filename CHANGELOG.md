@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.6.0](https://github.com/GetStream/stream-chat-python/compare/v4.5.0...v4.6.0) (2022-11-08)
+
+
+### Features
+
+* add restore_users ([#134](https://github.com/GetStream/stream-chat-python/issues/134)) ([0d57324](https://github.com/GetStream/stream-chat-python/commit/0d573241b6d4942c60def4fb076f33a662ad4ae5))
+
 ## [4.5.0](https://github.com/GetStream/stream-chat-python/compare/v4.4.2...v4.5.0) (2022-09-07)
 
 
