@@ -171,6 +171,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             "users/delete", data=dict(options, user=delete_type, user_ids=user_ids)
         )
 
+    async def restore_users(self, user_ids: Iterable[str]) -> StreamResponse:
+        return await self.post("users/restore", data={"user_ids": user_ids})
+
     async def deactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return await self.post(f"users/{user_id}/deactivate", data=options)
 

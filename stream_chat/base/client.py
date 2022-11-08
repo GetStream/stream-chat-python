@@ -219,6 +219,15 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def restore_users(
+        self, user_ids: Iterable[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Restores soft deleted users.
+        """
+        pass
+
+    @abc.abstractmethod
     def deactivate_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -562,7 +571,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def channel(
         self, channel_type: str, channel_id: str = None, data: Dict = None
-    ) -> TChannel:
+    ) -> TChannel:  # type: ignore[type-var]
         """
         Creates a channel object
 
@@ -1141,6 +1150,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def create_import(
         self, path: str, mode: Literal["insert", "upsert"] = "upsert"
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -1162,6 +1172,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def get_import(self, id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Get the status of an import task.
@@ -1181,6 +1192,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def list_imports(
         self, options: Dict = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
