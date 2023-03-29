@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.0](https://github.com/GetStream/stream-chat-python/compare/v4.6.0...v4.7.0) (2023-03-29)
+
+
+### Features
+
+* enable creation of channels with query options ([#137](https://github.com/GetStream/stream-chat-python/issues/137)) ([e33ae40](https://github.com/GetStream/stream-chat-python/commit/e33ae40d2680ad0a16ed84cdc582031d18e23c6f))
+
 ## [4.6.0](https://github.com/GetStream/stream-chat-python/compare/v4.5.0...v4.6.0) (2022-11-08)
 
 
