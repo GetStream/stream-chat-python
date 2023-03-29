@@ -31,6 +31,15 @@ class TestChannel:
         channel.create(random_users[0]["id"])
         assert channel.id is not None
 
+    def test_create_with_options(self, client: StreamChat, random_users: List[Dict]):
+        channel = client.channel(
+            "messaging", data={"members": [u["id"] for u in random_users]}
+        )
+        assert channel.id is None
+
+        channel.create(random_users[0]["id"], hide_for_creator=True)
+        assert channel.id is not None
+
     def test_send_message_with_options(self, channel: Channel, random_user: Dict):
         response = channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
