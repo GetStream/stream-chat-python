@@ -35,6 +35,17 @@ class TestChannel:
         await channel.create(random_users[0]["id"])
         assert channel.id is not None
 
+    async def test_create_with_options(
+        self, client: StreamChatAsync, random_users: List[Dict]
+    ):
+        channel = client.channel(
+            "messaging", data={"members": [u["id"] for u in random_users]}
+        )
+        assert channel.id is None
+
+        await channel.create(random_users[0]["id"], hide_for_creator=True)
+        assert channel.id is not None
+
     async def test_send_message_with_options(self, channel: Channel, random_user: Dict):
         response = await channel.send_message(
             {"text": "hi"}, random_user["id"], skip_push=True
