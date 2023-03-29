@@ -86,7 +86,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def create(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def create(
+        self, user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create the channel
 

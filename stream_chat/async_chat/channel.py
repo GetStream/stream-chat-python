@@ -35,9 +35,12 @@ class Channel(ChannelInterface):
             params={"user_id": user_id},
         )
 
-    async def create(self, user_id: str) -> StreamResponse:
+    async def create(self, user_id: str, **options: Any) -> StreamResponse:
         self.custom_data["created_by"] = {"id": user_id}
-        return await self.query(watch=False, state=False, presence=False)
+        options["watch"] = False
+        options["state"] = False
+        options["presence"] = False
+        return await self.query(**options)
 
     async def query(self, **options: Any) -> StreamResponse:
         payload = {"state": True, "data": self.custom_data, **options}
