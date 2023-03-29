@@ -30,9 +30,12 @@ class Channel(ChannelInterface):
             params={"user_id": user_id},
         )
 
-    def create(self, user_id: str) -> StreamResponse:
+    def create(self, user_id: str, **options: Any) -> StreamResponse:
         self.custom_data["created_by"] = {"id": user_id}
-        return self.query(watch=False, state=False, presence=False)
+        options["watch"] = False
+        options["state"] = False
+        options["presence"] = False
+        return self.query(**options)
 
     def get_messages(self, message_ids: List[str]) -> StreamResponse:
         return self.client.get(
