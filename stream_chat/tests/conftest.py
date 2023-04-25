@@ -61,9 +61,10 @@ def server_user(client: StreamChat):
 def random_users(client: StreamChat):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
-    client.update_users([user1, user2])
-    yield [user1, user2]
-    hard_delete_users(client, [user1["id"], user2["id"]])
+    user3 = {"id": str(uuid.uuid4())}
+    client.update_users([user1, user2, user3])
+    yield [user1, user2, user3]
+    hard_delete_users(client, [user1["id"], user2["id"], user3["id"]])
 
 
 @pytest.fixture(scope="function")

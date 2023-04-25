@@ -256,6 +256,12 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         }
         return await self.patch(f"moderation/reports/{report_id}", data=data)
 
+    async def mute_users(
+        self, target_ids: List[str], user_id: str, **options: Any
+    ) -> StreamResponse:
+        data = {"target_ids": target_ids, "user_id": user_id, **options}
+        return await self.post("moderation/mute", data=data)
+
     async def mute_user(
         self, target_id: str, user_id: str, **options: Any
     ) -> StreamResponse:
@@ -264,6 +270,10 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def unmute_user(self, target_id: str, user_id: str) -> StreamResponse:
         data = {"target_id": target_id, "user_id": user_id}
+        return await self.post("moderation/unmute", data=data)
+
+    async def unmute_users(self, target_ids: List[str], user_id: str) -> StreamResponse:
+        data = {"target_ids": target_ids, "user_id": user_id}
         return await self.post("moderation/unmute", data=data)
 
     async def mark_all_read(self, user_id: str) -> StreamResponse:

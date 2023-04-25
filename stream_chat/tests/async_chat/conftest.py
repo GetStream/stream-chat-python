@@ -70,9 +70,10 @@ async def server_user(client: StreamChatAsync):
 async def random_users(client: StreamChatAsync):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
-    await client.upsert_users([user1, user2])
-    yield [user1, user2]
-    await hard_delete_users(client, [user1["id"], user2["id"]])
+    user3 = {"id": str(uuid.uuid4())}
+    await client.upsert_users([user1, user2, user3])
+    yield [user1, user2, user3]
+    await hard_delete_users(client, [user1["id"], user2["id"], user3["id"]])
 
 
 @pytest.fixture(scope="function")

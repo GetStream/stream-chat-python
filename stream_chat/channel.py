@@ -88,7 +88,10 @@ class Channel(ChannelInterface):
         return self.client.post(f"{self.url}/truncate", data=options)
 
     def add_members(
-        self, members: Iterable[Dict], message: Dict = None, **options: Any
+        self,
+        members: Union[Iterable[Dict], Iterable[str]],
+        message: Dict = None,
+        **options: Any,
     ) -> StreamResponse:
         payload = {"add_members": members, "message": message, **options}
         return self.client.post(self.url, data=payload)
