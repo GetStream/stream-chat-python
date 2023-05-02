@@ -385,6 +385,12 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def mute_users(
+        self, target_ids: List[str], user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
     def mute_user(
         self, target_id: str, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -409,7 +415,12 @@ class StreamChatInterface(abc.ABC):
         :param user_id: the user muting the target
         :return:
         """
+        pass
 
+    @abc.abstractmethod
+    def unmute_users(
+        self, target_ids: List[str], user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod

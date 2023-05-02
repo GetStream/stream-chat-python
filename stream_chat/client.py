@@ -250,8 +250,18 @@ class StreamChat(StreamChatInterface):
         data = {"target_id": target_id, "user_id": user_id, **options}
         return self.post("moderation/mute", data=data)
 
+    def mute_users(
+        self, target_ids: List[str], user_id: str, **options: Any
+    ) -> StreamResponse:
+        data = {"target_ids": target_ids, "user_id": user_id, **options}
+        return self.post("moderation/mute", data=data)
+
     def unmute_user(self, target_id: str, user_id: str) -> StreamResponse:
         data = {"target_id": target_id, "user_id": user_id}
+        return self.post("moderation/unmute", data=data)
+
+    def unmute_users(self, target_ids: List[str], user_id: str) -> StreamResponse:
+        data = {"target_ids": target_ids, "user_id": user_id}
         return self.post("moderation/unmute", data=data)
 
     def mark_all_read(self, user_id: str) -> StreamResponse:

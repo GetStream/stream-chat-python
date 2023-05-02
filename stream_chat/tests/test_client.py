@@ -48,6 +48,22 @@ class TestClient:
         assert response["mute"]["user"]["id"] == random_users[1]["id"]
         client.unmute_user(random_users[0]["id"], random_users[1]["id"])
 
+    def test_mute_users(self, client: StreamChat, random_users: List[Dict]):
+        user_ids = [random_user["id"] for random_user in random_users]
+        user_id = user_ids[0]
+        target_user_ids = user_ids[1:]
+        response = client.mute_users(target_user_ids, user_id)
+        assert "mutes" in response
+        assert "expires" not in response["mutes"]
+        assert all(
+            [
+                mute["user"]["id"] == user_id
+                and mute["target"]["id"] in target_user_ids
+                for mute in response["mutes"]
+            ]
+        )
+        client.unmute_users(target_user_ids, user_id)
+
     def test_mute_user_with_timeout(self, client: StreamChat, random_users: List[Dict]):
         response = client.mute_user(
             random_users[0]["id"], random_users[1]["id"], timeout=10
