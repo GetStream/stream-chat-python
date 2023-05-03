@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.0](https://github.com/GetStream/stream-chat-python/compare/v4.7.0...v4.8.0) (2023-05-03)
+
+
+### Features
+
+* add multi user mute/unmute ([#140](https://github.com/GetStream/stream-chat-python/issues/140)) ([2a9ebd7](https://github.com/GetStream/stream-chat-python/commit/2a9ebd7d9d7b20445e1040467737b37b67900e2b))
+
 ## [4.7.0](https://github.com/GetStream/stream-chat-python/compare/v4.6.0...v4.7.0) (2023-03-29)
 
 
