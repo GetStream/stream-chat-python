@@ -103,6 +103,11 @@ class TestClient:
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
         assert response["mark_messages_pending"] is True
+        response = client.update_channel_type(
+            "team", mark_messages_pending=False
+        )
+        assert response["mark_messages_pending"] is False
+
 
     def test_get_command(self, client: StreamChat, command):
         response = client.get_command(command["name"])
@@ -126,6 +131,17 @@ class TestClient:
     def test_get_app_settings(self, client: StreamChat):
         configs = client.get_app_settings()
         assert "app" in configs
+
+    def test_update_app_settings(self, client: StreamChat):
+        client.update_app_settings(
+            async_moderation_config={
+                "callback": {
+                    "mode": "CALLBACK_MODE_REST",
+                    "server_url": "http://example.com/callback",
+                },
+                "timeout_ms": 10000,  # how long messages should stay pending before being deleted
+            }
+        )
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
