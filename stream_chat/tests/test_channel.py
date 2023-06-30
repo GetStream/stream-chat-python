@@ -47,9 +47,14 @@ class TestChannel:
         assert "message" in response
         assert response["message"]["text"] == "hi"
 
-    def test_send_pending_message(self, client:StreamChat, channel: Channel, random_user: Dict):
+    def test_send_pending_message(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
         response = channel.send_message(
-            {"text": "hi"}, random_user["id"], pending=True, pending_message_metadata={"extra_data": "test"}
+            {"text": "hi"},
+            random_user["id"],
+            pending=True,
+            pending_message_metadata={"extra_data": "test"},
         )
         assert "message" in response
         assert response["message"]["text"] == "hi"

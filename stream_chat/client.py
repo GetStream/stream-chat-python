@@ -274,7 +274,7 @@ class StreamChat(StreamChatInterface):
 
     def commit_message(self, message_id: str) -> StreamResponse:
         return self.post(f"messages/{message_id}/commit")
-        
+
     def pin_message(
         self, message_id: str, user_id: str, expiration: int = None
     ) -> StreamResponse:

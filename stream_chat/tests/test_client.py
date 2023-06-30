@@ -97,7 +97,9 @@ class TestClient:
         assert "channel_types" in response
 
     def test_update_channel_type(self, client: StreamChat):
-        response = client.update_channel_type("messaging", commands=["ban", "unban"], mark_messages_pending=True)
+        response = client.update_channel_type(
+            "team", commands=["ban", "unban"], mark_messages_pending=True
+        )
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
         assert response["mark_messages_pending"] is True
