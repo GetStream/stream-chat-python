@@ -272,6 +272,9 @@ class StreamChat(StreamChatInterface):
             f"messages/{message_id}/translate", data={"language": language}
         )
 
+    def commit_message(self, message_id: str) -> StreamResponse:
+        return self.post(f"messages/{message_id}/commit")
+        
     def pin_message(
         self, message_id: str, user_id: str, expiration: int = None
     ) -> StreamResponse:
