@@ -103,11 +103,8 @@ class TestClient:
         assert "commands" in response
         assert response["commands"] == ["ban", "unban"]
         assert response["mark_messages_pending"] is True
-        response = client.update_channel_type(
-            "team", mark_messages_pending=False
-        )
+        response = client.update_channel_type("team", mark_messages_pending=False)
         assert response["mark_messages_pending"] is False
-
 
     def test_get_command(self, client: StreamChat, command):
         response = client.get_command(command["name"])
