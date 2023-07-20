@@ -124,6 +124,17 @@ class TestClient:
         configs = client.get_app_settings()
         assert "app" in configs
 
+    def test_update_app_settings(self, client: StreamChat):
+        client.update_app_settings(
+            async_moderation_config={
+                "callback": {
+                    "mode": "CALLBACK_MODE_REST",
+                    "server_url": "http://example.com/callback",
+                },
+                "timeout_ms": 10000,  # how long messages should stay pending before being deleted
+            }
+        )
+
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
         response = client.update_user(user)
