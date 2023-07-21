@@ -751,6 +751,18 @@ class TestClient:
         assert rate_limit.remaining > 0
         assert type(rate_limit.reset) is datetime
 
+    async def test_stream_headers_in_exception(self, client: StreamChatAsync):
+        with pytest.raises(StreamAPIException) as stream_exception:
+            user = {"id": "bad id"}
+            response = await client.upsert_users([user])
+
+        assert stream_exception.value.headers is not None
+        rate_limit = stream_exception.value.rate_limit()
+        assert rate_limit is not None
+        assert rate_limit.limit > 0
+        assert rate_limit.remaining > 0
+        assert rate_limit.reset is not None
+
     async def test_swap_http_client(self):
         client = StreamChatAsync(
             api_key=os.environ["STREAM_KEY"], api_secret=os.environ["STREAM_SECRET"]

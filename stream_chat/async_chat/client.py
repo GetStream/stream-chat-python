@@ -69,10 +69,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         try:
             parsed_result = await response.json() if text else {}
         except aiohttp.ClientResponseError:
-            raise StreamAPIException(text, response.status)
+            raise StreamAPIException(text, response.status, dict(response.headers))
         if response.status >= 399:
-            raise StreamAPIException(text, response.status)
-
+            raise StreamAPIException(text, response.status, dict(response.headers))
         return StreamResponse(parsed_result, dict(response.headers), response.status)
 
     async def _make_request(

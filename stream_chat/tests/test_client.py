@@ -88,6 +88,18 @@ class TestClient:
         with pytest.raises(StreamAPIException):
             client.get_channel_type("team")
 
+    def test_stream_headers_in_exception(self, client: StreamChat):
+        with pytest.raises(StreamAPIException) as stream_exception:
+            user = {"id": "bad id"}
+            client.upsert_users([user])
+
+        assert stream_exception.value.headers is not None
+        rate_limit = stream_exception.value.rate_limit()
+        assert rate_limit is not None
+        assert rate_limit.limit > 0
+        assert rate_limit.remaining > 0
+        assert rate_limit.reset is not None
+
     def test_get_channel_types(self, client: StreamChat):
         response = client.get_channel_type("team")
         assert "permissions" in response
