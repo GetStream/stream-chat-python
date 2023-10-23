@@ -479,6 +479,12 @@ class StreamChat(StreamChatInterface):
     ) -> StreamResponse:
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return self.post("check_sqs", data=data)
+    
+    def check_sns(
+        self, sns_key: str = None, sns_secret: str = None, sns_topic_arn: str = None
+    ) -> StreamResponse:
+        data = {"sns_key": sns_key, "sns_secret": sns_secret, "sns_topic_arn": sns_topic_arn}
+        return self.post("check_sns", data=data)
 
     def get_permission(self, id: str) -> StreamResponse:
         return self.get(f"permissions/{id}")
