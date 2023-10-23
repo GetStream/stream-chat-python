@@ -498,7 +498,11 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def check_sns(
         self, sns_key: str = None, sns_secret: str = None, sns_topic_arn: str = None
     ) -> StreamResponse:
-        data = {"sns_key": sns_key, "sns_secret": sns_secret, "sns_topic_arn": sns_topic_arn}
+        data = {
+            "sns_key": sns_key,
+            "sns_secret": sns_secret,
+            "sns_topic_arn": sns_topic_arn,
+        }
         return await self.post("check_sns", data=data)
 
     async def set_guest_user(self, guest_user: Dict) -> StreamResponse:
