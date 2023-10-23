@@ -593,7 +593,7 @@ class TestClient:
             "key", "secret", "arn:aws:sns:us-east-1:123456789012:sns-topic"
         )
         assert response["status"] == "error"
-        assert "invalid SQS url" in response["error"]
+        assert "publishing the message failed." in response["error"]
 
     def test_guest_user(self, client: StreamChat, random_user: Dict):
         try:
