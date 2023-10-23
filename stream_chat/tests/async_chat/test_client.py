@@ -622,7 +622,9 @@ class TestClient:
         assert "invalid SQS url" in response["error"]
 
     async def test_check_sns(self, client: StreamChatAsync):
-        response = await client.check_sns("key", "secret", "arn:aws:sns:us-east-1:123456789012:sns-topic")
+        response = await client.check_sns(
+            "key", "secret", "arn:aws:sns:us-east-1:123456789012:sns-topic"
+        )
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
 
