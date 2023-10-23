@@ -586,7 +586,7 @@ class TestClient:
     def test_check_sqs(self, client: StreamChat):
         response = client.check_sqs("key", "secret", "https://foo.com/bar")
         assert response["status"] == "error"
-        assert "invalid SQS url" in response["error"]
+        assert "publishing the message failed." in response["error"]
 
     def test_check_sns(self, client: StreamChat):
         response = client.check_sns(
