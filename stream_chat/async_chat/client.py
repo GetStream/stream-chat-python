@@ -495,7 +495,6 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     ) -> StreamResponse:
         data = {"sqs_key": sqs_key, "sqs_secret": sqs_secret, "sqs_url": sqs_url}
         return await self.post("check_sqs", data=data)
-    
     async def check_sns(
         self, sns_key: str = None, sns_secret: str = None, sns_topic_arn: str = None
     ) -> StreamResponse:
