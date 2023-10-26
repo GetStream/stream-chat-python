@@ -588,6 +588,13 @@ class TestClient:
         assert response["status"] == "error"
         assert "invalid SQS url" in response["error"]
 
+    def test_check_sns(self, client: StreamChat):
+        response = client.check_sns(
+            "key", "secret", "arn:aws:sns:us-east-1:123456789012:sns-topic"
+        )
+        assert response["status"] == "error"
+        assert "publishing the message failed." in response["error"]
+
     def test_guest_user(self, client: StreamChat, random_user: Dict):
         try:
             response = client.set_guest_user({"user": {"id": str(uuid.uuid4())}})
