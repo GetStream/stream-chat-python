@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.10.0](https://github.com/GetStream/stream-chat-python/compare/v4.9.0...v4.10.0) (2023-10-26)
+
+
+### Features
+
+* sns ([#147](https://github.com/GetStream/stream-chat-python/issues/147)) ([616206e](https://github.com/GetStream/stream-chat-python/commit/616206ec62ab96a3d2e4f6468ce17888ccd3fbb9))
+
 ## [4.9.0](https://github.com/GetStream/stream-chat-python/compare/v4.8.0...v4.9.0) (2023-07-20)
 
 
