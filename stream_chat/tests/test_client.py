@@ -549,9 +549,7 @@ class TestClient:
         assert len(response["channels"][0]["members"]) == 9
 
     def test_create_blocklist(self, client: StreamChat):
-        client.create_blocklist(
-            name="Foo", words=["fudge", "heck"], blocklist_type="regular"
-        )
+        client.create_blocklist(name="Foo", words=["fudge", "heck"], type="regular")
 
     def test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()

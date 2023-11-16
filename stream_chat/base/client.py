@@ -753,14 +753,14 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def create_blocklist(
-        self, name: str, words: Iterable[str], blocklist_type: str = None
+        self, name: str, words: Iterable[str], type: str = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a blocklist
 
         :param name: the name of the blocklist
         :param words: list of blocked words
-        :param blocklist_type: blocklist type
+        :param type: blocklist type
         :return:
         """
         pass
