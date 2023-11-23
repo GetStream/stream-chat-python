@@ -472,8 +472,12 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         ) as response:
             return await self._parse_response(response)
 
-    async def create_blocklist(self, name: str, words: Iterable[str]) -> StreamResponse:
-        return await self.post("blocklists", data={"name": name, "words": words})
+    async def create_blocklist(
+        self, name: str, words: Iterable[str], type: str = "regular"
+    ) -> StreamResponse:
+        return await self.post(
+            "blocklists", data={"name": name, "words": words, "type": type}
+        )
 
     async def list_blocklists(self) -> StreamResponse:
         return await self.get("blocklists")
