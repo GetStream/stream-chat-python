@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.11.0](https://github.com/GetStream/stream-chat-python/compare/v4.10.0...v4.11.0) (2023-11-23)
+
+
+### Features
+
+* Add type field support on create_blocklist() ([#149](https://github.com/GetStream/stream-chat-python/issues/149)) ([786a50c](https://github.com/GetStream/stream-chat-python/commit/786a50cf1b4d56071a11a5d3bf91fe5e0b8fba75))
+
 ## [4.10.0](https://github.com/GetStream/stream-chat-python/compare/v4.9.0...v4.10.0) (2023-10-26)
 
 
