@@ -801,7 +801,9 @@ class TestClient:
     ):
         await channel.add_members([random_user["id"]])
         msg_id = str(uuid.uuid4())
-        await channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
+        await channel.send_message(
+            {"id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
         response = await client.unread_counts(random_user["id"])
         assert "total_unread_count" in response
         assert "channels" in response
