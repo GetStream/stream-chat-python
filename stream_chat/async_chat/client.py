@@ -677,10 +677,10 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.get("imports", params=options)
 
     async def unread_counts(self, user_id: str) -> StreamResponse:
-        return self.get("unread", params={"user_id": user_id})
+        return await self.get("unread", params={"user_id": user_id})
 
     async def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
-        return self.post("unread_batch", data={"user_ids": user_ids})
+        return await self.post("unread_batch", data={"user_ids": user_ids})
 
     async def close(self) -> None:
         await self.session.close()
