@@ -796,7 +796,9 @@ class TestClient:
         list_resp = await client.list_imports({"limit": 1})
         assert len(list_resp["import_tasks"]) == 1
 
-    async def test_unread_counts(self, client: StreamChatAsync, channel, random_user: Dict):
+    async def test_unread_counts(
+        self, client: StreamChatAsync, channel, random_user: Dict
+    ):
         channel.add_members([random_user["id"]])
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, uuid.uuid4())
