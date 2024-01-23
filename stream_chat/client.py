@@ -646,3 +646,9 @@ class StreamChat(StreamChatInterface):
 
     def list_imports(self, options: Dict = None) -> StreamResponse:
         return self.get("imports", params=options)
+
+    def unread_counts(self, user_id: str) -> StreamResponse:
+        return self.get("unread", params={"user_id": user_id})
+
+    def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
+        return self.post("unread_batch", data={"user_ids": user_ids})

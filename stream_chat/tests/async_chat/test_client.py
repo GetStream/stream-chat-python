@@ -795,3 +795,27 @@ class TestClient:
 
         list_resp = await client.list_imports({"limit": 1})
         assert len(list_resp["import_tasks"]) == 1
+
+    async def test_unread_counts(self, client: StreamChatAsync, channel, random_user: Dict):
+        channel.add_members([random_user["id"]])
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, uuid.uuid4())
+        response = client.unread_counts(random_user["id"])
+        assert "total_unread_count" in response
+        assert "channels" in response
+        assert "channel_type" in response
+        assert response["total_unread_count"] == 1
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel_id"] == channel.cid
+        assert len(response["channel_type"]) == 1
+
+    # PREP for new endpoint
+    # def test_unread_counts_batch(self, client: StreamChatAsync, channel, random_users: Dict):
+    #     channel.add_members([x["id"] for x in random_users])
+    #     msg_id = str(uuid.uuid4())
+    #     channel.send_message({"id": msg_id, "text": "helloworld"}, uuid.uuid4())
+    #     response = client.unread_counts_batch([x["id"] for x in random_users])
+    #     assert "counts_by_user" in response
+    #     for user_id in [x["id"] for x in random_users]:
+    #         assert user_id in response["counts_by_user"]
+    #         assert response["counts_by_user"][user_id]["total_unread_count"] == 1

@@ -1226,6 +1226,24 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def unread_counts(
+        self, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Get unread counts for a single user.
+        """
+        pass
+
+    @abc.abstractmethod
+    def unread_counts_batch(
+        self, user_ids: List[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Get unread counts for multiple users at once.
+        """
+        pass
+
     #####################
     #  Private methods  #
     #####################
