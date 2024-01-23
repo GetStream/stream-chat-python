@@ -49,7 +49,7 @@ async def client():
 @pytest.fixture(scope="function")
 async def random_user(client: StreamChatAsync):
     user = {"id": str(uuid.uuid4())}
-    response = await client.update_user(user)
+    response = await client.upsert_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
     yield user
@@ -59,7 +59,7 @@ async def random_user(client: StreamChatAsync):
 @pytest.fixture(scope="function")
 async def server_user(client: StreamChatAsync):
     user = {"id": str(uuid.uuid4())}
-    response = await client.update_user(user)
+    response = await client.upsert_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
     yield user

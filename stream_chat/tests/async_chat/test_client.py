@@ -136,7 +136,7 @@ class TestClient:
 
     async def test_update_user(self, client: StreamChatAsync):
         user = {"id": str(uuid.uuid4())}
-        response = await client.update_user(user)
+        response = await client.upsert_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
 
@@ -148,9 +148,9 @@ class TestClient:
 
     async def test_update_user_partial(self, client: StreamChatAsync):
         user_id = str(uuid.uuid4())
-        await client.update_user({"id": user_id, "field": "value"})
+        await client.upsert_user({"id": user_id, "field": "value"})
 
-        response = await client.update_user_partial(
+        response = await client.upsert_user_partial(
             {"id": user_id, "set": {"field": "updated"}}
         )
 
@@ -785,7 +785,7 @@ class TestClient:
             headers={"Content-Type": "application/json"},
         ) as resp:
             assert resp.status == 200
-        sess.close()
+        await sess.close()
 
         create_resp = await client.create_import(url_resp["path"], "upsert")
         assert create_resp["import_task"]["id"]

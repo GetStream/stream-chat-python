@@ -137,21 +137,21 @@ class TestClient:
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
-        response = client.update_user(user)
+        response = client.upsert_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
 
     def test_update_users(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
-        response = client.update_users([user])
+        response = client.upsert_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
 
     def test_update_user_partial(self, client: StreamChat):
         user_id = str(uuid.uuid4())
-        client.update_user({"id": user_id, "field": "value"})
+        client.upsert_user({"id": user_id, "field": "value"})
 
-        response = client.update_user_partial(
+        response = client.upsert_user_partial(
             {"id": user_id, "set": {"field": "updated"}}
         )
 
