@@ -151,7 +151,7 @@ class TestClient:
         user_id = str(uuid.uuid4())
         client.upsert_user({"id": user_id, "field": "value"})
 
-        response = client.upsert_user_partial(
+        response = client.update_user_partial(
             {"id": user_id, "set": {"field": "updated"}}
         )
 
