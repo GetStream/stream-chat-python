@@ -779,7 +779,7 @@ class TestClient:
     def test_unread_counts(self, client: StreamChat, channel, random_user: Dict):
         channel.add_members([random_user["id"]])
         msg_id = str(uuid.uuid4())
-        channel.send_message({"id": msg_id, "text": "helloworld"}, uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
         response = client.unread_counts(random_user["id"])
         assert "total_unread_count" in response
         assert "channels" in response
@@ -793,7 +793,7 @@ class TestClient:
     # def test_unread_counts_batch(self, client: StreamChat, channel, random_users: Dict):
     #     channel.add_members([x["id"] for x in random_users])
     #     msg_id = str(uuid.uuid4())
-    #     channel.send_message({"id": msg_id, "text": "helloworld"}, uuid.uuid4())
+    #     channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
     #     response = client.unread_counts_batch([x["id"] for x in random_users])
     #     assert "counts_by_user" in response
     #     for user_id in [x["id"] for x in random_users]:
