@@ -5,7 +5,10 @@ import hashlib
 import hmac
 import os
 import sys
-from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union
+from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union, Optional
+
+from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions, UpdateSegmentData
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -920,7 +923,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def create_segment(
-        self, segment: Dict
+        self, segment_type: SegmentType, segment_id: str, segment_name: str, data: SegmentData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a segment
@@ -929,7 +932,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_segments(
-        self, **params: Any
+        self, filter_conditions: Dict, options: QuerySegmentsOptions
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query segments
@@ -938,7 +941,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_segment(
-        self, segment_id: str, data: Dict
+        self, segment_id: str, data: UpdateSegmentData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update a segment by id
@@ -956,7 +959,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def create_campaign(
-        self, campaign: Dict
+        self, params: CampaignData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a campaign
@@ -965,7 +968,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_campaigns(
-        self, **params: Any
+        self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query campaigns
@@ -974,7 +977,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_campaign(
-        self, campaign_id: str, data: Dict
+        self, campaign_id: str, params: CampaignData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update a campaign
@@ -991,8 +994,8 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def schedule_campaign(
-        self, campaign_id: str, scheduled_for: int = None
+    def start_campaign(
+        self, campaign_id: str, scheduled_for: Optional[datetime.datetime] = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Schedule a campaign at given time

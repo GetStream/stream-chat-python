@@ -6,6 +6,9 @@ from typing import Any, Callable, Dict, Iterable, List, Union
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from stream_chat.types.campaign import QueryCampaignsOptions, CampaignData
+from stream_chat.types.segment import SegmentType, QuerySegmentsOptions, UpdateSegmentData
+
 if sys.version_info >= (3, 8):
     from typing import Literal
 else:
@@ -518,14 +521,15 @@ class StreamChat(StreamChatInterface):
     def list_roles(self) -> StreamResponse:
         return self.get("roles")
 
-    def create_segment(self, segment: Dict) -> StreamResponse:
-        return self.post("segments", data={"segment": segment})
+    def create_segment(self, segment_type: SegmentType, segment_id: str, name: str, data: Dict) -> StreamResponse:
+        return self.post("segments", data={"type": segment_type.value, "id": segment_id, "name": name, "data": data})
 
-    def query_segments(self, **params: Any) -> StreamResponse:
-        return self.get("segments", params={"payload": json.dumps(params)})
+    def query_segments(self, filter_conditions: Dict, options: QuerySegmentsOptions) -> StreamResponse:
+        payload = {"filter": filter_conditions, **options}
+        return self.get("segments", params={"payload": json.dumps(payload)})
 
-    def update_segment(self, segment_id: str, data: Dict) -> StreamResponse:
-        return self.put(f"segments/{segment_id}", data={"segment": data})
+    def update_segment(self, segment_id: str, data: UpdateSegmentData) -> StreamResponse:
+        return self.put(f"segments/{segment_id}", data=data)
 
     def delete_segment(self, segment_id: str) -> StreamResponse:
         return self.delete(f"segments/{segment_id}")
@@ -533,11 +537,12 @@ class StreamChat(StreamChatInterface):
     def create_campaign(self, campaign: Dict) -> StreamResponse:
         return self.post("campaigns", data={"campaign": campaign})
 
-    def query_campaigns(self, **params: Any) -> StreamResponse:
-        return self.get("campaigns", params={"payload": json.dumps(params)})
+    def query_campaigns(self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None) -> StreamResponse:
+        payload = {"filter": filter_conditions, **options}
+        return self.get("campaigns", params={"payload": json.dumps(payload)})
 
-    def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
-        return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
+    def update_campaign(self, campaign_id: str, params: CampaignData) -> StreamResponse:
+        return self.put(f"campaigns/{campaign_id}", data=params)
 
     def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
         return self.delete(f"campaigns/{campaign_id}", params=options)
