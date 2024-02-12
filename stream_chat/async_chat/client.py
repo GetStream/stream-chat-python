@@ -545,7 +545,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def query_segments(self, filter_conditions: Dict, options: QuerySegmentsOptions) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
-        return await self.get("segments", params={"payload": json.dumps(payload)})
+        return await self.post("segments/query", params=payload)
 
     async def update_segment(self, segment_id: str, data: UpdateSegmentData) -> StreamResponse:
         return await self.put(f"segments/{segment_id}", data=data)
@@ -558,7 +558,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def query_campaigns(self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
-        return await self.get("campaigns", params={"payload": json.dumps(payload)})
+        return await self.post("campaigns/query", params=payload)
 
     async def update_campaign(self, campaign_id: str, params: CampaignData) -> StreamResponse:
         return await self.put(f"campaigns/{campaign_id}", data=params)

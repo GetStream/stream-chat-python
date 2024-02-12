@@ -526,7 +526,7 @@ class StreamChat(StreamChatInterface):
 
     def query_segments(self, filter_conditions: Dict, options: QuerySegmentsOptions) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
-        return self.get("segments", params={"payload": json.dumps(payload)})
+        return self.post("segments", params=payload)
 
     def update_segment(self, segment_id: str, data: UpdateSegmentData) -> StreamResponse:
         return self.put(f"segments/{segment_id}", data=data)
@@ -534,12 +534,12 @@ class StreamChat(StreamChatInterface):
     def delete_segment(self, segment_id: str) -> StreamResponse:
         return self.delete(f"segments/{segment_id}")
 
-    def create_campaign(self, campaign: Dict) -> StreamResponse:
-        return self.post("campaigns", data={"campaign": campaign})
+    def create_campaign(self, params: CampaignData) -> StreamResponse:
+        return self.post("campaigns", data=params)
 
     def query_campaigns(self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
-        return self.get("campaigns", params={"payload": json.dumps(payload)})
+        return self.post("campaigns/query", params=payload)
 
     def update_campaign(self, campaign_id: str, params: CampaignData) -> StreamResponse:
         return self.put(f"campaigns/{campaign_id}", data=params)
