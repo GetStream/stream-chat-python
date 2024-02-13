@@ -2,18 +2,19 @@ import datetime
 import json
 import sys
 import warnings
-from typing import Any, Callable, Dict, Iterable, List, Union
+from typing import Any, Callable, Dict, Iterable, List, Union, Optional
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from stream_chat.campaign import Campaign
+from stream_chat.segment import Segment
 from stream_chat.types.campaign import QueryCampaignsOptions, CampaignData
-from stream_chat.types.segment import SegmentType, QuerySegmentsOptions, UpdateSegmentData
+from stream_chat.types.segment import SegmentType, QuerySegmentsOptions, UpdateSegmentData, SegmentData
 
 if sys.version_info >= (3, 8):
     from typing import Literal
 else:
     from typing_extensions import Literal
-
 
 import requests
 
@@ -521,12 +522,19 @@ class StreamChat(StreamChatInterface):
     def list_roles(self) -> StreamResponse:
         return self.get("roles")
 
-    def create_segment(self, segment_type: SegmentType, segment_id: str, name: str, data: Dict) -> StreamResponse:
-        return self.post("segments", data={"type": segment_type.value, "id": segment_id, "name": name, "data": data})
+    def segment(self, segment_type: SegmentType, segment_id: Optional[str] = None, segment_name: Optional[str] = None,
+                data: Optional[SegmentData] = None) -> Segment:
+        return Segment(client=self, segment_type=segment_type, segment_id=segment_id, segment_name=segment_name,
+                       data=data)
+
+    def create_segment(self, segment_type: SegmentType, segment_id: Optional[str] = None,
+                       segment_name: Optional[str] = None, data: Dict = None) -> StreamResponse:
+        return self.post("segments",
+                         data={"type": segment_type.value, "id": segment_id, "name": segment_name, "data": data})
 
     def query_segments(self, filter_conditions: Dict, options: QuerySegmentsOptions) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
-        return self.post("segments", params=payload)
+        return self.post("segments/query", data=payload)
 
     def update_segment(self, segment_id: str, data: UpdateSegmentData) -> StreamResponse:
         return self.put(f"segments/{segment_id}", data=data)
@@ -534,12 +542,22 @@ class StreamChat(StreamChatInterface):
     def delete_segment(self, segment_id: str) -> StreamResponse:
         return self.delete(f"segments/{segment_id}")
 
-    def create_campaign(self, params: CampaignData) -> StreamResponse:
-        return self.post("campaigns", data=params)
+    def campaign(self, campaign_id: Optional[str] = None, data: CampaignData = None) -> Campaign:
+        return Campaign(client=self, campaign_id=campaign_id, data=data)
 
-    def query_campaigns(self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None) -> StreamResponse:
+    def create_campaign(self, campaign_id: Optional[str] = None, data: CampaignData = None) -> StreamResponse:
+        payload = {"id": campaign_id}
+        if data is not None:
+            payload.update(data)
+        return self.post("campaigns", data=payload)
+
+    def get_campaign(self, campaign_id: str) -> StreamResponse:
+        return self.get(f"campaigns/{campaign_id}")
+
+    def query_campaigns(self, filter_conditions: Dict[str, Any],
+                        options: QueryCampaignsOptions = None) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
-        return self.post("campaigns/query", params=payload)
+        return self.post("campaigns/query", data=payload)
 
     def update_campaign(self, campaign_id: str, params: CampaignData) -> StreamResponse:
         return self.put(f"campaigns/{campaign_id}", data=params)
@@ -547,11 +565,11 @@ class StreamChat(StreamChatInterface):
     def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
         return self.delete(f"campaigns/{campaign_id}", params=options)
 
-    def schedule_campaign(
-        self, campaign_id: str, scheduled_for: int = None
+    def start_campaign(
+            self, campaign_id: str, scheduled_for: Optional[datetime.datetime] = None
     ) -> StreamResponse:
         return self.patch(
-            f"campaigns/{campaign_id}/schedule", data={"scheduled_for": scheduled_for}
+            f"campaigns/{campaign_id}/start", data={"scheduled_for": scheduled_for}
         )
 
     def stop_campaign(self, campaign_id: str) -> StreamResponse:

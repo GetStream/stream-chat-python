@@ -21,6 +21,10 @@ from stream_chat.types.stream_response import StreamResponse
 
 TChannel = TypeVar("TChannel")
 
+TSegment = TypeVar("TSegment")
+
+TCampaign = TypeVar("TCampaign")
+
 
 class StreamChatInterface(abc.ABC):
     def __init__(
@@ -588,7 +592,6 @@ class StreamChatInterface(abc.ABC):
     ) -> TChannel:  # type: ignore[type-var]
         """
         Creates a channel object
-
         :param channel_type: the channel type
         :param channel_id: the id of the channel
         :param data: additional data, ie: {"members":[id1, id2, ...]}
@@ -921,6 +924,17 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    def segment(self, segment_type: SegmentType, segment_id: str, segment_name: str) -> TSegment:
+        """
+        Creates a channel object
+        :param segment_type: the segment type
+        :param segment_id: the id of the segment
+        :param segment_name: the name of the segment
+        :param data: additional data, ie: {"members":[id1, id2, ...]}
+        :return: Channel
+        """
+        pass
+
     @abc.abstractmethod
     def create_segment(
         self, segment_type: SegmentType, segment_id: str, segment_name: str, data: SegmentData
@@ -957,9 +971,28 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    def campaign(self, campaign_id: Optional[str]):
+        """
+        Creates a channel object
+        :param channel_type: the channel type
+        :param channel_id: the id of the channel
+        :param data: additional data, ie: {"members":[id1, id2, ...]}
+        :return: Channel
+        """
+        pass
+
     @abc.abstractmethod
     def create_campaign(
-        self, params: CampaignData
+        self, campaign_id: Optional[str], data: Optional[CampaignData]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Create a campaign
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_campaign(
+        self, campaign_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a campaign
@@ -977,7 +1010,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_campaign(
-        self, campaign_id: str, params: CampaignData
+        self, campaign_id: str, data: CampaignData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update a campaign

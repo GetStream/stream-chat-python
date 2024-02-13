@@ -14,7 +14,7 @@ class MessageTemplate(TypedDict, total=False):
 
 class CampaignData(TypedDict, total=False):
     message_template: MessageTemplate
-    segments: List[str]
+    segment_ids: List[str]
     sender_id: str
     description: Optional[str]
     name: Optional[str]

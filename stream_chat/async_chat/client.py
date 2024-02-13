@@ -540,8 +540,8 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def list_roles(self) -> StreamResponse:
         return await self.get("roles")
 
-    async def create_segment(self, segment_type: SegmentType, segment_id: str, name: str, data: SegmentData) -> StreamResponse:
-        return await self.post("segments", data={"type": segment_type.value, "id": segment_id, "name": name, "data": data})
+    async def create_segment(self, segment_type: SegmentType, segment_id: str, segment_name: str, data: SegmentData) -> StreamResponse:
+        return await self.post("segments", data={"type": segment_type.value, "id": segment_id, "name": segment_name, "data": data})
 
     async def query_segments(self, filter_conditions: Dict, options: QuerySegmentsOptions) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
