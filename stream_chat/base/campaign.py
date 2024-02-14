@@ -1,6 +1,6 @@
 import abc
 import datetime
-from typing import Awaitable, Dict, List, Union, Optional
+from typing import Awaitable, Union, Optional
 
 from stream_chat.base.client import StreamChatInterface
 from stream_chat.types.campaign import CampaignData
