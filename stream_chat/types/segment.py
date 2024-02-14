@@ -10,12 +10,9 @@ class SegmentType(Enum):
 
 
 class SegmentData(TypedDict, total=False):
+    name: Optional[str]
     description: Optional[str]
     filter: Optional[Dict]
-
-
-class UpdateSegmentData(SegmentData, total=False):
-    name: str
 
 
 class QuerySegmentsOptions(Pager, total=False):

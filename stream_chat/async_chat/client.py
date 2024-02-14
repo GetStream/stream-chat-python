@@ -17,7 +17,7 @@ from typing import (
 from urllib.parse import urlparse
 
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
-from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions, UpdateSegmentData
+from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -547,7 +547,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         payload = {"filter": filter_conditions, **options}
         return await self.post("segments/query", params=payload)
 
-    async def update_segment(self, segment_id: str, data: UpdateSegmentData) -> StreamResponse:
+    async def update_segment(self, segment_id: str, data: SegmentData) -> StreamResponse:
         return await self.put(f"segments/{segment_id}", data=data)
 
     async def delete_segment(self, segment_id: str) -> StreamResponse:
@@ -567,7 +567,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.delete(f"campaigns/{campaign_id}", params=options)
 
     async def start_campaign(
-        self, campaign_id: str, scheduled_for: Optional[datetime.datetime] = None
+        self, campaign_id: str, scheduled_for: Optional[Union[str, datetime.datetime]] = None
     ) -> StreamResponse:
         return await self.patch(
             f"campaigns/{campaign_id}/start", data={"scheduled_for": scheduled_for}

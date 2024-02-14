@@ -1,4 +1,5 @@
 import abc
+import datetime
 from typing import Awaitable, Dict, List, Union, Optional
 
 from stream_chat.base.client import StreamChatInterface
@@ -26,7 +27,7 @@ class CampaignInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def update(self, data: CampaignData) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
@@ -34,7 +35,7 @@ class CampaignInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def start(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def start(self, scheduled_for: Optional[Union[str, datetime.datetime]] = None) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod

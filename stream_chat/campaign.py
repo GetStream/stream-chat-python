@@ -1,4 +1,8 @@
+import datetime
+from typing import Any, Optional, Union
+
 from stream_chat.base.campaign import CampaignInterface
+from stream_chat.types.campaign import CampaignData
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -14,18 +18,14 @@ class Campaign(CampaignInterface):
     def get(self) -> StreamResponse:
         return self.client.get_campaign(campaign_id=self.campaign_id)
 
-    def update(self, name: str = None, description: str = None) -> StreamResponse:
-        payload = {"name": name, "description": description}
-        return self.client.put(f"campaigns/{self.campaign_id}", data=payload)
+    def update(self, data: CampaignData) -> StreamResponse:
+        return self.client.update_campaign(campaign_id=self.campaign_id, data=data)
 
-    def delete(self) -> StreamResponse:
-        return self.client.delete(f"campaigns/{self.campaign_id}")
+    def delete(self, **options: Any) -> StreamResponse:
+        return self.client.delete_campaign(campaign_id=self.campaign_id, options=options)
 
-    def start(self) -> StreamResponse:
-        return self.client.get(f"campaigns/{self.campaign_id}")
+    def start(self, scheduled_for: Optional[Union[str, datetime.datetime]] = None) -> StreamResponse:
+        return self.client.start_campaign(campaign_id=self.campaign_id, scheduled_for=scheduled_for)
 
     def stop(self) -> StreamResponse:
-        return self.client.get(f"campaigns/{self.campaign_id}")
-
-    def query(self) -> StreamResponse:
-        return self.client.get(f"campaigns/{self.campaign_id}")
+        return self.client.stop_campaign(campaign_id=self.campaign_id)
