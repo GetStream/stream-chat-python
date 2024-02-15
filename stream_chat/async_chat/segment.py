@@ -1,11 +1,18 @@
+from typing import Optional
+
 from stream_chat.base.segment import SegmentInterface
-from stream_chat.types.segment import SegmentData
+from stream_chat.types.segment import SegmentData, SegmentDataWithId, QuerySegmentTargetsOptions
 from stream_chat.types.stream_response import StreamResponse
 
 
 class Segment(SegmentInterface):
 
-    async def create(self) -> StreamResponse:
+    async def create(self, segment_id: Optional[str] = None, data: Optional[SegmentData] = None) -> StreamResponse:
+        if segment_id is not None:
+            self.segment_id = segment_id
+        if data is not None:
+            self.data = data
+
         state = await self.client.create_segment(
             segment_type=self.segment_type,
             segment_id=self.segment_id,
@@ -33,6 +40,9 @@ class Segment(SegmentInterface):
 
     async def add_targets(self, target_ids: list) -> StreamResponse:
         return await self.client.add_segment_targets(segment_id=self.segment_id, target_ids=target_ids)
+
+    async def query_targets(self, options: QuerySegmentTargetsOptions) -> StreamResponse:
+        return await self.client.query_segment_targets(segment_id=self.segment_id, options=options)
 
     async def delete_targets(self, target_ids: list) -> StreamResponse:
         return await self.client.delete_segment_targets(segment_id=self.segment_id, target_ids=target_ids)

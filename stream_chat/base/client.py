@@ -8,7 +8,7 @@ import sys
 from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union, Optional
 
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
-from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions
+from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions, QuerySegmentTargetsOptions
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -924,14 +924,15 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
-    def segment(self, segment_type: SegmentType, data: Optional[SegmentData]) -> TSegment:
+    def segment(
+        self, segment_type: SegmentType, segment_id: Optional[str], data: Optional[SegmentData]
+    ) -> TSegment:
         """
         Creates a channel object
         :param segment_type: the segment type
         :param segment_id: the id of the segment
-        :param segment_name: the name of the segment
-        :param data: additional data, ie: {"members":[id1, id2, ...]}
-        :return: Channel
+        :param data: the segment data, ie: {"members":[id1, id2, ...]}
+        :return: Segment
         """
         pass
 
@@ -999,6 +1000,15 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def query_segment_targets(
+            self, segment_id: str, options: QuerySegmentTargetsOptions
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Query targets in a segment
+        """
+        pass
+
+    @abc.abstractmethod
     def delete_segment_targets(
             self, segment_id: str, target_ids: List[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -1007,13 +1017,14 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
-    def campaign(self, campaign_id: Optional[str]):
+    def campaign(
+        self, campaign_id: Optional[str], data: Optional[CampaignData]
+    ) -> TCampaign:
         """
-        Creates a channel object
-        :param channel_type: the channel type
-        :param channel_id: the id of the channel
-        :param data: additional data, ie: {"members":[id1, id2, ...]}
-        :return: Channel
+        Creates a campaign object
+        :param campaign_id: the campaign id
+        :param data: campaign_id data
+        :return: Campaign
         """
         pass
 
@@ -1067,7 +1078,7 @@ class StreamChatInterface(abc.ABC):
         self, campaign_id: str, scheduled_for: Optional[Union[str, datetime.datetime]] = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Schedule a campaign at given time
+        Start a campaign at given time or now if not specified
         """
         pass
 
@@ -1076,7 +1087,7 @@ class StreamChatInterface(abc.ABC):
         self, campaign_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Stop a in progress campaign
+        Stop an in progress campaign
         """
         pass
 

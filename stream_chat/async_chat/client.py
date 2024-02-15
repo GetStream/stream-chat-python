@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
-from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions
+from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions, QuerySegmentTargetsOptions
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -542,12 +542,17 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def list_roles(self) -> StreamResponse:
         return await self.get("roles")
 
-    def segment(self, segment_type: SegmentType, segment_id: Optional[str] = None,
-                      data: Optional[SegmentData] = None) -> Segment:
+    def segment(
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str] = None,
+        data: Optional[SegmentData] = None
+    ) -> Segment:
         return Segment(client=self, segment_type=segment_type, segment_id=segment_id, data=data)
 
-    async def create_segment(self, segment_type: SegmentType, segment_id: Optional[str] = None,
-                       data: Optional[SegmentData] = None) -> StreamResponse:
+    async def create_segment(
+        self, segment_type: SegmentType, segment_id: Optional[str] = None, data: Optional[SegmentData] = None
+    ) -> StreamResponse:
         payload = {"type": segment_type.value}
         if segment_id is not None:
             payload["id"] = segment_id
@@ -569,17 +574,22 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.delete(f"segments/{segment_id}")
 
     async def segment_target_exists(
-            self, segment_id: str, target_id: str
+        self, segment_id: str, target_id: str
     ) -> StreamResponse:
         return await self.get(f"segments/{segment_id}/target/{target_id}")
 
     async def add_segment_targets(
-            self, segment_id: str, target_ids: List[str]
+        self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
         return await self.post(f"segments/{segment_id}/addtargets", data={"target_ids": target_ids})
 
+    async def query_segment_targets(
+        self, segment_id: str, options: QuerySegmentTargetsOptions
+    ) -> StreamResponse:
+        return await self.post(f"segments/{segment_id}/targets/query", data=options)
+
     async def delete_segment_targets(
-            self, segment_id: str, target_ids: List[str]
+        self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
         return await self.post(f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids})
 
@@ -595,8 +605,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def get_campaign(self, campaign_id: str) -> StreamResponse:
         return await self.get(f"campaigns/{campaign_id}")
 
-    async def query_campaigns(self, filter_conditions: Dict[str, Any],
-                        options: QueryCampaignsOptions = None) -> StreamResponse:
+    async def query_campaigns(
+        self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None
+    ) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
         return await self.post("campaigns/query", data=payload)
 
@@ -604,10 +615,10 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.put(f"campaigns/{campaign_id}", data=data)
 
     async def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
-        return await self.delete(f"campaigns/{campaign_id}", params=options)
+        return await self.delete(f"campaigns/{campaign_id}", options)
 
     async def start_campaign(
-            self, campaign_id: str, scheduled_for: Optional[Union[str, datetime.datetime]] = None
+        self, campaign_id: str, scheduled_for: Optional[Union[str, datetime.datetime]] = None
     ) -> StreamResponse:
         payload = {}
         if scheduled_for is not None:

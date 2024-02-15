@@ -1,26 +1,36 @@
 from enum import IntEnum
-from typing import TypedDict, Optional, Any
+from typing import TypedDict, Optional
 
 
 class SortOrder(IntEnum):
+    """
+    Represents the sort order for a query.
+    """
     ASC = 1
     DESC = -1
 
 
 class SortParam(TypedDict, total=False):
+    """
+    Represents a sort parameter for a query.
+
+    Parameters:
+        field: The field to sort by.
+        direction: The direction to sort by.
+    """
     field: str
     direction: SortOrder
 
 
-class SortField(TypedDict, total=False):
-    field: str
-    value: Any
-
-
 class Pager(TypedDict, total=False):
+    """
+    Represents the data structure for a pager.
+
+    Parameters:
+        limit: The maximum number of items to return.
+        next: The next page token.
+        prev: The previous page token.
+    """
     limit: Optional[int]
     next: Optional[str]
     prev: Optional[str]
-
-
-

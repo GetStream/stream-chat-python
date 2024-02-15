@@ -8,7 +8,11 @@ from stream_chat.types.stream_response import StreamResponse
 
 class Campaign(CampaignInterface):
 
-    async def create(self) -> StreamResponse:
+    async def create(self, campaign_id: Optional[str] = None, data: Optional[CampaignData] = None) -> StreamResponse:
+        if campaign_id is not None:
+            self.campaign_id = campaign_id
+        if data is not None:
+            self.data = data
         state = await self.client.create_campaign(campaign_id=self.campaign_id, data=self.data)
 
         if self.campaign_id is None and state.is_ok() and "campaign" in state:
@@ -22,7 +26,7 @@ class Campaign(CampaignInterface):
         return await self.client.update_campaign(campaign_id=self.campaign_id, data=data)
 
     async def delete(self, **options: Any) -> StreamResponse:
-        return await self.client.delete_campaign(campaign_id=self.campaign_id, options=options)
+        return await self.client.delete_campaign(campaign_id=self.campaign_id, **options)
 
     async def start(self, scheduled_for: Optional[Union[str, datetime.datetime]] = None) -> StreamResponse:
         return await self.client.start_campaign(campaign_id=self.campaign_id, scheduled_for=scheduled_for)

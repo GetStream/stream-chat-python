@@ -19,7 +19,9 @@ class CampaignInterface(abc.ABC):
         self.data = data
 
     @abc.abstractmethod
-    def create(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def create(
+        self, campaign_id: Optional[str], data: Optional[CampaignData]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod

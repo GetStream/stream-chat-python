@@ -2,7 +2,7 @@ import abc
 from typing import Optional, Awaitable, Union, List
 
 from stream_chat.base.client import StreamChatInterface
-from stream_chat.types.segment import SegmentType, SegmentData
+from stream_chat.types.segment import SegmentType, SegmentData, SegmentDataWithId, QuerySegmentTargetsOptions
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -20,7 +20,9 @@ class SegmentInterface(abc.ABC):
         self.data = data
 
     @abc.abstractmethod
-    def create(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def create(
+        self, segment_id: Optional[str] = None, data: Optional[SegmentData] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
@@ -41,6 +43,10 @@ class SegmentInterface(abc.ABC):
 
     @abc.abstractmethod
     def add_targets(self, target_ids: List[str]) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def query_targets(self, options: QuerySegmentTargetsOptions) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
