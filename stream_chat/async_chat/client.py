@@ -576,12 +576,12 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def add_segment_targets(
             self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return await self.post(f"segments/{segment_id}/addtargets", data={"targets": target_ids})
+        return await self.post(f"segments/{segment_id}/addtargets", data={"target_ids": target_ids})
 
     async def delete_segment_targets(
             self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return await self.post(f"segments/{segment_id}/deletetargets", data={"targets": target_ids})
+        return await self.post(f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids})
 
     def campaign(self, campaign_id: Optional[str] = None, data: CampaignData = None) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)

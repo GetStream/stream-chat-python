@@ -554,12 +554,12 @@ class StreamChat(StreamChatInterface):
     def add_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return self.post(f"segments/{segment_id}/addtargets", data={"targets": target_ids})
+        return self.post(f"segments/{segment_id}/addtargets", data={"target_ids": target_ids})
 
     def delete_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return self.post(f"segments/{segment_id}/deletetargets", data={"targets": target_ids})
+        return self.post(f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids})
 
     def campaign(self, campaign_id: Optional[str] = None, data: CampaignData = None) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)
@@ -601,9 +601,6 @@ class StreamChat(StreamChatInterface):
 
     def test_campaign(self, campaign_id: str, users: Iterable[str]) -> StreamResponse:
         return self.post(f"campaigns/{campaign_id}/test", data={"users": users})
-
-    def query_recipients(self, **params: Any) -> StreamResponse:
-        return self.get("recipients", params={"payload": json.dumps(params)})
 
     def revoke_tokens(self, since: Union[str, datetime.datetime]) -> StreamResponse:
         if isinstance(since, datetime.datetime):

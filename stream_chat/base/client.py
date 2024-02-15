@@ -1090,15 +1090,6 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def query_recipients(
-        self, **params: Any
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Query recipients
-        """
-        pass
-
-    @abc.abstractmethod
     def revoke_tokens(
         self, since: Union[str, datetime.datetime]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
