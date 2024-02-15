@@ -929,6 +929,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def segment(
         self,
         segment_type: SegmentType,
@@ -1028,6 +1029,7 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def campaign(
         self, campaign_id: Optional[str], data: Optional[CampaignData]
     ) -> TCampaign:

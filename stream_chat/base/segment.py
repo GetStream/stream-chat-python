@@ -5,7 +5,6 @@ from stream_chat.base.client import StreamChatInterface
 from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
-    SegmentDataWithId,
     SegmentType,
 )
 from stream_chat.types.stream_response import StreamResponse

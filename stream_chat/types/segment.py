@@ -32,10 +32,6 @@ class SegmentData(TypedDict, total=False):
     filter: Optional[Dict]
 
 
-class SegmentDataWithId(SegmentData, total=False):
-    id: Optional[str]
-
-
 class QuerySegmentsOptions(Pager, total=False):
     sort: Optional[List[SortParam]]
 

@@ -1,11 +1,7 @@
 from typing import Optional
 
 from stream_chat.base.segment import SegmentInterface
-from stream_chat.types.segment import (
-    QuerySegmentTargetsOptions,
-    SegmentData,
-    SegmentDataWithId,
-)
+from stream_chat.types.segment import QuerySegmentTargetsOptions, SegmentData
 from stream_chat.types.stream_response import StreamResponse
 
 
