@@ -935,7 +935,7 @@ class StreamChatInterface(abc.ABC):
         segment_type: SegmentType,
         segment_id: Optional[str],
         data: Optional[SegmentData],
-    ) -> TSegment:
+    ) -> TSegment:  # type: ignore[type-var]
         """
         Creates a channel object
         :param segment_type: the segment type
@@ -1032,7 +1032,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def campaign(
         self, campaign_id: Optional[str], data: Optional[CampaignData]
-    ) -> TCampaign:
+    ) -> TCampaign:  # type: ignore[type-var]
         """
         Creates a campaign object
         :param campaign_id: the campaign id

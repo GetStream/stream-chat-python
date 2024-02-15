@@ -15,7 +15,7 @@ class Campaign(CampaignInterface):
             self.campaign_id = campaign_id
         if data is not None:
             self.data = data
-        state = await self.client.create_campaign(
+        state = await self.client.create_campaign(  # type: ignore
             campaign_id=self.campaign_id, data=self.data
         )
 
@@ -24,24 +24,28 @@ class Campaign(CampaignInterface):
         return state
 
     async def get(self) -> StreamResponse:
-        return await self.client.get_campaign(campaign_id=self.campaign_id)
+        return await self.client.get_campaign(  # type: ignore
+            campaign_id=self.campaign_id
+        )
 
     async def update(self, data: CampaignData) -> StreamResponse:
-        return await self.client.update_campaign(
+        return await self.client.update_campaign(  # type: ignore
             campaign_id=self.campaign_id, data=data
         )
 
     async def delete(self, **options: Any) -> StreamResponse:
-        return await self.client.delete_campaign(
+        return await self.client.delete_campaign(  # type: ignore
             campaign_id=self.campaign_id, **options
         )
 
     async def start(
         self, scheduled_for: Optional[Union[str, datetime.datetime]] = None
     ) -> StreamResponse:
-        return await self.client.start_campaign(
+        return await self.client.start_campaign(  # type: ignore
             campaign_id=self.campaign_id, scheduled_for=scheduled_for
         )
 
     async def stop(self) -> StreamResponse:
-        return await self.client.stop_campaign(campaign_id=self.campaign_id)
+        return await self.client.stop_campaign(  # type: ignore
+            campaign_id=self.campaign_id
+        )

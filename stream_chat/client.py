@@ -2,7 +2,7 @@ import datetime
 import json
 import sys
 import warnings
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
@@ -527,7 +527,7 @@ class StreamChat(StreamChatInterface):
     def list_roles(self) -> StreamResponse:
         return self.get("roles")
 
-    def segment(
+    def segment(  # type: ignore
         self,
         segment_type: SegmentType,
         segment_id: Optional[str] = None,
@@ -547,7 +547,7 @@ class StreamChat(StreamChatInterface):
         if segment_id is not None:
             payload["id"] = segment_id
         if data is not None:
-            payload.update(data)
+            payload.update(cast(dict, data))
         return self.post("segments", data=payload)
 
     def get_segment(self, segment_id: str) -> StreamResponse:
@@ -587,7 +587,7 @@ class StreamChat(StreamChatInterface):
             f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids}
         )
 
-    def campaign(
+    def campaign(  # type: ignore
         self, campaign_id: Optional[str] = None, data: CampaignData = None
     ) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)
@@ -597,7 +597,7 @@ class StreamChat(StreamChatInterface):
     ) -> StreamResponse:
         payload = {"id": campaign_id}
         if data is not None:
-            payload.update(data)
+            payload.update(cast(dict, data))
         return self.post("campaigns", data=payload)
 
     def get_campaign(self, campaign_id: str) -> StreamResponse:

@@ -19,25 +19,29 @@ class Campaign(CampaignInterface):
             campaign_id=self.campaign_id, data=self.data
         )
 
-        if self.campaign_id is None and state.is_ok() and "campaign" in state:
-            self.campaign_id = state["campaign"]["id"]
-        return state
+        if self.campaign_id is None and state.is_ok() and "campaign" in state:  # type: ignore
+            self.campaign_id = state["campaign"]["id"]  # type: ignore
+        return state  # type: ignore
 
     def get(self) -> StreamResponse:
-        return self.client.get_campaign(campaign_id=self.campaign_id)
+        return self.client.get_campaign(campaign_id=self.campaign_id)  # type: ignore
 
     def update(self, data: CampaignData) -> StreamResponse:
-        return self.client.update_campaign(campaign_id=self.campaign_id, data=data)
+        return self.client.update_campaign(  # type: ignore
+            campaign_id=self.campaign_id, data=data
+        )
 
     def delete(self, **options: Any) -> StreamResponse:
-        return self.client.delete_campaign(campaign_id=self.campaign_id, **options)
+        return self.client.delete_campaign(  # type: ignore
+            campaign_id=self.campaign_id, **options
+        )
 
     def start(
         self, scheduled_for: Optional[Union[str, datetime.datetime]] = None
     ) -> StreamResponse:
-        return self.client.start_campaign(
+        return self.client.start_campaign(  # type: ignore
             campaign_id=self.campaign_id, scheduled_for=scheduled_for
         )
 
     def stop(self) -> StreamResponse:
-        return self.client.stop_campaign(campaign_id=self.campaign_id)
+        return self.client.stop_campaign(campaign_id=self.campaign_id)  # type: ignore

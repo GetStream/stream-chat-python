@@ -13,6 +13,7 @@ from typing import (
     Optional,
     Type,
     Union,
+    cast,
 )
 from urllib.parse import urlparse
 
@@ -547,7 +548,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def list_roles(self) -> StreamResponse:
         return await self.get("roles")
 
-    def segment(
+    def segment(  # type: ignore
         self,
         segment_type: SegmentType,
         segment_id: Optional[str] = None,
@@ -567,7 +568,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         if segment_id is not None:
             payload["id"] = segment_id
         if data is not None:
-            payload.update(data)
+            payload.update(cast(dict, data))
         return await self.post("segments", data=payload)
 
     async def get_segment(self, segment_id: str) -> StreamResponse:
@@ -611,7 +612,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids}
         )
 
-    def campaign(
+    def campaign(  # type: ignore
         self, campaign_id: Optional[str] = None, data: CampaignData = None
     ) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)
@@ -621,7 +622,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     ) -> StreamResponse:
         payload = {"id": campaign_id}
         if data is not None:
-            payload.update(data)
+            payload.update(cast(dict, data))
         return await self.post("campaigns", data=payload)
 
     async def get_campaign(self, campaign_id: str) -> StreamResponse:

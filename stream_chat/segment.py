@@ -19,35 +19,37 @@ class Segment(SegmentInterface):
             segment_type=self.segment_type, segment_id=self.segment_id, data=self.data
         )
 
-        if self.segment_id is None and state.is_ok() and "segment" in state:
-            self.segment_id = state["segment"]["id"]
-        return state
+        if self.segment_id is None and state.is_ok() and "segment" in state:  # type: ignore
+            self.segment_id = state["segment"]["id"]  # type: ignore
+        return state  # type: ignore
 
     def get(self) -> StreamResponse:
-        return self.client.get_segment(segment_id=self.segment_id)
+        return self.client.get_segment(segment_id=self.segment_id)  # type: ignore
 
     def update(self, data: SegmentData) -> StreamResponse:
-        return self.client.update_segment(segment_id=self.segment_id, data=data)
+        return self.client.update_segment(  # type: ignore
+            segment_id=self.segment_id, data=data
+        )
 
     def delete(self) -> StreamResponse:
-        return self.client.delete_segment(segment_id=self.segment_id)
+        return self.client.delete_segment(segment_id=self.segment_id)  # type: ignore
 
     def target_exists(self, target_id: str) -> StreamResponse:
-        return self.client.segment_target_exists(
+        return self.client.segment_target_exists(  # type: ignore
             segment_id=self.segment_id, target_id=target_id
         )
 
     def add_targets(self, target_ids: list) -> StreamResponse:
-        return self.client.add_segment_targets(
+        return self.client.add_segment_targets(  # type: ignore
             segment_id=self.segment_id, target_ids=target_ids
         )
 
     def query_targets(self, options: QuerySegmentTargetsOptions) -> StreamResponse:
-        return self.client.query_segment_targets(
+        return self.client.query_segment_targets(  # type: ignore
             segment_id=self.segment_id, options=options
         )
 
     def delete_targets(self, target_ids: list) -> StreamResponse:
-        return self.client.delete_segment_targets(
+        return self.client.delete_segment_targets(  # type: ignore
             segment_id=self.segment_id, target_ids=target_ids
         )
