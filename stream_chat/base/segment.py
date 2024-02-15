@@ -1,8 +1,13 @@
 import abc
-from typing import Optional, Awaitable, Union, List
+from typing import Awaitable, List, Optional, Union
 
 from stream_chat.base.client import StreamChatInterface
-from stream_chat.types.segment import SegmentType, SegmentData, SegmentDataWithId, QuerySegmentTargetsOptions
+from stream_chat.types.segment import (
+    QuerySegmentTargetsOptions,
+    SegmentData,
+    SegmentDataWithId,
+    SegmentType,
+)
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -30,7 +35,9 @@ class SegmentInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update(self, data: SegmentData) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def update(
+        self, data: SegmentData
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
@@ -38,17 +45,25 @@ class SegmentInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def target_exists(self, target_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def target_exists(
+        self, target_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def add_targets(self, target_ids: List[str]) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def add_targets(
+        self, target_ids: List[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def query_targets(self, options: QuerySegmentTargetsOptions) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def query_targets(
+        self, options: QuerySegmentTargetsOptions
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
-    def delete_targets(self, target_ids: List[str]) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def delete_targets(
+        self, target_ids: List[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass

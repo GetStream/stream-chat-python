@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional, TypedDict, Dict, Union
+from typing import Dict, List, Optional, TypedDict, Union
 
 from stream_chat.types.base import Pager, SortParam
 
@@ -12,6 +12,7 @@ class MessageTemplate(TypedDict, total=False):
         text: The text of the message.
         attachments: List of the message attachments.
     """
+
     text: str
     attachments: Optional[List[Dict]]
 
@@ -24,6 +25,7 @@ class ChannelTemplate(TypedDict, total=False):
         type: The type of channel.
         id: The ID of the channel.
     """
+
     type: str
     id: str
 
@@ -48,6 +50,7 @@ class CampaignData(TypedDict, total=False):
         skip_push: Flag to indicate if push notifications should be skipped.
         scheduled_for: The scheduled time for the campaign. Can be a string or a datetime object.
     """
+
     message_template: MessageTemplate
     sender_id: str
     segment_ids: Optional[List[str]]

@@ -67,5 +67,5 @@ class StreamResponse(dict):
         return self.__status_code
 
     def is_ok(self) -> bool:
-        """Returns True if the status code is in the 200 range. """
+        """Returns True if the status code is in the 200 range."""
         return 200 <= self.__status_code < 300

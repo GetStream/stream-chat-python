@@ -5,10 +5,15 @@ import hashlib
 import hmac
 import os
 import sys
-from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union, Optional
+from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Union
 
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
-from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions, QuerySegmentTargetsOptions
+from stream_chat.types.segment import (
+    QuerySegmentsOptions,
+    QuerySegmentTargetsOptions,
+    SegmentData,
+    SegmentType,
+)
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -925,7 +930,10 @@ class StreamChatInterface(abc.ABC):
         pass
 
     def segment(
-        self, segment_type: SegmentType, segment_id: Optional[str], data: Optional[SegmentData]
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str],
+        data: Optional[SegmentData],
     ) -> TSegment:
         """
         Creates a channel object
@@ -938,7 +946,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def create_segment(
-        self, segment_type: SegmentType, segment_id: Optional[str], data: Optional[SegmentData] = None
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str],
+        data: Optional[SegmentData] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a segment
@@ -992,7 +1003,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def add_segment_targets(
-            self, segment_id: str, target_ids: List[str]
+        self, segment_id: str, target_ids: List[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Add targets to a segment
@@ -1001,7 +1012,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_segment_targets(
-            self, segment_id: str, options: QuerySegmentTargetsOptions
+        self, segment_id: str, options: QuerySegmentTargetsOptions
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query targets in a segment
@@ -1010,7 +1021,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def delete_segment_targets(
-            self, segment_id: str, target_ids: List[str]
+        self, segment_id: str, target_ids: List[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Delete targets from a segment
@@ -1075,7 +1086,9 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def start_campaign(
-        self, campaign_id: str, scheduled_for: Optional[Union[str, datetime.datetime]] = None
+        self,
+        campaign_id: str,
+        scheduled_for: Optional[Union[str, datetime.datetime]] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Start a campaign at given time or now if not specified

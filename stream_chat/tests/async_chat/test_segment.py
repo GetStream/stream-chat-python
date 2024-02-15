@@ -9,10 +9,13 @@ from stream_chat.types.segment import SegmentType
 @pytest.mark.incremental
 class TestSegment:
     async def test_segment_crud(self, client: StreamChatAsync):
-        segment = client.segment(SegmentType.USER, data={
-            "name": "test_segment",
-            "description": "test_description",
-        })
+        segment = client.segment(
+            SegmentType.USER,
+            data={
+                "name": "test_segment",
+                "description": "test_description",
+            },
+        )
         created = await segment.create()
         assert created.is_ok()
         assert "segment" in created
@@ -26,10 +29,12 @@ class TestSegment:
         assert "name" in received["segment"]
         assert received["segment"]["name"] == created["segment"]["name"]
 
-        updated = await segment.update({
-            "name": "updated_name",
-            "description": "updated_description",
-        })
+        updated = await segment.update(
+            {
+                "name": "updated_name",
+                "description": "updated_description",
+            }
+        )
         assert updated.is_ok()
         assert "segment" in updated
         assert "id" in updated["segment"]
@@ -55,18 +60,22 @@ class TestSegment:
         target_exists = await segment.target_exists(target_id=target_ids[0])
         assert target_exists.is_ok()
 
-        query_targets_1 = await segment.query_targets({
-            "limit": 3,
-        })
+        query_targets_1 = await segment.query_targets(
+            {
+                "limit": 3,
+            }
+        )
         assert query_targets_1.is_ok()
         assert "targets" in query_targets_1
         assert "next" in query_targets_1
         assert len(query_targets_1["targets"]) == 3
 
-        query_targets_2 = await segment.query_targets({
-            "limit": 3,
-            "next": query_targets_1["next"],
-        })
+        query_targets_2 = await segment.query_targets(
+            {
+                "limit": 3,
+                "next": query_targets_1["next"],
+            }
+        )
         assert query_targets_2.is_ok()
         assert "targets" in query_targets_2
         assert "next" in query_targets_2
@@ -77,4 +86,3 @@ class TestSegment:
 
         deleted = await segment.delete()
         assert deleted.is_ok()
-

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TypedDict, Optional, Dict, List
+from typing import Dict, List, Optional, TypedDict
 
 from stream_chat.types.base import Pager, SortParam
 
@@ -12,6 +12,7 @@ class SegmentType(Enum):
         CHANNEL: A segment targeting channels.
         USER: A segment targeting users.
     """
+
     CHANNEL = "channel"
     USER = "user"
 
@@ -25,6 +26,7 @@ class SegmentData(TypedDict, total=False):
         description: A description of the segment.
         filter: A filter to apply to the segment.
     """
+
     name: Optional[str]
     description: Optional[str]
     filter: Optional[Dict]

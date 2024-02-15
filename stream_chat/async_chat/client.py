@@ -19,7 +19,12 @@ from urllib.parse import urlparse
 from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
-from stream_chat.types.segment import SegmentType, SegmentData, QuerySegmentsOptions, QuerySegmentTargetsOptions
+from stream_chat.types.segment import (
+    QuerySegmentsOptions,
+    QuerySegmentTargetsOptions,
+    SegmentData,
+    SegmentType,
+)
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -546,12 +551,17 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         self,
         segment_type: SegmentType,
         segment_id: Optional[str] = None,
-        data: Optional[SegmentData] = None
+        data: Optional[SegmentData] = None,
     ) -> Segment:
-        return Segment(client=self, segment_type=segment_type, segment_id=segment_id, data=data)
+        return Segment(
+            client=self, segment_type=segment_type, segment_id=segment_id, data=data
+        )
 
     async def create_segment(
-        self, segment_type: SegmentType, segment_id: Optional[str] = None, data: Optional[SegmentData] = None
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str] = None,
+        data: Optional[SegmentData] = None,
     ) -> StreamResponse:
         payload = {"type": segment_type.value}
         if segment_id is not None:
@@ -563,11 +573,15 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def get_segment(self, segment_id: str) -> StreamResponse:
         return await self.get(f"segments/{segment_id}")
 
-    async def query_segments(self, filter_conditions: Dict, options: QuerySegmentsOptions) -> StreamResponse:
+    async def query_segments(
+        self, filter_conditions: Dict, options: QuerySegmentsOptions
+    ) -> StreamResponse:
         payload = {"filter": filter_conditions, **options}
         return await self.post("segments/query", data=payload)
 
-    async def update_segment(self, segment_id: str, data: SegmentData) -> StreamResponse:
+    async def update_segment(
+        self, segment_id: str, data: SegmentData
+    ) -> StreamResponse:
         return await self.put(f"segments/{segment_id}", data=data)
 
     async def delete_segment(self, segment_id: str) -> StreamResponse:
@@ -581,7 +595,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def add_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return await self.post(f"segments/{segment_id}/addtargets", data={"target_ids": target_ids})
+        return await self.post(
+            f"segments/{segment_id}/addtargets", data={"target_ids": target_ids}
+        )
 
     async def query_segment_targets(
         self, segment_id: str, options: QuerySegmentTargetsOptions
@@ -591,12 +607,18 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def delete_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return await self.post(f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids})
+        return await self.post(
+            f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids}
+        )
 
-    def campaign(self, campaign_id: Optional[str] = None, data: CampaignData = None) -> Campaign:
+    def campaign(
+        self, campaign_id: Optional[str] = None, data: CampaignData = None
+    ) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)
 
-    async def create_campaign(self, campaign_id: Optional[str] = None, data: CampaignData = None) -> StreamResponse:
+    async def create_campaign(
+        self, campaign_id: Optional[str] = None, data: CampaignData = None
+    ) -> StreamResponse:
         payload = {"id": campaign_id}
         if data is not None:
             payload.update(data)
@@ -611,23 +633,25 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         payload = {"filter": filter_conditions, **options}
         return await self.post("campaigns/query", data=payload)
 
-    async def update_campaign(self, campaign_id: str, data: CampaignData) -> StreamResponse:
+    async def update_campaign(
+        self, campaign_id: str, data: CampaignData
+    ) -> StreamResponse:
         return await self.put(f"campaigns/{campaign_id}", data=data)
 
     async def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
         return await self.delete(f"campaigns/{campaign_id}", options)
 
     async def start_campaign(
-        self, campaign_id: str, scheduled_for: Optional[Union[str, datetime.datetime]] = None
+        self,
+        campaign_id: str,
+        scheduled_for: Optional[Union[str, datetime.datetime]] = None,
     ) -> StreamResponse:
         payload = {}
         if scheduled_for is not None:
             if isinstance(scheduled_for, datetime.datetime):
                 scheduled_for = scheduled_for.isoformat()
             payload["scheduled_for"] = scheduled_for
-        return await self.post(
-            f"campaigns/{campaign_id}/start", data=payload
-        )
+        return await self.post(f"campaigns/{campaign_id}/start", data=payload)
 
     async def stop_campaign(self, campaign_id: str) -> StreamResponse:
         return await self.post(f"campaigns/{campaign_id}/stop")

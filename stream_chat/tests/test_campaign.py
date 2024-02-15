@@ -15,14 +15,16 @@ class TestCampaign:
 
         sender_id = random_user["id"]
 
-        campaign = client.campaign(data={
-            "message_template": {
-                "text": "{Hello}",
-            },
-            "segment_ids": [segment_id],
-            "sender_id": sender_id,
-            "name": "some name",
-        })
+        campaign = client.campaign(
+            data={
+                "message_template": {
+                    "text": "{Hello}",
+                },
+                "segment_ids": [segment_id],
+                "sender_id": sender_id,
+                "name": "some name",
+            }
+        )
         created = campaign.create()
         assert created.is_ok()
         assert "campaign" in created
@@ -36,14 +38,16 @@ class TestCampaign:
         assert "name" in received["campaign"]
         assert received["campaign"]["name"] == created["campaign"]["name"]
 
-        updated = campaign.update({
-            "message_template": {
-                "text": "{Hello}",
-            },
-            "segment_ids": [segment_id],
-            "sender_id": sender_id,
-            "name": "updated_name",
-        })
+        updated = campaign.update(
+            {
+                "message_template": {
+                    "text": "{Hello}",
+                },
+                "segment_ids": [segment_id],
+                "sender_id": sender_id,
+                "name": "updated_name",
+            }
+        )
         assert updated.is_ok()
         assert "campaign" in updated
         assert "id" in updated["campaign"]
@@ -61,17 +65,21 @@ class TestCampaign:
 
         sender_id = random_user["id"]
 
-        target_added = client.add_segment_targets(segment_id=segment_id, target_ids=[sender_id])
+        target_added = client.add_segment_targets(
+            segment_id=segment_id, target_ids=[sender_id]
+        )
         assert target_added.is_ok()
 
-        campaign = client.campaign(data={
-            "message_template": {
-                "text": "{Hello}",
-            },
-            "segment_ids": [segment_id],
-            "sender_id": sender_id,
-            "name": "some name",
-        })
+        campaign = client.campaign(
+            data={
+                "message_template": {
+                    "text": "{Hello}",
+                },
+                "segment_ids": [segment_id],
+                "sender_id": sender_id,
+                "name": "some name",
+            }
+        )
         created = campaign.create()
         assert created.is_ok()
         assert "campaign" in created
