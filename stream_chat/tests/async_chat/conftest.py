@@ -33,7 +33,7 @@ def event_loop():
     loop.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 async def client():
     base_url = os.environ.get("STREAM_HOST")
     options = {"base_url": base_url} if base_url else {}
