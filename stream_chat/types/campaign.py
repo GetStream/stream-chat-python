@@ -11,10 +11,12 @@ class MessageTemplate(TypedDict, total=False):
     Parameters:
         text: The text of the message.
         attachments: List of the message attachments.
+        custom: Custom data.
     """
 
     text: str
     attachments: Optional[List[Dict]]
+    custom: Optional[Dict]
 
 
 class ChannelTemplate(TypedDict, total=False):
@@ -24,10 +26,12 @@ class ChannelTemplate(TypedDict, total=False):
     Parameters:
         type: The type of channel.
         id: The ID of the channel.
+        custom: Custom data.
     """
 
     type: str
     id: str
+    custom: Optional[Dict]
 
 
 class CampaignData(TypedDict, total=False):

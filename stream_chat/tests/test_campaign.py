@@ -25,11 +25,16 @@ class TestCampaign:
                 "name": "some name",
             }
         )
-        created = campaign.create()
+        created = campaign.create(
+            data={
+                "name": "created name",
+            }
+        )
         assert created.is_ok()
         assert "campaign" in created
         assert "id" in created["campaign"]
         assert "name" in created["campaign"]
+        assert created["campaign"]["name"] == "created name"
 
         received = campaign.get()
         assert received.is_ok()

@@ -14,7 +14,7 @@ class Campaign(CampaignInterface):
         if campaign_id is not None:
             self.campaign_id = campaign_id
         if data is not None:
-            self.data = data
+            self.data = self._merge_campaign_data(self.data, data)
         state = self.client.create_campaign(
             campaign_id=self.campaign_id, data=self.data
         )
@@ -45,3 +45,15 @@ class Campaign(CampaignInterface):
 
     def stop(self) -> StreamResponse:
         return self.client.stop_campaign(campaign_id=self.campaign_id)  # type: ignore
+
+    @staticmethod
+    def _merge_campaign_data(
+        data1: Optional[CampaignData],
+        data2: Optional[CampaignData],
+    ) -> CampaignData:
+        if data1 is None:
+            return data2
+        if data2 is None:
+            return data1
+        data1.update(data2)  # type: ignore
+        return data1
