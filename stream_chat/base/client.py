@@ -1013,7 +1013,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_segment_targets(
-        self, segment_id: str, options: QuerySegmentTargetsOptions
+        self,
+        segment_id: str,
+        filter_conditions: Optional[Dict] = None,
+        options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query targets in a segment

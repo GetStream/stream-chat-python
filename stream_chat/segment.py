@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from stream_chat.base.segment import SegmentInterface
 from stream_chat.types.segment import QuerySegmentTargetsOptions, SegmentData
@@ -44,9 +44,15 @@ class Segment(SegmentInterface):
             segment_id=self.segment_id, target_ids=target_ids
         )
 
-    def query_targets(self, options: QuerySegmentTargetsOptions) -> StreamResponse:
+    def query_targets(
+        self,
+        filter_conditions: Optional[Dict] = None,
+        options: Optional[QuerySegmentTargetsOptions] = None,
+    ) -> StreamResponse:
         return self.client.query_segment_targets(  # type: ignore
-            segment_id=self.segment_id, options=options
+            segment_id=self.segment_id,
+            filter_conditions=filter_conditions,
+            options=options,
         )
 
     def remove_targets(self, target_ids: list) -> StreamResponse:

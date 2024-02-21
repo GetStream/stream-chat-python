@@ -576,9 +576,17 @@ class StreamChat(StreamChatInterface):
         )
 
     def query_segment_targets(
-        self, segment_id: str, options: QuerySegmentTargetsOptions
+        self,
+        segment_id: str,
+        filter_conditions: Optional[Dict] = None,
+        options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> StreamResponse:
-        return self.post(f"segments/{segment_id}/targets/query", data=options)
+        payload = {}
+        if filter_conditions is not None:
+            payload["filter"] = filter_conditions
+        if options is not None:
+            payload.update(cast(dict, options))
+        return self.post(f"segments/{segment_id}/targets/query", data=payload)
 
     def remove_segment_targets(
         self, segment_id: str, target_ids: List[str]

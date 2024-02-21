@@ -1,5 +1,5 @@
 import abc
-from typing import Awaitable, List, Optional, Union
+from typing import Awaitable, Dict, List, Optional, Union
 
 from stream_chat.base.client import StreamChatInterface
 from stream_chat.types.segment import (
@@ -57,7 +57,9 @@ class SegmentInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_targets(
-        self, options: QuerySegmentTargetsOptions
+        self,
+        filter_conditions: Optional[Dict] = None,
+        options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
