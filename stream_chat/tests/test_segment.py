@@ -3,6 +3,7 @@ import uuid
 import pytest
 
 from stream_chat import StreamChat
+from stream_chat.types.base import SortOrder
 from stream_chat.types.segment import SegmentType
 
 
@@ -75,7 +76,7 @@ class TestSegment:
             options={
                 "limit": 3,
                 "next": query_targets_1["next"],
-                "sort": [{"field": "target_id", "direction": -1}],
+                "sort": [{"field": "target_id", "direction": SortOrder.DESC}],
             },
         )
         assert query_targets_2.is_ok()

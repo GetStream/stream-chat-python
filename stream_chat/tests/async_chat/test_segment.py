@@ -3,6 +3,7 @@ import uuid
 import pytest
 
 from stream_chat.async_chat.client import StreamChatAsync
+from stream_chat.types.base import SortOrder
 from stream_chat.types.segment import SegmentType
 
 
@@ -70,12 +71,12 @@ class TestSegment:
         assert "next" in query_targets_1
         assert len(query_targets_1["targets"]) == 3
 
-        query_targets_2 = segment.query_targets(
+        query_targets_2 = await segment.query_targets(
             filter_conditions={"target_id": {"$lte": "<user_id>"}},
             options={
                 "limit": 3,
                 "next": query_targets_1["next"],
-                "sort": [{"field": "target_id", "direction": -1}],
+                "sort": [{"field": "target_id", "direction": SortOrder.DESC}],
             },
         )
         assert query_targets_2.is_ok()
