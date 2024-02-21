@@ -51,7 +51,7 @@ class CampaignData(TypedDict, total=False):
         name: The name of the campaign.
         description: A description of the campaign.
         skip_push: Flag to indicate if push notifications should be skipped.
-        scheduled_for: The scheduled time for the campaign. Can be a string or a datetime object.
+        skip_webhook: Flag to indicate if webhooks should be skipped.
     """
 
     message_template: MessageTemplate
@@ -63,7 +63,8 @@ class CampaignData(TypedDict, total=False):
     name: Optional[str]
     description: Optional[str]
     skip_push: Optional[bool]
+    skip_webhook: Optional[bool]
 
 
 class QueryCampaignsOptions(Pager, total=False):
-    sort: Optional[List[SortParam]]
+    pass

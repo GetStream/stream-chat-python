@@ -7,6 +7,7 @@ import os
 import sys
 from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Union
 
+from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
@@ -968,7 +969,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_segments(
-        self, filter_conditions: Dict, options: QuerySegmentsOptions
+        self,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QuerySegmentsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query segments
@@ -1015,7 +1019,8 @@ class StreamChatInterface(abc.ABC):
     def query_segment_targets(
         self,
         segment_id: str,
-        filter_conditions: Optional[Dict] = None,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
@@ -1064,7 +1069,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_campaigns(
-        self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None
+        self,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryCampaignsOptions] = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query campaigns

@@ -8,6 +8,7 @@ from urllib.request import Request, urlopen
 
 from stream_chat.campaign import Campaign
 from stream_chat.segment import Segment
+from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
@@ -554,9 +555,18 @@ class StreamChat(StreamChatInterface):
         return self.get(f"segments/{segment_id}")
 
     def query_segments(
-        self, filter_conditions: Dict, options: QuerySegmentsOptions
+        self,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QuerySegmentsOptions] = None
     ) -> StreamResponse:
-        payload = {"filter": filter_conditions, **options}
+        payload = {}
+        if filter_conditions is not None:
+            payload["filter"] = filter_conditions
+        if sort is not None:
+            payload["sort"] = sort
+        if options is not None:
+            payload.update(cast(dict, options))
         return self.post("segments/query", data=payload)
 
     def update_segment(self, segment_id: str, data: SegmentData) -> StreamResponse:
@@ -578,12 +588,15 @@ class StreamChat(StreamChatInterface):
     def query_segment_targets(
         self,
         segment_id: str,
-        filter_conditions: Optional[Dict] = None,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> StreamResponse:
         payload = {}
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
+        if sort is not None:
+            payload["sort"] = sort
         if options is not None:
             payload.update(cast(dict, options))
         return self.post(f"segments/{segment_id}/targets/query", data=payload)
@@ -612,9 +625,18 @@ class StreamChat(StreamChatInterface):
         return self.get(f"campaigns/{campaign_id}")
 
     def query_campaigns(
-        self, filter_conditions: Dict[str, Any], options: QueryCampaignsOptions = None
+        self,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryCampaignsOptions] = None
     ) -> StreamResponse:
-        payload = {"filter": filter_conditions, **options}
+        payload = {}
+        if filter_conditions is not None:
+            payload["filter"] = filter_conditions
+        if sort is not None:
+            payload["sort"] = sort
+        if options is not None:
+            payload.update(cast(dict, options))
         return self.post("campaigns/query", data=payload)
 
     def update_campaign(self, campaign_id: str, data: CampaignData) -> StreamResponse:

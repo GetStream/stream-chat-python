@@ -1,6 +1,7 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from stream_chat.base.segment import SegmentInterface
+from stream_chat.types.base import SortParam
 from stream_chat.types.segment import QuerySegmentTargetsOptions, SegmentData
 from stream_chat.types.stream_response import StreamResponse
 
@@ -49,11 +50,13 @@ class Segment(SegmentInterface):
     async def query_targets(
         self,
         filter_conditions: Optional[Dict] = None,
+        sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> StreamResponse:
         return await self.client.query_segment_targets(  # type: ignore
             segment_id=self.segment_id,
             filter_conditions=filter_conditions,
+            sort=sort,
             options=options,
         )
 

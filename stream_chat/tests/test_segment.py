@@ -73,10 +73,10 @@ class TestSegment:
 
         query_targets_2 = segment.query_targets(
             filter_conditions={"target_id": {"$lte": "<user_id>"}},
+            sort=[{"field": "target_id", "direction": SortOrder.DESC}],
             options={
                 "limit": 3,
                 "next": query_targets_1["next"],
-                "sort": [{"field": "target_id", "direction": SortOrder.DESC}],
             },
         )
         assert query_targets_2.is_ok()
@@ -88,4 +88,27 @@ class TestSegment:
         assert target_deleted.is_ok()
 
         deleted = segment.delete()
+        assert deleted.is_ok()
+
+    def test_query_segments(self, client: StreamChat):
+        created = client.create_segment(segment_type=SegmentType.USER)
+        assert created.is_ok()
+        assert "segment" in created
+        assert "id" in created["segment"]
+        assert "name" in created["segment"]
+        segment_id = created["segment"]["id"]
+
+        target_ids = [str(uuid.uuid4()) for _ in range(10)]
+        target_added = client.add_segment_targets(segment_id=segment_id, target_ids=target_ids)
+        assert target_added.is_ok()
+
+        query_segments = client.query_segments(filter_conditions={"id": {"$eq": segment_id}})
+        assert query_segments.is_ok()
+        assert "segments" in query_segments
+        assert len(query_segments["segments"]) == 1
+
+        target_deleted = client.remove_segment_targets(segment_id=segment_id, target_ids=target_ids)
+        assert target_deleted.is_ok()
+
+        deleted = client.delete_segment(segment_id=segment_id)
         assert deleted.is_ok()

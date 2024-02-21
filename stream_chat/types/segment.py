@@ -33,8 +33,8 @@ class SegmentData(TypedDict, total=False):
 
 
 class QuerySegmentsOptions(Pager, total=False):
-    sort: Optional[List[SortParam]]
+    pass
 
 
 class QuerySegmentTargetsOptions(Pager, total=False):
-    sort: Optional[List[SortParam]]
+    pass

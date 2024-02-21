@@ -107,3 +107,48 @@ class TestCampaign:
         assert deleted.is_ok()
 
         await client.delete_segment(segment_id=segment_id)
+
+    async def test_query_campaigns(self, client: StreamChatAsync, random_user: Dict):
+        segment_created = await client.create_segment(segment_type=SegmentType.USER)
+        segment_id = segment_created["segment"]["id"]
+
+        sender_id = random_user["id"]
+
+        target_added = await client.add_segment_targets(
+            segment_id=segment_id, target_ids=[sender_id]
+        )
+        assert target_added.is_ok()
+
+        created = await client.create_campaign(
+            data={
+                "message_template": {
+                    "text": "{Hello}",
+                },
+                "segment_ids": [segment_id],
+                "sender_id": sender_id,
+                "name": "some name",
+            }
+        )
+        assert created.is_ok()
+        assert "campaign" in created
+        assert "id" in created["campaign"]
+        assert "name" in created["campaign"]
+        campaign_id = created["campaign"]["id"]
+
+        query_campaigns = await client.query_campaigns(
+            filter_conditions={
+                "id": {
+                    "$eq": campaign_id,
+                }
+            }
+        )
+        assert query_campaigns.is_ok()
+        assert "campaigns" in query_campaigns
+        assert len(query_campaigns["campaigns"]) == 1
+        assert query_campaigns["campaigns"][0]["id"] == campaign_id
+
+        deleted = await client.delete_campaign(campaign_id=campaign_id)
+        assert deleted.is_ok()
+
+        segment_deleted = await client.delete_segment(segment_id=segment_id)
+        assert segment_deleted.is_ok()
