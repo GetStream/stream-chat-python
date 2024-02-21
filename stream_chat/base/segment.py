@@ -2,6 +2,7 @@ import abc
 from typing import Awaitable, Dict, List, Optional, Union
 
 from stream_chat.base.client import StreamChatInterface
+from stream_chat.types.base import SortParam
 from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
@@ -59,6 +60,7 @@ class SegmentInterface(abc.ABC):
     def query_targets(
         self,
         filter_conditions: Optional[Dict] = None,
+        sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass

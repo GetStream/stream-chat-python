@@ -556,15 +556,15 @@ class StreamChat(StreamChatInterface):
 
     def query_segments(
         self,
-        filter_conditions: Optional[Dict[str, Any]] = None,
+        filter_conditions: Optional[Dict] = None,
         sort: Optional[List[SortParam]] = None,
-        options: Optional[QuerySegmentsOptions] = None
+        options: Optional[QuerySegmentsOptions] = None,
     ) -> StreamResponse:
         payload = {}
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
         if sort is not None:
-            payload["sort"] = sort
+            payload["sort"] = sort  # type: ignore
         if options is not None:
             payload.update(cast(dict, options))
         return self.post("segments/query", data=payload)
@@ -592,7 +592,7 @@ class StreamChat(StreamChatInterface):
         sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> StreamResponse:
-        payload = {}
+        payload: Dict[str, Union[Dict[str, Any], List[SortParam]]] = {}
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
         if sort is not None:
@@ -628,13 +628,13 @@ class StreamChat(StreamChatInterface):
         self,
         filter_conditions: Optional[Dict[str, Any]] = None,
         sort: Optional[List[SortParam]] = None,
-        options: Optional[QueryCampaignsOptions] = None
+        options: Optional[QueryCampaignsOptions] = None,
     ) -> StreamResponse:
         payload = {}
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
         if sort is not None:
-            payload["sort"] = sort
+            payload["sort"] = sort  # type: ignore
         if options is not None:
             payload.update(cast(dict, options))
         return self.post("campaigns/query", data=payload)

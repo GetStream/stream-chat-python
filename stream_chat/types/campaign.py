@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, TypedDict
 
-from stream_chat.types.base import Pager, SortParam
+from stream_chat.types.base import Pager
 
 
 class MessageTemplate(TypedDict, total=False):

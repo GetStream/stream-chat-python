@@ -579,13 +579,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         self,
         filter_conditions: Optional[Dict[str, Any]] = None,
         sort: Optional[List[SortParam]] = None,
-        options: Optional[QuerySegmentsOptions] = None
+        options: Optional[QuerySegmentsOptions] = None,
     ) -> StreamResponse:
         payload = {}
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
         if sort is not None:
-            payload["sort"] = sort
+            payload["sort"] = sort  # type: ignore
         if options is not None:
             payload.update(cast(dict, options))
         return await self.post("segments/query", data=payload)
@@ -621,7 +621,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
         if sort is not None:
-            payload["sort"] = sort
+            payload["sort"] = sort  # type: ignore
         if options is not None:
             payload.update(cast(dict, options))
         return await self.post(f"segments/{segment_id}/targets/query", data=payload)
@@ -653,13 +653,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         self,
         filter_conditions: Optional[Dict[str, Any]] = None,
         sort: Optional[List[SortParam]] = None,
-        options: QueryCampaignsOptions = None
+        options: QueryCampaignsOptions = None,
     ) -> StreamResponse:
         payload = {}
         if filter_conditions is not None:
             payload["filter"] = filter_conditions
         if sort is not None:
-            payload["sort"] = sort
+            payload["sort"] = sort  # type: ignore
         if options is not None:
             payload.update(cast(dict, options))
         return await self.post("campaigns/query", data=payload)

@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, Optional, TypedDict
 
-from stream_chat.types.base import Pager, SortParam
+from stream_chat.types.base import Pager
 
 
 class SegmentType(Enum):

@@ -99,15 +99,22 @@ class TestSegment:
         segment_id = created["segment"]["id"]
 
         target_ids = [str(uuid.uuid4()) for _ in range(10)]
-        target_added = await client.add_segment_targets(segment_id=segment_id, target_ids=target_ids)
+        target_added = await client.add_segment_targets(
+            segment_id=segment_id, target_ids=target_ids
+        )
         assert target_added.is_ok()
 
-        query_segments = await client.query_segments(filter_conditions={"id": {"$eq": segment_id}})
+        query_segments = await client.query_segments(
+            filter_conditions={"id": {"$eq": segment_id}},
+            sort=[{"field": "created_at", "direction": SortOrder.DESC}],
+        )
         assert query_segments.is_ok()
         assert "segments" in query_segments
         assert len(query_segments["segments"]) == 1
 
-        target_deleted = await client.remove_segment_targets(segment_id=segment_id, target_ids=target_ids)
+        target_deleted = await client.remove_segment_targets(
+            segment_id=segment_id, target_ids=target_ids
+        )
         assert target_deleted.is_ok()
 
         deleted = await client.delete_segment(segment_id=segment_id)

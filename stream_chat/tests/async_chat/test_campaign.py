@@ -4,6 +4,7 @@ from typing import Dict
 import pytest
 
 from stream_chat import StreamChatAsync
+from stream_chat.types.base import SortOrder
 from stream_chat.types.segment import SegmentType
 
 
@@ -140,7 +141,11 @@ class TestCampaign:
                 "id": {
                     "$eq": campaign_id,
                 }
-            }
+            },
+            sort=[{"field": "created_at", "direction": SortOrder.DESC}],
+            options={
+                "limit": 10,
+            },
         )
         assert query_campaigns.is_ok()
         assert "campaigns" in query_campaigns

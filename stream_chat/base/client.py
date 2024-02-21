@@ -970,7 +970,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def query_segments(
         self,
-        filter_conditions: Optional[Dict[str, Any]] = None,
+        filter_conditions: Optional[Dict] = None,
         sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -1019,7 +1019,7 @@ class StreamChatInterface(abc.ABC):
     def query_segment_targets(
         self,
         segment_id: str,
-        filter_conditions: Optional[Dict[str, Any]] = None,
+        filter_conditions: Optional[Dict] = None,
         sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
@@ -1070,9 +1070,9 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def query_campaigns(
         self,
-        filter_conditions: Optional[Dict[str, Any]] = None,
+        filter_conditions: Optional[Dict] = None,
         sort: Optional[List[SortParam]] = None,
-        options: Optional[QueryCampaignsOptions] = None
+        options: Optional[QueryCampaignsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query campaigns

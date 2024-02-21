@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
 from stream_chat.base.segment import SegmentInterface
 from stream_chat.types.base import SortParam
