@@ -1021,7 +1021,7 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete_segment_targets(
+    def remove_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """

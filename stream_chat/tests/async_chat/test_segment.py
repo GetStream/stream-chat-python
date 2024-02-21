@@ -81,7 +81,7 @@ class TestSegment:
         assert "next" in query_targets_2
         assert len(query_targets_2["targets"]) == 3
 
-        target_deleted = await segment.delete_targets(target_ids=target_ids)
+        target_deleted = await segment.remove_targets(target_ids=target_ids)
         assert target_deleted.is_ok()
 
         deleted = await segment.delete()

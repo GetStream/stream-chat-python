@@ -605,7 +605,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     ) -> StreamResponse:
         return await self.post(f"segments/{segment_id}/targets/query", data=options)
 
-    async def delete_segment_targets(
+    async def remove_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
         return await self.post(

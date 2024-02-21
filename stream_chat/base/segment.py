@@ -62,7 +62,7 @@ class SegmentInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete_targets(
+    def remove_targets(
         self, target_ids: List[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass

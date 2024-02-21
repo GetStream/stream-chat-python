@@ -37,4 +37,4 @@ class QuerySegmentsOptions(Pager, total=False):
 
 
 class QuerySegmentTargetsOptions(Pager, total=False):
-    pass
+    sort: Optional[List[SortParam]]

@@ -1,5 +1,4 @@
-import datetime
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict
 
 from stream_chat.types.base import Pager, SortParam
 
@@ -64,7 +63,6 @@ class CampaignData(TypedDict, total=False):
     name: Optional[str]
     description: Optional[str]
     skip_push: Optional[bool]
-    scheduled_for: Optional[Union[str, datetime.datetime]]
 
 
 class QueryCampaignsOptions(Pager, total=False):

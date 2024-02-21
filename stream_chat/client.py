@@ -580,7 +580,7 @@ class StreamChat(StreamChatInterface):
     ) -> StreamResponse:
         return self.post(f"segments/{segment_id}/targets/query", data=options)
 
-    def delete_segment_targets(
+    def remove_segment_targets(
         self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
         return self.post(

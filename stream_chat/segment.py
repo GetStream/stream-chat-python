@@ -49,7 +49,7 @@ class Segment(SegmentInterface):
             segment_id=self.segment_id, options=options
         )
 
-    def delete_targets(self, target_ids: list) -> StreamResponse:
-        return self.client.delete_segment_targets(  # type: ignore
+    def remove_targets(self, target_ids: list) -> StreamResponse:
+        return self.client.remove_segment_targets(  # type: ignore
             segment_id=self.segment_id, target_ids=target_ids
         )
