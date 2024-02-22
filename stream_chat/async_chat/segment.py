@@ -7,7 +7,6 @@ from stream_chat.types.stream_response import StreamResponse
 
 
 class Segment(SegmentInterface):
-
     async def create(
         self, segment_id: Optional[str] = None, data: Optional[SegmentData] = None
     ) -> StreamResponse:

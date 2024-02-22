@@ -7,7 +7,6 @@ from stream_chat.types.stream_response import StreamResponse
 
 
 class Campaign(CampaignInterface):
-
     def create(
         self, campaign_id: Optional[str] = None, data: Optional[CampaignData] = None
     ) -> StreamResponse:
