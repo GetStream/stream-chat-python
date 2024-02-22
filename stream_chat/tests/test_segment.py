@@ -8,6 +8,7 @@ from stream_chat.types.segment import SegmentType
 
 
 @pytest.mark.incremental
+@pytest.mark.skip(reason="endpoints are not available in the API yet.")
 class TestSegment:
     def test_segment_crud(self, client: StreamChat):
         segment = client.segment(

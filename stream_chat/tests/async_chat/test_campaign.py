@@ -9,6 +9,7 @@ from stream_chat.types.segment import SegmentType
 
 
 @pytest.mark.incremental
+@pytest.mark.skip(reason="endpoints are not available in the API yet.")
 class TestCampaign:
     async def test_campaign_crud(self, client: StreamChatAsync, random_user: Dict):
         segment = await client.create_segment(segment_type=SegmentType.USER)
