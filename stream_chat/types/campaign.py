@@ -1,4 +1,10 @@
-from typing import Dict, List, Optional, TypedDict
+import sys
+from typing import Dict, List, Optional
+
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
 from stream_chat.types.base import Pager
 
