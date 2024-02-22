@@ -102,7 +102,8 @@ async def command(client: StreamChatAsync):
     await client.delete_command(response["command"]["name"])
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
+@pytest.mark.asyncio
 async def fellowship_of_the_ring(client: StreamChatAsync):
     members: List[Dict] = [
         {"id": "frodo-baggins", "name": "Frodo Baggins", "race": "Hobbit", "age": 50},
