@@ -2,15 +2,25 @@ import datetime
 import json
 import sys
 import warnings
-from typing import Any, Callable, Dict, Iterable, List, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+
+from stream_chat.campaign import Campaign
+from stream_chat.segment import Segment
+from stream_chat.types.base import SortParam
+from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.segment import (
+    QuerySegmentsOptions,
+    QuerySegmentTargetsOptions,
+    SegmentData,
+    SegmentType,
+)
 
 if sys.version_info >= (3, 8):
     from typing import Literal
 else:
     from typing_extensions import Literal
-
 
 import requests
 
@@ -518,48 +528,140 @@ class StreamChat(StreamChatInterface):
     def list_roles(self) -> StreamResponse:
         return self.get("roles")
 
-    def create_segment(self, segment: Dict) -> StreamResponse:
-        return self.post("segments", data={"segment": segment})
+    def segment(  # type: ignore
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str] = None,
+        data: Optional[SegmentData] = None,
+    ) -> Segment:
+        return Segment(
+            client=self, segment_type=segment_type, segment_id=segment_id, data=data
+        )
 
-    def query_segments(self, **params: Any) -> StreamResponse:
-        return self.get("segments", params={"payload": json.dumps(params)})
+    def create_segment(
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str] = None,
+        data: Optional[SegmentData] = None,
+    ) -> StreamResponse:
+        payload = {"type": segment_type.value}
+        if segment_id is not None:
+            payload["id"] = segment_id
+        if data is not None:
+            payload.update(cast(dict, data))
+        return self.post("segments", data=payload)
 
-    def update_segment(self, segment_id: str, data: Dict) -> StreamResponse:
-        return self.put(f"segments/{segment_id}", data={"segment": data})
+    def get_segment(self, segment_id: str) -> StreamResponse:
+        return self.get(f"segments/{segment_id}")
+
+    def query_segments(
+        self,
+        filter_conditions: Optional[Dict] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QuerySegmentsOptions] = None,
+    ) -> StreamResponse:
+        payload = {}
+        if filter_conditions is not None:
+            payload["filter"] = filter_conditions
+        if sort is not None:
+            payload["sort"] = sort  # type: ignore
+        if options is not None:
+            payload.update(cast(dict, options))
+        return self.post("segments/query", data=payload)
+
+    def update_segment(self, segment_id: str, data: SegmentData) -> StreamResponse:
+        return self.put(f"segments/{segment_id}", data=data)
 
     def delete_segment(self, segment_id: str) -> StreamResponse:
         return self.delete(f"segments/{segment_id}")
 
-    def create_campaign(self, campaign: Dict) -> StreamResponse:
-        return self.post("campaigns", data={"campaign": campaign})
+    def segment_target_exists(self, segment_id: str, target_id: str) -> StreamResponse:
+        return self.get(f"segments/{segment_id}/target/{target_id}")
 
-    def query_campaigns(self, **params: Any) -> StreamResponse:
-        return self.get("campaigns", params={"payload": json.dumps(params)})
-
-    def update_campaign(self, campaign_id: str, data: Dict) -> StreamResponse:
-        return self.put(f"campaigns/{campaign_id}", data={"campaign": data})
-
-    def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
-        return self.delete(f"campaigns/{campaign_id}", params=options)
-
-    def schedule_campaign(
-        self, campaign_id: str, scheduled_for: int = None
+    def add_segment_targets(
+        self, segment_id: str, target_ids: List[str]
     ) -> StreamResponse:
-        return self.patch(
-            f"campaigns/{campaign_id}/schedule", data={"scheduled_for": scheduled_for}
+        return self.post(
+            f"segments/{segment_id}/addtargets", data={"target_ids": target_ids}
         )
 
-    def stop_campaign(self, campaign_id: str) -> StreamResponse:
-        return self.patch(f"campaigns/{campaign_id}/stop")
+    def query_segment_targets(
+        self,
+        segment_id: str,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QuerySegmentTargetsOptions] = None,
+    ) -> StreamResponse:
+        payload: Dict[str, Union[Dict[str, Any], List[SortParam]]] = {}
+        if filter_conditions is not None:
+            payload["filter"] = filter_conditions
+        if sort is not None:
+            payload["sort"] = sort
+        if options is not None:
+            payload.update(cast(dict, options))
+        return self.post(f"segments/{segment_id}/targets/query", data=payload)
 
-    def resume_campaign(self, campaign_id: str) -> StreamResponse:
-        return self.patch(f"campaigns/{campaign_id}/resume")
+    def remove_segment_targets(
+        self, segment_id: str, target_ids: List[str]
+    ) -> StreamResponse:
+        return self.post(
+            f"segments/{segment_id}/deletetargets", data={"target_ids": target_ids}
+        )
+
+    def campaign(  # type: ignore
+        self, campaign_id: Optional[str] = None, data: CampaignData = None
+    ) -> Campaign:
+        return Campaign(client=self, campaign_id=campaign_id, data=data)
+
+    def create_campaign(
+        self, campaign_id: Optional[str] = None, data: CampaignData = None
+    ) -> StreamResponse:
+        payload = {"id": campaign_id}
+        if data is not None:
+            payload.update(cast(dict, data))
+        return self.post("campaigns", data=payload)
+
+    def get_campaign(self, campaign_id: str) -> StreamResponse:
+        return self.get(f"campaigns/{campaign_id}")
+
+    def query_campaigns(
+        self,
+        filter_conditions: Optional[Dict[str, Any]] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryCampaignsOptions] = None,
+    ) -> StreamResponse:
+        payload = {}
+        if filter_conditions is not None:
+            payload["filter"] = filter_conditions
+        if sort is not None:
+            payload["sort"] = sort  # type: ignore
+        if options is not None:
+            payload.update(cast(dict, options))
+        return self.post("campaigns/query", data=payload)
+
+    def update_campaign(self, campaign_id: str, data: CampaignData) -> StreamResponse:
+        return self.put(f"campaigns/{campaign_id}", data=data)
+
+    def delete_campaign(self, campaign_id: str, **options: Any) -> StreamResponse:
+        return self.delete(f"campaigns/{campaign_id}", options)
+
+    def start_campaign(
+        self,
+        campaign_id: str,
+        scheduled_for: Optional[Union[str, datetime.datetime]] = None,
+    ) -> StreamResponse:
+        payload = {}
+        if scheduled_for is not None:
+            if isinstance(scheduled_for, datetime.datetime):
+                scheduled_for = scheduled_for.isoformat()
+            payload["scheduled_for"] = scheduled_for
+        return self.post(f"campaigns/{campaign_id}/start", data=payload)
+
+    def stop_campaign(self, campaign_id: str) -> StreamResponse:
+        return self.post(f"campaigns/{campaign_id}/stop")
 
     def test_campaign(self, campaign_id: str, users: Iterable[str]) -> StreamResponse:
         return self.post(f"campaigns/{campaign_id}/test", data={"users": users})
-
-    def query_recipients(self, **params: Any) -> StreamResponse:
-        return self.get("recipients", params={"payload": json.dumps(params)})
 
     def revoke_tokens(self, since: Union[str, datetime.datetime]) -> StreamResponse:
         if isinstance(since, datetime.datetime):

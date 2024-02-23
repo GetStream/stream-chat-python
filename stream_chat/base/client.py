@@ -5,7 +5,16 @@ import hashlib
 import hmac
 import os
 import sys
-from typing import Any, Awaitable, Dict, Iterable, List, TypeVar, Union
+from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Union
+
+from stream_chat.types.base import SortParam
+from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.segment import (
+    QuerySegmentsOptions,
+    QuerySegmentTargetsOptions,
+    SegmentData,
+    SegmentType,
+)
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -17,6 +26,10 @@ import jwt
 from stream_chat.types.stream_response import StreamResponse
 
 TChannel = TypeVar("TChannel")
+
+TSegment = TypeVar("TSegment")
+
+TCampaign = TypeVar("TCampaign")
 
 
 class StreamChatInterface(abc.ABC):
@@ -585,7 +598,6 @@ class StreamChatInterface(abc.ABC):
     ) -> TChannel:  # type: ignore[type-var]
         """
         Creates a channel object
-
         :param channel_type: the channel type
         :param channel_id: the id of the channel
         :param data: additional data, ie: {"members":[id1, id2, ...]}
@@ -919,8 +931,27 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def segment(
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str],
+        data: Optional[SegmentData],
+    ) -> TSegment:  # type: ignore[type-var]
+        """
+        Creates a channel object
+        :param segment_type: the segment type
+        :param segment_id: the id of the segment
+        :param data: the segment data, ie: {"members":[id1, id2, ...]}
+        :return: Segment
+        """
+        pass
+
+    @abc.abstractmethod
     def create_segment(
-        self, segment: Dict
+        self,
+        segment_type: SegmentType,
+        segment_id: Optional[str],
+        data: Optional[SegmentData] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a segment
@@ -928,8 +959,20 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def get_segment(
+        self, segment_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Query segments
+        """
+        pass
+
+    @abc.abstractmethod
     def query_segments(
-        self, **params: Any
+        self,
+        filter_conditions: Optional[Dict] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QuerySegmentsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query segments
@@ -938,7 +981,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_segment(
-        self, segment_id: str, data: Dict
+        self, segment_id: str, data: SegmentData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update a segment by id
@@ -955,8 +998,69 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def segment_target_exists(
+        self, segment_id: str, target_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Check if a target exists in a segment
+        """
+        pass
+
+    @abc.abstractmethod
+    def add_segment_targets(
+        self, segment_id: str, target_ids: List[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Add targets to a segment
+        """
+        pass
+
+    @abc.abstractmethod
+    def query_segment_targets(
+        self,
+        segment_id: str,
+        filter_conditions: Optional[Dict] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QuerySegmentTargetsOptions] = None,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Query targets in a segment
+        """
+        pass
+
+    @abc.abstractmethod
+    def remove_segment_targets(
+        self, segment_id: str, target_ids: List[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Delete targets from a segment
+        """
+        pass
+
+    @abc.abstractmethod
+    def campaign(
+        self, campaign_id: Optional[str], data: Optional[CampaignData]
+    ) -> TCampaign:  # type: ignore[type-var]
+        """
+        Creates a campaign object
+        :param campaign_id: the campaign id
+        :param data: campaign_id data
+        :return: Campaign
+        """
+        pass
+
+    @abc.abstractmethod
     def create_campaign(
-        self, campaign: Dict
+        self, campaign_id: Optional[str], data: Optional[CampaignData]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Create a campaign
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_campaign(
+        self, campaign_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a campaign
@@ -965,7 +1069,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_campaigns(
-        self, **params: Any
+        self,
+        filter_conditions: Optional[Dict] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryCampaignsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Query campaigns
@@ -974,7 +1081,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_campaign(
-        self, campaign_id: str, data: Dict
+        self, campaign_id: str, data: CampaignData
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update a campaign
@@ -991,11 +1098,13 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def schedule_campaign(
-        self, campaign_id: str, scheduled_for: int = None
+    def start_campaign(
+        self,
+        campaign_id: str,
+        scheduled_for: Optional[Union[str, datetime.datetime]] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Schedule a campaign at given time
+        Start a campaign at given time or now if not specified
         """
         pass
 
@@ -1004,16 +1113,7 @@ class StreamChatInterface(abc.ABC):
         self, campaign_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Stop a in progress campaign
-        """
-        pass
-
-    @abc.abstractmethod
-    def resume_campaign(
-        self, campaign_id: str
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Resume a stopped campaign
+        Stop an in progress campaign
         """
         pass
 
@@ -1023,15 +1123,6 @@ class StreamChatInterface(abc.ABC):
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Trigger a test send of the given campaing to given users
-        """
-        pass
-
-    @abc.abstractmethod
-    def query_recipients(
-        self, **params: Any
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
-        """
-        Query recipients
         """
         pass
 

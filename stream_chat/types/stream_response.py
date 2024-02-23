@@ -65,3 +65,7 @@ class StreamResponse(dict):
     def status_code(self) -> int:
         """Returns the HTTP status code of the response."""
         return self.__status_code
+
+    def is_ok(self) -> bool:
+        """Returns True if the status code is in the 200 range."""
+        return 200 <= self.__status_code < 300
