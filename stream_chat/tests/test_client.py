@@ -790,8 +790,12 @@ class TestClient:
         assert len(response["channel_type"]) == 1
 
         # test threads unread counts
-        channel.send_message({"parent_id": msg_id, "text": "helloworld"}, random_user["id"])
-        channel.send_message({"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
+        channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, random_user["id"]
+        )
+        channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
         response = client.unread_counts(random_user["id"])
         assert "total_unread_threads_count" in response
         assert "threads" in response
@@ -813,8 +817,12 @@ class TestClient:
             channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user_id)
 
         # test threads unread counts
-        channel.send_message({"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
+        channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
         response = client.unread_counts_batch([x["id"] for x in random_users])
         for user_id in [x["id"] for x in random_users]:
             assert user_id in response["counts_by_user"]
-            assert response["counts_by_user"][user_id]["total_unread_threads_count"] == 1
+            assert (
+                response["counts_by_user"][user_id]["total_unread_threads_count"] == 1
+            )
