@@ -467,7 +467,7 @@ class StreamChat(StreamChatInterface):
         return self._parse_response(response)
 
     def create_blocklist(
-        self, name: str, words: Iterable[str], type: str = "regular"
+        self, name: str, words: Iterable[str], type: str = "word"
     ) -> StreamResponse:
         return self.post(
             "blocklists", data={"name": name, "words": words, "type": type}

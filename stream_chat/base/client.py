@@ -765,7 +765,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def create_blocklist(
-        self, name: str, words: Iterable[str], type: str = "regular"
+        self, name: str, words: Iterable[str], type: str = "word"
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a blocklist
