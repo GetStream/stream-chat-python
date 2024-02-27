@@ -609,7 +609,7 @@ class StreamChat(StreamChatInterface):
         )
 
     def campaign(  # type: ignore
-        self, campaign_id: Optional[str] = None, data: CampaignData = None
+        self, campaign_id: Optional[str] = None, data: Optional[CampaignData] = None
     ) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)
 
