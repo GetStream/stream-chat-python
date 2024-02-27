@@ -92,8 +92,11 @@ class TestCampaign:
 
         now = datetime.datetime.now(datetime.timezone.utc)
         one_hour_later = now + datetime.timedelta(hours=1)
+        two_hours_later = now + datetime.timedelta(hours=2)
 
-        started = await campaign.start(scheduled_for=one_hour_later)
+        started = await campaign.start(
+            scheduled_for=one_hour_later, stop_at=two_hours_later
+        )
         assert started.is_ok()
         assert "campaign" in started
         assert "id" in started["campaign"]

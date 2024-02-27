@@ -40,7 +40,9 @@ class CampaignInterface(abc.ABC):
 
     @abc.abstractmethod
     def start(
-        self, scheduled_for: Optional[Union[str, datetime.datetime]] = None
+        self,
+        scheduled_for: Optional[Union[str, datetime.datetime]] = None,
+        stop_at: Optional[Union[str, datetime.datetime]] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 

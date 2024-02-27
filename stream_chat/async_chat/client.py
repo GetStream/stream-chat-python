@@ -676,12 +676,17 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         self,
         campaign_id: str,
         scheduled_for: Optional[Union[str, datetime.datetime]] = None,
+        stop_at: Optional[Union[str, datetime.datetime]] = None,
     ) -> StreamResponse:
         payload = {}
         if scheduled_for is not None:
             if isinstance(scheduled_for, datetime.datetime):
                 scheduled_for = scheduled_for.isoformat()
             payload["scheduled_for"] = scheduled_for
+        if stop_at is not None:
+            if isinstance(stop_at, datetime.datetime):
+                stop_at = stop_at.isoformat()
+            payload["stop_at"] = stop_at
         return await self.post(f"campaigns/{campaign_id}/start", data=payload)
 
     async def stop_campaign(self, campaign_id: str) -> StreamResponse:
