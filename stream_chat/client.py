@@ -467,7 +467,7 @@ class StreamChat(StreamChatInterface):
         return self._parse_response(response)
 
     def create_blocklist(
-        self, name: str, words: Iterable[str], type: str = "regular"
+        self, name: str, words: Iterable[str], type: str = "word"
     ) -> StreamResponse:
         return self.post(
             "blocklists", data={"name": name, "words": words, "type": type}
@@ -609,7 +609,7 @@ class StreamChat(StreamChatInterface):
         )
 
     def campaign(  # type: ignore
-        self, campaign_id: Optional[str] = None, data: CampaignData = None
+        self, campaign_id: Optional[str] = None, data: Optional[CampaignData] = None
     ) -> Campaign:
         return Campaign(client=self, campaign_id=campaign_id, data=data)
 
@@ -649,12 +649,17 @@ class StreamChat(StreamChatInterface):
         self,
         campaign_id: str,
         scheduled_for: Optional[Union[str, datetime.datetime]] = None,
+        stop_at: Optional[Union[str, datetime.datetime]] = None,
     ) -> StreamResponse:
         payload = {}
         if scheduled_for is not None:
             if isinstance(scheduled_for, datetime.datetime):
                 scheduled_for = scheduled_for.isoformat()
             payload["scheduled_for"] = scheduled_for
+        if stop_at is not None:
+            if isinstance(stop_at, datetime.datetime):
+                stop_at = stop_at.isoformat()
+            payload["stop_at"] = stop_at
         return self.post(f"campaigns/{campaign_id}/start", data=payload)
 
     def stop_campaign(self, campaign_id: str) -> StreamResponse:

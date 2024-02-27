@@ -765,7 +765,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def create_blocklist(
-        self, name: str, words: Iterable[str], type: str = "regular"
+        self, name: str, words: Iterable[str], type: str = "word"
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Create a blocklist
@@ -1102,6 +1102,7 @@ class StreamChatInterface(abc.ABC):
         self,
         campaign_id: str,
         scheduled_for: Optional[Union[str, datetime.datetime]] = None,
+        stop_at: Optional[Union[str, datetime.datetime]] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Start a campaign at given time or now if not specified

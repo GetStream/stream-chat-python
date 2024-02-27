@@ -36,10 +36,12 @@ class Campaign(CampaignInterface):
         )
 
     def start(
-        self, scheduled_for: Optional[Union[str, datetime.datetime]] = None
+        self,
+        scheduled_for: Optional[Union[str, datetime.datetime]] = None,
+        stop_at: Optional[Union[str, datetime.datetime]] = None,
     ) -> StreamResponse:
         return self.client.start_campaign(  # type: ignore
-            campaign_id=self.campaign_id, scheduled_for=scheduled_for
+            campaign_id=self.campaign_id, scheduled_for=scheduled_for, stop_at=stop_at
         )
 
     def stop(self) -> StreamResponse:

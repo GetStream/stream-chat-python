@@ -31,11 +31,13 @@ class ChannelTemplate(TypedDict, total=False):
     Parameters:
         type: The type of channel.
         id: The ID of the channel.
+        members: List of member IDs.
         custom: Custom data.
     """
 
     type: str
-    id: str
+    id: Optional[str]
+    members: Optional[List[str]]
     custom: Optional[Dict]
 
 

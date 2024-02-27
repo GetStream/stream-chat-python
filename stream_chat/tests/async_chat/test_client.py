@@ -580,7 +580,7 @@ class TestClient:
         assert len(response["channels"][0]["members"]) == 9
 
     async def test_create_blocklist(self, client: StreamChatAsync):
-        await client.create_blocklist(name="Foo", words=["fudge", "heck"])
+        await client.create_blocklist(name="Foo", words=["fudge", "heck"], type="word")
 
     async def test_list_blocklists(self, client: StreamChatAsync):
         response = await client.list_blocklists()
