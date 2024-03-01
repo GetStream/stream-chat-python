@@ -40,7 +40,7 @@ def client():
 @pytest.fixture(scope="function")
 def random_user(client: StreamChat):
     user = {"id": str(uuid.uuid4())}
-    response = client.update_user(user)
+    response = client.upsert_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
     yield user
@@ -50,7 +50,7 @@ def random_user(client: StreamChat):
 @pytest.fixture(scope="function")
 def server_user(client: StreamChat):
     user = {"id": str(uuid.uuid4())}
-    response = client.update_user(user)
+    response = client.upsert_user(user)
     assert "users" in response
     assert user["id"] in response["users"]
     yield user
@@ -62,7 +62,7 @@ def random_users(client: StreamChat):
     user1 = {"id": str(uuid.uuid4())}
     user2 = {"id": str(uuid.uuid4())}
     user3 = {"id": str(uuid.uuid4())}
-    client.update_users([user1, user2, user3])
+    client.upsert_users([user1, user2, user3])
     yield [user1, user2, user3]
     hard_delete_users(client, [user1["id"], user2["id"], user3["id"]])
 
@@ -111,7 +111,7 @@ def fellowship_of_the_ring(client: StreamChat):
         },
         {"id": "peregrin-took", "name": "Peregrin Took", "race": "Hobbit", "age": 28},
     ]
-    client.update_users(members)
+    client.upsert_users(members)
     channel = client.channel(
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
     )

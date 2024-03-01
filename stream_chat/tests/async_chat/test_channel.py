@@ -276,7 +276,7 @@ class TestChannel:
 
     async def test_invites(self, client: StreamChatAsync, channel: Channel):
         members = ["john", "paul", "george", "pete", "ringo", "eric"]
-        await client.update_users([{"id": m} for m in members])
+        await client.upsert_users([{"id": m} for m in members])
         channel = client.channel(
             "team",
             "beatles-" + str(uuid.uuid4()),
@@ -305,7 +305,7 @@ class TestChannel:
 
     async def test_query_members(self, client: StreamChatAsync, channel: Channel):
         members = ["paul", "george", "john", "jessica", "john2"]
-        await client.update_users([{"id": m, "name": m} for m in members])
+        await client.upsert_users([{"id": m, "name": m} for m in members])
         for member in members:
             await channel.add_members([member])
 

@@ -137,19 +137,19 @@ class TestClient:
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
-        response = client.update_user(user)
+        response = client.upsert_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
 
     def test_update_users(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
-        response = client.update_users([user])
+        response = client.upsert_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
 
     def test_update_user_partial(self, client: StreamChat):
         user_id = str(uuid.uuid4())
-        client.update_user({"id": user_id, "field": "value"})
+        client.upsert_user({"id": user_id, "field": "value"})
 
         response = client.update_user_partial(
             {"id": user_id, "set": {"field": "updated"}}
@@ -775,3 +775,54 @@ class TestClient:
 
         list_resp = client.list_imports({"limit": 1})
         assert len(list_resp["import_tasks"]) == 1
+
+    def test_unread_counts(self, client: StreamChat, channel, random_user: Dict):
+        channel.add_members([random_user["id"]])
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
+        response = client.unread_counts(random_user["id"])
+        assert "total_unread_count" in response
+        assert "channels" in response
+        assert "channel_type" in response
+        assert response["total_unread_count"] == 1
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel_id"] == channel.cid
+        assert len(response["channel_type"]) == 1
+
+        # test threads unread counts
+        channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, random_user["id"]
+        )
+        channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
+        response = client.unread_counts(random_user["id"])
+        assert "total_unread_threads_count" in response
+        assert "threads" in response
+        assert response["total_unread_threads_count"] == 1
+        assert len(response["threads"]) == 1
+        assert response["threads"][0]["parent_message_id"] == msg_id
+
+    def test_unread_counts_batch(self, client: StreamChat, channel, random_users: Dict):
+        channel.add_members([x["id"] for x in random_users])
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
+        response = client.unread_counts_batch([x["id"] for x in random_users])
+        assert "counts_by_user" in response
+        for user_id in [x["id"] for x in random_users]:
+            assert user_id in response["counts_by_user"]
+            assert response["counts_by_user"][user_id]["total_unread_count"] == 1
+
+            # send this message to add user to the thread
+            channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user_id)
+
+        # test threads unread counts
+        channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
+        response = client.unread_counts_batch([x["id"] for x in random_users])
+        for user_id in [x["id"] for x in random_users]:
+            assert user_id in response["counts_by_user"]
+            assert (
+                response["counts_by_user"][user_id]["total_unread_threads_count"] == 1
+            )

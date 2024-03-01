@@ -136,7 +136,7 @@ class TestClient:
 
     async def test_update_user(self, client: StreamChatAsync):
         user = {"id": str(uuid.uuid4())}
-        response = await client.update_user(user)
+        response = await client.upsert_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
 
@@ -148,7 +148,7 @@ class TestClient:
 
     async def test_update_user_partial(self, client: StreamChatAsync):
         user_id = str(uuid.uuid4())
-        await client.update_user({"id": user_id, "field": "value"})
+        await client.upsert_user({"id": user_id, "field": "value"})
 
         response = await client.update_user_partial(
             {"id": user_id, "set": {"field": "updated"}}
@@ -785,7 +785,7 @@ class TestClient:
             headers={"Content-Type": "application/json"},
         ) as resp:
             assert resp.status == 200
-        sess.close()
+        await sess.close()
 
         create_resp = await client.create_import(url_resp["path"], "upsert")
         assert create_resp["import_task"]["id"]
@@ -795,3 +795,64 @@ class TestClient:
 
         list_resp = await client.list_imports({"limit": 1})
         assert len(list_resp["import_tasks"]) == 1
+
+    async def test_unread_counts(
+        self, client: StreamChatAsync, channel, random_user: Dict
+    ):
+        await channel.add_members([random_user["id"]])
+        msg_id = str(uuid.uuid4())
+        await channel.send_message(
+            {"id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
+        response = await client.unread_counts(random_user["id"])
+        assert "total_unread_count" in response
+        assert "channels" in response
+        assert "channel_type" in response
+        assert response["total_unread_count"] == 1
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel_id"] == channel.cid
+        assert len(response["channel_type"]) == 1
+
+        # test threads unread counts
+        await channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, random_user["id"]
+        )
+        await channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
+        response = await client.unread_counts(random_user["id"])
+        assert "total_unread_threads_count" in response
+        assert "threads" in response
+        assert response["total_unread_threads_count"] == 1
+        assert len(response["threads"]) == 1
+        assert response["threads"][0]["parent_message_id"] == msg_id
+
+    async def test_unread_counts_batch(
+        self, client: StreamChatAsync, channel, random_users: Dict
+    ):
+        await channel.add_members([x["id"] for x in random_users])
+        msg_id = str(uuid.uuid4())
+        await channel.send_message(
+            {"id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
+        response = await client.unread_counts_batch([x["id"] for x in random_users])
+        assert "counts_by_user" in response
+        for user_id in [x["id"] for x in random_users]:
+            assert user_id in response["counts_by_user"]
+            assert response["counts_by_user"][user_id]["total_unread_count"] == 1
+
+            # send this message to add user to the thread
+            await channel.send_message(
+                {"parent_id": msg_id, "text": "helloworld"}, user_id
+            )
+
+        # test threads unread counts
+        await channel.send_message(
+            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
+        )
+        response = await client.unread_counts_batch([x["id"] for x in random_users])
+        for user_id in [x["id"] for x in random_users]:
+            assert user_id in response["counts_by_user"]
+            assert (
+                response["counts_by_user"][user_id]["total_unread_threads_count"] == 1
+            )

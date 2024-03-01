@@ -276,7 +276,7 @@ class TestChannel:
 
     def test_invites(self, client: StreamChat, channel: Channel):
         members = ["john", "paul", "george", "pete", "ringo", "eric"]
-        client.update_users([{"id": m} for m in members])
+        client.upsert_users([{"id": m} for m in members])
         channel = client.channel(
             "team",
             "beatles-" + str(uuid.uuid4()),
@@ -305,7 +305,7 @@ class TestChannel:
 
     def test_query_members(self, client: StreamChat, channel: Channel):
         members = ["paul", "george", "john", "jessica", "john2"]
-        client.update_users([{"id": m, "name": m} for m in members])
+        client.upsert_users([{"id": m, "name": m} for m in members])
         for member in members:
             channel.add_members([member])
 
