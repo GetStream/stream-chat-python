@@ -516,10 +516,11 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def get_message(
-        self, message_id: str
+        self, message_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Returns a single message.
+        If the msg is deleted and you want to retrieve it, you can pass the show_deleted_message.
         """
         pass
 

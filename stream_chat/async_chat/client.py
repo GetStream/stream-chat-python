@@ -332,8 +332,8 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def delete_message(self, message_id: str, **options: Any) -> StreamResponse:
         return await self.delete(f"messages/{message_id}", options)
 
-    async def get_message(self, message_id: str) -> StreamResponse:
-        return await self.get(f"messages/{message_id}")
+    async def get_message(self, message_id: str, **options: Any) -> StreamResponse:
+        return await self.get(f"messages/{message_id}", options)
 
     async def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
