@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.14.0](https://github.com/GetStream/stream-chat-python/compare/v4.13.0...v4.14.0) (2024-03-08)
+
+
+### Features
+
+* add support for show_deleted_message in getMessage ([#161](https://github.com/GetStream/stream-chat-python/issues/161)) ([e42aa94](https://github.com/GetStream/stream-chat-python/commit/e42aa94fe8aac489a33f288479c08e5f31d7e6d8))
+
 ## [4.13.0](https://github.com/GetStream/stream-chat-python/compare/v4.12.1...v4.13.0) (2024-03-01)
 
 ### [4.12.1](https://github.com/GetStream/stream-chat-python/compare/v4.12.0...v4.12.1) (2024-02-27)
