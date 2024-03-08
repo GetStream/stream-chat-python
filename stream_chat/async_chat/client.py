@@ -333,6 +333,11 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def delete_message(self, message_id: str, **options: Any) -> StreamResponse:
         return await self.delete(f"messages/{message_id}", options)
 
+    async def undelete_message(self, message_id: str, user_id: str) -> StreamResponse:
+        return await self.post(
+            f"messages/{message_id}/undelete", data={"undeleted_by": user_id}
+        )
+
     async def get_message(self, message_id: str, **options: Any) -> StreamResponse:
         return await self.get(f"messages/{message_id}", options)
 

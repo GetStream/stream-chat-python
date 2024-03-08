@@ -516,6 +516,15 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def undelete_message(
+        self, message_id: str, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Undeletes a message.
+        """
+        pass
+
+    @abc.abstractmethod
     def get_message(
         self, message_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
