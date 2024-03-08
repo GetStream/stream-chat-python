@@ -321,6 +321,9 @@ class StreamChat(StreamChatInterface):
     def delete_message(self, message_id: str, **options: Any) -> StreamResponse:
         return self.delete(f"messages/{message_id}", options)
 
+    def undelete_message(self, message_id: str, user_id: str) -> StreamResponse:
+        return self.post(f"messages/{message_id}/undelete", data={"undeleted_by": user_id})
+
     def get_message(self, message_id: str) -> StreamResponse:
         return self.get(f"messages/{message_id}")
 
