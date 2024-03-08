@@ -321,8 +321,8 @@ class StreamChat(StreamChatInterface):
     def delete_message(self, message_id: str, **options: Any) -> StreamResponse:
         return self.delete(f"messages/{message_id}", options)
 
-    def get_message(self, message_id: str) -> StreamResponse:
-        return self.get(f"messages/{message_id}")
+    def get_message(self, message_id: str, **options: Any) -> StreamResponse:
+        return self.get(f"messages/{message_id}", options)
 
     def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any

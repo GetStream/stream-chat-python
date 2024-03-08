@@ -78,6 +78,8 @@ class TestClient:
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id)
+        msg = client.get_message(msg_id, show_deleted_message=True)
+        assert msg["message"]["text"] == "helloworld"
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         message = client.get_message(msg_id)
