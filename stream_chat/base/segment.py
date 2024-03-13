@@ -7,6 +7,7 @@ from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
     SegmentType,
+    SegmentUpdatableFields,
 )
 from stream_chat.types.stream_response import StreamResponse
 
@@ -36,7 +37,7 @@ class SegmentInterface(abc.ABC):
 
     @abc.abstractmethod
     def update(
-        self, data: SegmentData
+        self, data: SegmentUpdatableFields
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
