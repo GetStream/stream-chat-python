@@ -15,6 +15,7 @@ from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
     SegmentType,
+    SegmentUpdatableFields,
 )
 
 if sys.version_info >= (3, 8):
@@ -569,7 +570,9 @@ class StreamChat(StreamChatInterface):
             payload.update(cast(dict, options))
         return self.post("segments/query", data=payload)
 
-    def update_segment(self, segment_id: str, data: SegmentData) -> StreamResponse:
+    def update_segment(
+        self, segment_id: str, data: SegmentUpdatableFields
+    ) -> StreamResponse:
         return self.put(f"segments/{segment_id}", data=data)
 
     def delete_segment(self, segment_id: str) -> StreamResponse:
