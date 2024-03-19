@@ -14,6 +14,7 @@ from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
     SegmentType,
+    SegmentUpdatableFields,
 )
 
 if sys.version_info >= (3, 8):
@@ -982,7 +983,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_segment(
-        self, segment_id: str, data: SegmentData
+        self, segment_id: str, data: SegmentUpdatableFields
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update a segment by id

@@ -23,9 +23,9 @@ class SegmentType(Enum):
     USER = "user"
 
 
-class SegmentData(TypedDict, total=False):
+class SegmentUpdatableFields(TypedDict, total=False):
     """
-    Represents the data structure for a segment.
+    Represents the updatable data structure for a segment.
 
     Parameters:
         name: The name of the segment.
@@ -36,6 +36,19 @@ class SegmentData(TypedDict, total=False):
     name: Optional[str]
     description: Optional[str]
     filter: Optional[Dict]
+
+
+class SegmentData(SegmentUpdatableFields, total=False):
+    """
+    Represents the data structure for a segment.
+
+    Parameters:
+        all_users: Whether to target all users.
+        all_sender_channels: Whether to target all sender channels.
+    """
+
+    all_users: Optional[bool]
+    all_sender_channels: Optional[bool]
 
 
 class QuerySegmentsOptions(Pager, total=False):

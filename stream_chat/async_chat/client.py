@@ -26,6 +26,7 @@ from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
     SegmentType,
+    SegmentUpdatableFields,
 )
 
 if sys.version_info >= (3, 8):
@@ -591,7 +592,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.post("segments/query", data=payload)
 
     async def update_segment(
-        self, segment_id: str, data: SegmentData
+        self, segment_id: str, data: SegmentUpdatableFields
     ) -> StreamResponse:
         return await self.put(f"segments/{segment_id}", data=data)
 

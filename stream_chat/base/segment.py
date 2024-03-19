@@ -7,6 +7,7 @@ from stream_chat.types.segment import (
     QuerySegmentTargetsOptions,
     SegmentData,
     SegmentType,
+    SegmentUpdatableFields,
 )
 from stream_chat.types.stream_response import StreamResponse
 
@@ -36,7 +37,7 @@ class SegmentInterface(abc.ABC):
 
     @abc.abstractmethod
     def update(
-        self, data: SegmentData
+        self, data: SegmentUpdatableFields
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
@@ -70,3 +71,10 @@ class SegmentInterface(abc.ABC):
         self, target_ids: List[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
+
+    def verify_segment_id(self) -> None:
+        if not self.segment_id:
+            raise ValueError(
+                "Segment id is missing. Either create the segment using segment.create() "
+                "or set the id during instantiation - segment = Segment(segment_id=segment_id)"
+            )
