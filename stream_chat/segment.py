@@ -28,27 +28,27 @@ class Segment(SegmentInterface):
         return state  # type: ignore
 
     def get(self) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.get_segment(segment_id=self.segment_id)  # type: ignore
 
     def update(self, data: SegmentUpdatableFields) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.update_segment(  # type: ignore
             segment_id=self.segment_id, data=data
         )
 
     def delete(self) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.delete_segment(segment_id=self.segment_id)  # type: ignore
 
     def target_exists(self, target_id: str) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.segment_target_exists(  # type: ignore
             segment_id=self.segment_id, target_id=target_id
         )
 
     def add_targets(self, target_ids: list) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.add_segment_targets(  # type: ignore
             segment_id=self.segment_id, target_ids=target_ids
         )
@@ -59,7 +59,7 @@ class Segment(SegmentInterface):
         sort: Optional[List[SortParam]] = None,
         options: Optional[QuerySegmentTargetsOptions] = None,
     ) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.query_segment_targets(  # type: ignore
             segment_id=self.segment_id,
             sort=sort,
@@ -68,14 +68,7 @@ class Segment(SegmentInterface):
         )
 
     def remove_targets(self, target_ids: list) -> StreamResponse:
-        self.verify_segment_id()
+        super().verify_segment_id()
         return self.client.remove_segment_targets(  # type: ignore
             segment_id=self.segment_id, target_ids=target_ids
         )
-
-    def verify_segment_id(self) -> None:
-        if not self.segment_id:
-            raise ValueError(
-                "Segment id is missing. Either create the segment using segment.create() "
-                "or set the id during instantiation - segment = Segment(segment_id=segment_id)"
-            )
