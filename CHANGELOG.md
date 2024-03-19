@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.15.0](https://github.com/GetStream/stream-chat-python/compare/v4.14.0...v4.15.0) (2024-03-19)
+
+
+### Features
+
+* support all_users & all_sender_channels for segment ([#164](https://github.com/GetStream/stream-chat-python/issues/164)) ([7d57dcc](https://github.com/GetStream/stream-chat-python/commit/7d57dcc6e603863140588f5e02927a13e4c0f595))
+
 ## [4.14.0](https://github.com/GetStream/stream-chat-python/compare/v4.13.0...v4.14.0) (2024-03-08)
 
 
