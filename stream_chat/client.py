@@ -325,6 +325,13 @@ class StreamChat(StreamChatInterface):
     def get_message(self, message_id: str, **options: Any) -> StreamResponse:
         return self.get(f"messages/{message_id}", options)
 
+    def query_message_history(
+        self, filter: Dict = None, sort: List[Dict] = None, **options: Any
+    ) -> StreamResponse:
+        params = options.copy()
+        params.update({"filter": filter, "sort": self.normalize_sort(sort)})
+        return self.post("messages/history", data=params)
+
     def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
     ) -> StreamResponse:
