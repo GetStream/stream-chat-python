@@ -828,3 +828,39 @@ class TestClient:
             assert (
                 response["counts_by_user"][user_id]["total_unread_threads_count"] == 1
             )
+
+    def test_query_message_history(
+        self, client: StreamChat, channel, random_user: Dict
+    ):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        client.update_message(
+            {"id": msg_id, "text": "helloworld-1", "user_id": random_user["id"]}
+        )
+        client.update_message(
+            {"id": msg_id, "text": "helloworld-2", "user_id": random_user["id"]}
+        )
+        client.update_message(
+            {"id": msg_id, "text": "helloworld-3", "user_id": random_user["id"]}
+        )
+        client.update_message(
+            {"id": msg_id, "text": "helloworld-4", "user_id": random_user["id"]}
+        )
+
+        response = client.query_message_history(
+            {"message_id": {"$eq": msg_id}},
+            sort=[{"message_updated_at": -1}],
+            **{"limit": 1},
+        )
+
+        assert len(response["message_history"]) == 1
+        assert response["message_history"][0]["text"] == "helloworld-3"
+
+        response_next = client.query_message_history(
+            {"message_id": {"$eq": msg_id}},
+            sort=[{"message_updated_at": -1}],
+            **{"limit": 1, "next": response["next"]},
+        )
+
+        assert len(response_next["message_history"]) == 1
+        assert response_next["message_history"][0]["text"] == "helloworld-2"

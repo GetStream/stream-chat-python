@@ -526,6 +526,15 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def query_message_history(
+        self, filter: Dict = None, sort: List[Dict] = None, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Queries message history.
+        """
+        pass
+
+    @abc.abstractmethod
     def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
