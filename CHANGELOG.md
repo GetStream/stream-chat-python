@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.16.0](https://github.com/GetStream/stream-chat-python/compare/v4.15.0...v4.16.0) (2024-05-17)
+
+
+### Features
+
+* new API endpoint query_message_history ([#168](https://github.com/GetStream/stream-chat-python/issues/168)) ([f3f4c9f](https://github.com/GetStream/stream-chat-python/commit/f3f4c9fe1ad94fd11065bf742664fb69339df757))
+
 ## [4.15.0](https://github.com/GetStream/stream-chat-python/compare/v4.14.0...v4.15.0) (2024-03-19)
 
 
