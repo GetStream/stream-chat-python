@@ -527,7 +527,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def query_message_history(
-        self, filter: Dict, sort: List[Dict] = None, **options: Any
+        self, filter: Dict = None, sort: List[Dict] = None, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Queries message history.
