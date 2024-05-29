@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.17.0](https://github.com/GetStream/stream-chat-python/compare/v4.16.0...v4.17.0) (2024-05-29)
+
+
+### Features
+
+* add support for undeleting messages ([#162](https://github.com/GetStream/stream-chat-python/issues/162)) ([c1da19d](https://github.com/GetStream/stream-chat-python/commit/c1da19d3915c455f9c0cf37434ffbeac4e9a09b0))
+
 ## [4.16.0](https://github.com/GetStream/stream-chat-python/compare/v4.15.0...v4.16.0) (2024-05-17)
 
 
