@@ -73,7 +73,11 @@ class StreamChatInterface(abc.ABC):
         return sort_fields
 
     def create_token(
-        self, user_id: str, exp: int = None, iat: int = None, **claims: Any
+        self,
+        user_id: str,
+        exp: Optional[int] = None,
+        iat: Optional[int] = None,
+        **claims: Any,
     ) -> str:
         """
         Creates a JWT for a user.
