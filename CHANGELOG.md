@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.18.0](https://github.com/GetStream/stream-chat-python/compare/v4.17.0...v4.18.0) (2024-07-03)
+
+
+### Features
+
+* Add support for mark_unread msg or thread ([#172](https://github.com/GetStream/stream-chat-python/issues/172)) ([1981ab7](https://github.com/GetStream/stream-chat-python/commit/1981ab7e75dcbf5d13ef105dfae50d46a8e39d70))
+
 ## [4.17.0](https://github.com/GetStream/stream-chat-python/compare/v4.16.0...v4.17.0) (2024-05-29)
 
 
