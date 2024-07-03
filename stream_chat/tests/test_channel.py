@@ -169,6 +169,12 @@ class TestChannel:
         assert "event" in response
         assert response["event"]["type"] == "message.read"
 
+    def test_mark_unread(self, channel: Channel, random_user: Dict):
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        response = channel.mark_unread(random_user["id"], message_id=msg_id)
+        assert "duration" in response
+
     def test_get_messages(self, channel: Channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
