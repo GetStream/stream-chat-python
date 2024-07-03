@@ -278,6 +278,20 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def mark_unread(
+        self, user_id: str, **data: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Marks channel as unread from a specific message or thread, if thread_id is provided in data
+        a thread will be searched, otherwise a message.
+
+        :param user_id: the user ID for the event
+        :param data: additional data, ie {"message_id": last_message_id} or {"thread_id": thread_id}
+        :return: The server response
+        """
+        pass
+
+    @abc.abstractmethod
     def get_replies(
         self, parent_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:

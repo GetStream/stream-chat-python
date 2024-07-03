@@ -135,6 +135,10 @@ class Channel(ChannelInterface):
         payload = add_user_id(data, user_id)
         return self.client.post(f"{self.url}/read", data=payload)
 
+    def mark_unread(self, user_id: str, **data: Any) -> StreamResponse:
+        payload = add_user_id(data, user_id)
+        return self.client.post(f"{self.url}/unread", data=payload)
+
     def get_replies(self, parent_id: str, **options: Any) -> StreamResponse:
         return self.client.get(f"messages/{parent_id}/replies", params=options)
 
