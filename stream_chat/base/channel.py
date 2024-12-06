@@ -475,7 +475,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update_member_partial(self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def update_member_partial(
+        self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update channel member partially
 
