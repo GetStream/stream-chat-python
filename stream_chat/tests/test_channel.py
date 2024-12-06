@@ -377,3 +377,30 @@ class TestChannel:
                 assert "error" not in resp
                 break
             time.sleep(0.5)
+
+    def test_pin_channel(self, client: StreamChat, channel: Channel, random_users: List[Dict]):
+        user_id = random_users[0]["id"]
+        
+        # Pin the channel
+        response = channel.pin(user_id)
+        assert response is not None
+
+        # Query for pinned channels
+        response = client.query_channels(
+            {"pinned": True, "cid": channel.cid},
+            user_id=user_id
+        )
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["cid"] == channel.cid
+
+        # Unpin the channel
+        response = channel.unpin(user_id)
+        assert response is not None
+
+        # Query for pinned channels
+        response = client.query_channels(
+            {"pinned": False, "cid": channel.cid},
+            user_id=user_id
+        )
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["cid"] == channel.cid
