@@ -437,7 +437,9 @@ class TestChannel:
         assert len(response["channels"]) == 1
         assert response["channels"][0]["channel"]["cid"] == channel.cid
 
-    async def test_update_member_partial(self, channel: Channel, random_users: List[Dict]):
+    async def test_update_member_partial(
+        self, channel: Channel, random_users: List[Dict]
+    ):
         user_id = random_users[0]["id"]
         await channel.add_members([user_id])
 
