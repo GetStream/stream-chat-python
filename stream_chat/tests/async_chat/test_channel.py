@@ -436,3 +436,20 @@ class TestChannel:
         )
         assert len(response["channels"]) == 1
         assert response["channels"][0]["channel"]["cid"] == channel.cid
+
+    async def test_update_member_partial(self, channel: Channel, random_users: List[Dict]):
+        user_id = random_users[0]["id"]
+        await channel.add_members([user_id])
+
+        # Test setting a custom field
+        response = await channel.update_member_partial(user_id, set={"hat": "blue"})
+        assert response["channel_member"]["hat"] == "blue"
+
+        # Test setting a new field while unsetting the previous one
+        response = await channel.update_member_partial(
+            user_id,
+            set={"color": "red"},
+            unset=["hat"]
+        )
+        assert response["channel_member"]["color"] == "red"
+        assert "hat" not in response["channel_member"]
