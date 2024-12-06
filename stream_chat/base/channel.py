@@ -444,7 +444,7 @@ class ChannelInterface(abc.ABC):
     def pin(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Pins a channel
-        Allows a user to pin the channel (only for theirselves)
+        Allows a user to pin the channel (only for themselves)
         """
         pass
 
@@ -452,7 +452,7 @@ class ChannelInterface(abc.ABC):
     def unpin(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Unpins a channel
-        Allows a user to unpin the channel (only for theirselves)
+        Allows a user to unpin the channel (only for themselves)
         """
         pass
 
@@ -460,7 +460,7 @@ class ChannelInterface(abc.ABC):
     def archive(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Pins a channel
-        Allows a user to archive the channel (only for theirselves)
+        Allows a user to archive the channel (only for themselves)
         """
         pass
 
@@ -470,7 +470,7 @@ class ChannelInterface(abc.ABC):
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Unpins a channel
-        Allows a user to unpin the channel (only for theirselves)
+        Allows a user to unpin the channel (only for themselves)
         """
         pass
 
