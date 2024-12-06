@@ -238,15 +238,13 @@ class Channel(ChannelInterface):
     async def unarchive(self, user_id: str) -> StreamResponse:
         if not user_id:
             raise StreamChannelException("user_id must not be empty")
-        
-        payload = {
-            "set": {
-                "archived": False
-            }
-        }
+
+        payload = {"set": {"archived": False}}
         return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
 
-    async def update_member_partial(self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    async def update_member_partial(
+        self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         if not user_id:
             raise StreamChannelException("user_id must not be empty")
 
