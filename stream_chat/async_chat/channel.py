@@ -227,12 +227,8 @@ class Channel(ChannelInterface):
     async def archive(self, user_id: str) -> StreamResponse:
         if not user_id:
             raise StreamChannelException("user_id must not be empty")
-        
-        payload = {
-            "set": {
-                "archived": True
-            }
-        }
+
+        payload = {"set": {"archived": True}}
         return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
 
     async def unarchive(self, user_id: str) -> StreamResponse:
