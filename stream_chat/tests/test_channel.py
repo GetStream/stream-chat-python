@@ -439,13 +439,13 @@ class TestChannel:
         channel.add_members([user_id])
 
         # Test setting a custom field
-        response = channel.update_member_partial(user_id, set={"hat": "blue"})
+        response = channel.update_member_partial(user_id, to_unset={"hat": "blue"})
         assert response["channel_member"]["hat"] == "blue"
 
         # Test setting a new field while unsetting the previous one
         response = channel.update_member_partial(
             user_id,
-            set={"color": "red"},
+            to_unset={"color": "red"},
             unset=["hat"]
         )
         assert response["channel_member"]["color"] == "red"
