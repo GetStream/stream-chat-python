@@ -378,7 +378,9 @@ class TestChannel:
                 break
             time.sleep(0.5)
 
-    def test_pin_channel(self, client: StreamChat, channel: Channel, random_users: List[Dict]):
+    def test_pin_channel(
+        self, client: StreamChat, channel: Channel, random_users: List[Dict]
+    ):
         user_id = random_users[0]["id"]
         
         # Pin the channel
