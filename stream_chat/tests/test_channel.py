@@ -382,7 +382,6 @@ class TestChannel:
         self, client: StreamChat, channel: Channel, random_users: List[Dict]
     ):
         user_id = random_users[0]["id"]
-        
         # Pin the channel
         response = channel.pin(user_id)
         assert response is not None
