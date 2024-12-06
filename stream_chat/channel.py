@@ -242,7 +242,7 @@ class Channel(ChannelInterface):
 
     def update_member_partial(
         self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None
-    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    ) -> StreamResponse:
         if not user_id:
             raise StreamChannelException("user_id must not be empty")
 
