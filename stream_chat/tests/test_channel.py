@@ -389,8 +389,7 @@ class TestChannel:
 
         # Query for pinned channels
         response = client.query_channels(
-            {"pinned": True, "cid": channel.cid},
-            user_id=user_id
+            {"pinned": True, "cid": channel.cid}, user_id=user_id
         )
         assert len(response["channels"]) == 1
         assert response["channels"][0]["cid"] == channel.cid
