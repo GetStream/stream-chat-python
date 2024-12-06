@@ -444,9 +444,7 @@ class TestChannel:
 
         # Test setting a new field while unsetting the previous one
         response = channel.update_member_partial(
-            user_id,
-            set={"color": "red"},
-            unset=["hat"]
+            user_id, set={"color": "red"}, unset=["hat"]
         )
         assert response["channel_member"]["color"] == "red"
         assert "hat" not in response["channel_member"]
