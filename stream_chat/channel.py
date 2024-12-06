@@ -225,12 +225,8 @@ class Channel(ChannelInterface):
     def unpin(self, user_id: str) -> StreamResponse:
         if not user_id:
             raise StreamChannelException("user_id must not be empty")
-        
-        payload = {
-            "set": {
-                "pinned": False
-            }
-        }
+
+        payload = {"set": {"pinned": False}}
         return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
 
     def archive(self, user_id: str) -> StreamResponse:
