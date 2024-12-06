@@ -465,7 +465,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def unarchive(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def unarchive(
+        self, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Unpins a channel
         Allows a user to unpin the channel (only for theirselves)
