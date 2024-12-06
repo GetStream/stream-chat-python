@@ -382,6 +382,8 @@ class TestChannel:
         self, client: StreamChat, channel: Channel, random_users: List[Dict]
     ):
         user_id = random_users[0]["id"]
+        channel.add_members([user_id])
+
         # Pin the channel
         response = channel.pin(user_id)
         assert response is not None
@@ -390,8 +392,9 @@ class TestChannel:
         response = client.query_channels(
             {"pinned": True, "cid": channel.cid}, user_id=user_id
         )
+        print(response)
         assert len(response["channels"]) == 1
-        assert response["channels"][0]["cid"] == channel.cid
+        assert response["channels"][0]["channel"]["cid"] == channel.cid
 
         # Unpin the channel
         response = channel.unpin(user_id)
@@ -402,4 +405,4 @@ class TestChannel:
             {"pinned": False, "cid": channel.cid}, user_id=user_id
         )
         assert len(response["channels"]) == 1
-        assert response["channels"][0]["cid"] == channel.cid
+        assert response["channels"][0]["channel"]["cid"] == channel.cid
