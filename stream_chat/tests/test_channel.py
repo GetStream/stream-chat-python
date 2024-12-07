@@ -377,3 +377,74 @@ class TestChannel:
                 assert "error" not in resp
                 break
             time.sleep(0.5)
+
+    def test_pin_channel(
+        self, client: StreamChat, channel: Channel, random_users: List[Dict]
+    ):
+        user_id = random_users[0]["id"]
+        channel.add_members([user_id])
+
+        # Pin the channel
+        response = channel.pin(user_id)
+        assert response is not None
+
+        # Query for pinned channels
+        response = client.query_channels(
+            {"pinned": True, "cid": channel.cid}, user_id=user_id
+        )
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel"]["cid"] == channel.cid
+
+        # Unpin the channel
+        response = channel.unpin(user_id)
+        assert response is not None
+
+        # Query for pinned channels
+        response = client.query_channels(
+            {"pinned": False, "cid": channel.cid}, user_id=user_id
+        )
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel"]["cid"] == channel.cid
+
+    def test_archive_channel(
+        self, client: StreamChat, channel: Channel, random_users: List[Dict]
+    ):
+        user_id = random_users[0]["id"]
+        channel.add_members([user_id])
+
+        # Archive the channel
+        response = channel.archive(user_id)
+        assert response is not None
+
+        # Query for archived channels
+        response = client.query_channels(
+            {"archived": True, "cid": channel.cid}, user_id=user_id
+        )
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel"]["cid"] == channel.cid
+
+        # Unarchive the channel
+        response = channel.unarchive(user_id)
+        assert response is not None
+
+        # Query for archhived channels
+        response = client.query_channels(
+            {"archived": False, "cid": channel.cid}, user_id=user_id
+        )
+        assert len(response["channels"]) == 1
+        assert response["channels"][0]["channel"]["cid"] == channel.cid
+
+    def test_update_member_partial(self, channel: Channel, random_users: List[Dict]):
+        user_id = random_users[0]["id"]
+        channel.add_members([user_id])
+
+        # Test setting a custom field
+        response = channel.update_member_partial(user_id, to_set={"hat": "blue"})
+        assert response["channel_member"]["hat"] == "blue"
+
+        # Test setting a new field while unsetting the previous one
+        response = channel.update_member_partial(
+            user_id, to_set={"color": "red"}, to_unset=["hat"]
+        )
+        assert response["channel_member"]["color"] == "red"
+        assert "hat" not in response["channel_member"]

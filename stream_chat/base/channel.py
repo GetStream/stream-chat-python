@@ -440,6 +440,52 @@ class ChannelInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def pin(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Pins a channel
+        Allows a user to pin the channel (only for themselves)
+        """
+        pass
+
+    @abc.abstractmethod
+    def unpin(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unpins a channel
+        Allows a user to unpin the channel (only for themselves)
+        """
+        pass
+
+    @abc.abstractmethod
+    def archive(self, user_id: str) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Pins a channel
+        Allows a user to archive the channel (only for themselves)
+        """
+        pass
+
+    @abc.abstractmethod
+    def unarchive(
+        self, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unpins a channel
+        Allows a user to unpin the channel (only for themselves)
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_member_partial(
+        self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Update channel member partially
+
+        :param to_set: a dictionary of key/value pairs to set or to override
+        :param to_unset: a list of keys to clear
+        """
+        pass
+
 
 def add_user_id(payload: Dict, user_id: str) -> Dict:
     return {**payload, "user": {"id": user_id}}

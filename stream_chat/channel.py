@@ -2,6 +2,7 @@ import json
 from typing import Any, Dict, Iterable, List, Union
 
 from stream_chat.base.channel import ChannelInterface, add_user_id
+from stream_chat.base.exceptions import StreamChannelException
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -210,3 +211,40 @@ class Channel(ChannelInterface):
             "channel_cid": self.cid,
         }
         return self.client.post("moderation/unmute/channel", data=params)
+
+    def pin(self, user_id: str) -> StreamResponse:
+        if not user_id:
+            raise StreamChannelException("user_id must not be empty")
+
+        payload = {"set": {"pinned": True}}
+        return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
+
+    def unpin(self, user_id: str) -> StreamResponse:
+        if not user_id:
+            raise StreamChannelException("user_id must not be empty")
+
+        payload = {"set": {"pinned": False}}
+        return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
+
+    def archive(self, user_id: str) -> StreamResponse:
+        if not user_id:
+            raise StreamChannelException("user_id must not be empty")
+
+        payload = {"set": {"archived": True}}
+        return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
+
+    def unarchive(self, user_id: str) -> StreamResponse:
+        if not user_id:
+            raise StreamChannelException("user_id must not be empty")
+
+        payload = {"set": {"archived": False}}
+        return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
+
+    def update_member_partial(
+        self, user_id: str, to_set: Dict = None, to_unset: Iterable[str] = None
+    ) -> StreamResponse:
+        if not user_id:
+            raise StreamChannelException("user_id must not be empty")
+
+        payload = {"set": to_set or {}, "unset": to_unset or []}
+        return self.client.patch(f"{self.url}/member/{user_id}", data=payload)

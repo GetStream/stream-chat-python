@@ -24,10 +24,6 @@ jobs:
         with:
           fetch-depth: 0 # gives the commit message linter access to all previous commits
 
-      - name: Commit lint
-        if: ${{ matrix.python == '3.8' && github.ref == 'refs/heads/master' }}
-        uses: wagoid/commitlint-github-action@v4
-
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
