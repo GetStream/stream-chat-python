@@ -503,26 +503,40 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             return await self._parse_response(response)
 
     async def create_blocklist(
-        self, name: str, words: Iterable[str], type: str = "word", team: Optional[str] = None
+        self,
+        name: str,
+        words: Iterable[str],
+        type: str = "word",
+        team: Optional[str] = None,
     ) -> StreamResponse:
         params = {"team": team} if team is not None else {}
         return await self.post(
-            "blocklists", data={"name": name, "words": words, "type": type}, params=params
+            "blocklists",
+            data={"name": name, "words": words, "type": type},
+            params=params,
         )
 
     async def list_blocklists(self, team: Optional[str] = None) -> StreamResponse:
         params = {"team": team} if team is not None else {}
         return await self.get("blocklists", params)
 
-    async def get_blocklist(self, name: str, team: Optional[str] = None) -> StreamResponse:
+    async def get_blocklist(
+        self, name: str, team: Optional[str] = None
+    ) -> StreamResponse:
         params = {"team": team} if team is not None else {}
         return await self.get(f"blocklists/{name}", params)
 
-    async def update_blocklist(self, name: str, words: Iterable[str], team: Optional[str] = None) -> StreamResponse:
+    async def update_blocklist(
+        self, name: str, words: Iterable[str], team: Optional[str] = None
+    ) -> StreamResponse:
         params = {"team": team} if team is not None else {}
-        return await self.put(f"blocklists/{name}", data={"words": words}, params=params)
+        return await self.put(
+            f"blocklists/{name}", data={"words": words}, params=params
+        )
 
-    async def delete_blocklist(self, name: str, team: Optional[str] = None) -> StreamResponse:
+    async def delete_blocklist(
+        self, name: str, team: Optional[str] = None
+    ) -> StreamResponse:
         params = {"team": team} if team is not None else {}
         return await self.delete(f"blocklists/{name}", params)
 
