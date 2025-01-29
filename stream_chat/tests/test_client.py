@@ -370,6 +370,64 @@ class TestClient:
         assert response["message"]["text"] == "helloworld"
         assert response["message"]["awesome"] is True
 
+    def test_update_message_restricted_visibility(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
+        # Create test users first
+        restricted_users = [
+            {"id": "amy", "name": "Amy"},
+            {"id": "paul", "name": "Paul"},
+        ]
+        client.upsert_users(restricted_users)
+
+        # Add users to channel
+        channel.add_members([u["id"] for u in restricted_users])
+
+        # Send initial message
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+        assert response["message"]["text"] == "hello world"
+
+        # Update message with restricted visibility
+        response = client.update_message(
+            {
+                "id": msg_id,
+                "text": "helloworld",
+                "restricted_visibility": ["amy", "paul"],
+                "user": {"id": response["message"]["user"]["id"]},
+            }
+        )
+        assert response["message"]["text"] == "helloworld"
+        assert response["message"]["restricted_visibility"] == ["amy", "paul"]
+
+    def test_update_message_partial_restricted_visibility(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
+        # Create test users first
+        restricted_users = [
+            {"id": "amy", "name": "Amy"},
+            {"id": "paul", "name": "Paul"},
+        ]
+        client.upsert_users(restricted_users)
+
+        # Add users to channel
+        channel.add_members([u["id"] for u in restricted_users])
+
+        msg_id = str(uuid.uuid4())
+        response = channel.send_message(
+            {"id": msg_id, "text": "hello world"}, random_user["id"]
+        )
+        assert response["message"]["text"] == "hello world"
+        response = client.update_message_partial(
+            msg_id,
+            dict(set=dict(text="helloworld", restricted_visibility=["amy"])),
+            random_user["id"],
+        )
+
+        assert response["message"]["restricted_visibility"] == ["amy"]
+
     def test_delete_message(self, client: StreamChat, channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
