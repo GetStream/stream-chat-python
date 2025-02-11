@@ -53,6 +53,29 @@ class TestChannel:
         assert "message" in response
         assert response["message"]["text"] == "hi"
 
+    async def test_send_message_with_restricted_visibility(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
+
+        # Create test users first
+        restricted_users = [
+            {"id": "amy", "name": "Amy"},
+            {"id": "paul", "name": "Paul"},
+        ]
+        await client.upsert_users(restricted_users)
+
+        # Add users to channel
+        await channel.add_members([u["id"] for u in restricted_users])
+
+        # Send message with restricted visibility
+        response = await channel.send_message(
+            {"text": "hi", "restricted_visibility": ["amy", "paul"]}, random_user["id"]
+        )
+
+        assert "message" in response
+        assert response["message"]["text"] == "hi"
+        assert response["message"]["restricted_visibility"] == ["amy", "paul"]
+
     async def test_send_event(self, channel: Channel, random_user: Dict):
         response = await channel.send_event({"type": "typing.start"}, random_user["id"])
         assert "event" in response
