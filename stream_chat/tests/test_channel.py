@@ -66,7 +66,6 @@ class TestChannel:
     def test_send_message_with_restricted_visibility(
         self, client: StreamChat, channel: Channel, random_user: Dict
     ):
-
         # Create test users first
         restricted_users = [
             {"id": "amy", "name": "Amy"},

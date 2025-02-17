@@ -740,6 +740,9 @@ class StreamChat(StreamChatInterface):
     def get_export_channel_status(self, task_id: str) -> StreamResponse:
         return self.get(f"export_channels/{task_id}")
 
+    def export_users(self, user_ids: Iterable[str]) -> StreamResponse:
+        return self.post("export/users", data={"user_ids": user_ids})
+
     def get_task(self, task_id: str) -> StreamResponse:
         return self.get(f"tasks/{task_id}")
 

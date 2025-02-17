@@ -207,6 +207,23 @@ class TestClient:
         assert "user" in response
         assert response["user"]["name"] == "Gandalf the Grey"
 
+    async def test_export_users(self, client: StreamChatAsync, random_user: Dict):
+        response = await client.export_users([random_user["id"]])
+        assert "task_id" in response
+        assert len(response["task_id"]) == 36
+
+        async def f():
+            r = await client.get_task(response["task_id"])
+            return r["status"] == "completed"
+
+        await wait_for_async(f)
+
+        response = await client.get_task(response["task_id"])
+        assert response["status"] == "completed"
+        assert "result" in response
+        assert "url" in response["result"]
+        assert "/exports/users/" in response["result"]["url"]
+
     async def test_ban_user(
         self, client: StreamChatAsync, random_user, server_user: Dict
     ):

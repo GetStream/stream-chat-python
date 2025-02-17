@@ -1214,6 +1214,15 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def export_users(
+        self, user_ids: Iterable[str]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Requests a channels export
+        """
+        pass
+
+    @abc.abstractmethod
     def get_task(
         self, task_id: str
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
