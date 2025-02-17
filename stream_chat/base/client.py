@@ -1218,7 +1218,7 @@ class StreamChatInterface(abc.ABC):
         self, user_ids: Iterable[str]
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Requests a channels export
+        Requests a users export
         """
         pass
 
