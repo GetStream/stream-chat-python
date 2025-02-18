@@ -776,6 +776,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def get_export_channel_status(self, task_id: str) -> StreamResponse:
         return await self.get(f"export_channels/{task_id}")
 
+    async def export_users(self, user_ids: Iterable[str]) -> StreamResponse:
+        return await self.post("export/users", data={"user_ids": user_ids})
+
     async def get_task(self, task_id: str) -> StreamResponse:
         return await self.get(f"tasks/{task_id}")
 

@@ -210,6 +210,19 @@ class TestClient:
         assert "user" in response
         assert response["user"]["name"] == "Gandalf the Grey"
 
+    def test_export_users(self, client: StreamChat, random_user: Dict):
+        response = client.export_users([random_user["id"]])
+        assert "task_id" in response
+        assert len(response["task_id"]) == 36
+
+        wait_for(lambda: client.get_task(response["task_id"])["status"] == "completed")
+
+        response = client.get_task(response["task_id"])
+        assert response["status"] == "completed"
+        assert "result" in response
+        assert "url" in response["result"]
+        assert "/exports/users/" in response["result"]["url"]
+
     def test_shadow_ban(
         self, client: StreamChat, random_user, server_user, channel: Channel
     ):
