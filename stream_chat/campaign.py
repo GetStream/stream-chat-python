@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Optional, Union
 
 from stream_chat.base.campaign import CampaignInterface
-from stream_chat.types.campaign import CampaignData
+from stream_chat.types.campaign import CampaignData, GetCampaignOptions
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -22,8 +22,8 @@ class Campaign(CampaignInterface):
             self.campaign_id = state["campaign"]["id"]  # type: ignore
         return state  # type: ignore
 
-    def get(self) -> StreamResponse:
-        return self.client.get_campaign(campaign_id=self.campaign_id)  # type: ignore
+    def get(self, options: Optional[GetCampaignOptions] = None) -> StreamResponse:
+        return self.client.get_campaign(campaign_id=self.campaign_id, options=options)  # type: ignore
 
     def update(self, data: CampaignData) -> StreamResponse:
         return self.client.update_campaign(  # type: ignore

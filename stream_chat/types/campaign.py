@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -76,3 +76,13 @@ class CampaignData(TypedDict, total=False):
 
 class QueryCampaignsOptions(Pager, total=False):
     pass
+
+
+class GetCampaignOptions(TypedDict, total=False):
+    """
+    Options for getting a campaign.
+
+    Parameters:
+        users: Optional Pager containing pagination options for users
+    """
+    users: Optional[Pager]
