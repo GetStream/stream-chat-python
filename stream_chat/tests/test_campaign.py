@@ -84,8 +84,7 @@ class TestCampaign:
         campaign_id = created["campaign"]["id"]
 
         # Test get_campaign with user pagination options
-        response = client.get_campaign(
-            campaign_id=campaign_id,
+        response = campaign.get(
             options={"users": {"limit": 2}}  # Limit to 2 users per page
         )
         assert response.is_ok()
@@ -95,7 +94,7 @@ class TestCampaign:
         assert len(response["campaign"]["users"]) <= 2  # Verify pagination limit worked
 
         # Cleanup
-        client.delete_campaign(campaign_id=campaign_id)
+        campaign.delete()
 
     def test_campaign_start_stop(self, client: StreamChat, random_user: Dict):
         segment = client.create_segment(segment_type=SegmentType.USER)
