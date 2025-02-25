@@ -67,7 +67,9 @@ class TestCampaign:
         segment_deleted = client.delete_segment(segment_id=segment_id)
         assert segment_deleted.is_ok()
 
-    def test_get_campaign_with_user_pagination(self, client: StreamChat, random_users: List[Dict]):
+    def test_get_campaign_with_user_pagination(
+        self, client: StreamChat, random_users: List[Dict]
+    ):
         # Create a campaign with user_ids
         campaign = client.campaign(
             data={

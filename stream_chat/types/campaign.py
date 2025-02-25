@@ -85,4 +85,5 @@ class GetCampaignOptions(TypedDict, total=False):
     Parameters:
         users: Optional Pager containing pagination options for users
     """
+
     users: Optional[Pager]

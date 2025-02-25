@@ -9,7 +9,11 @@ from urllib.request import Request, urlopen
 from stream_chat.campaign import Campaign
 from stream_chat.segment import Segment
 from stream_chat.types.base import SortParam
-from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions, GetCampaignOptions
+from stream_chat.types.campaign import (
+    CampaignData,
+    QueryCampaignsOptions,
+    GetCampaignOptions,
+)
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -636,7 +640,9 @@ class StreamChat(StreamChatInterface):
             payload.update(cast(dict, data))
         return self.post("campaigns", data=payload)
 
-    def get_campaign(self, campaign_id: str, options: Optional[GetCampaignOptions] = None) -> StreamResponse:
+    def get_campaign(
+        self, campaign_id: str, options: Optional[GetCampaignOptions] = None
+    ) -> StreamResponse:
         params = {}
         if options and "users" in options:
             params.update(options["users"])

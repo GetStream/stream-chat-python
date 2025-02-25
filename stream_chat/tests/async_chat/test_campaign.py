@@ -61,7 +61,9 @@ class TestCampaign:
 
         await client.delete_segment(segment_id=segment_id)
 
-    async def test_get_campaign_with_user_pagination(self, client: StreamChatAsync, random_users: List[Dict]):
+    async def test_get_campaign_with_user_pagination(
+        self, client: StreamChatAsync, random_users: List[Dict]
+    ):
         # Create a campaign with user_ids
         campaign = client.campaign(
             data={

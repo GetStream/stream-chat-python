@@ -8,7 +8,11 @@ import sys
 from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Union
 
 from stream_chat.types.base import SortParam
-from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions, GetCampaignOptions
+from stream_chat.types.campaign import (
+    CampaignData,
+    QueryCampaignsOptions,
+    GetCampaignOptions,
+)
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,

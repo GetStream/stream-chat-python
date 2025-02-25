@@ -20,7 +20,11 @@ from urllib.parse import urlparse
 from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.base import SortParam
-from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions, GetCampaignOptions
+from stream_chat.types.campaign import (
+    CampaignData,
+    QueryCampaignsOptions,
+    GetCampaignOptions,
+)
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -664,7 +668,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             payload.update(cast(dict, data))
         return await self.post("campaigns", data=payload)
 
-    async def get_campaign(self, campaign_id: str, options: Optional[GetCampaignOptions] = None) -> StreamResponse:
+    async def get_campaign(
+        self, campaign_id: str, options: Optional[GetCampaignOptions] = None
+    ) -> StreamResponse:
         params = {}
         if options and "users" in options:
             params.update(options["users"])
