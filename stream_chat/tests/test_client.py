@@ -197,6 +197,23 @@ class TestClient:
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
 
+    def test_deactivate_users(self, client: StreamChat, random_users: Dict):
+        user_ids = [user["id"] for user in random_users]
+        response = client.deactivate_users(user_ids)
+        assert "task_id" in response
+        assert len(response["task_id"]) == 36  # task_id is a UUID
+
+        wait_for(lambda: client.get_task(response["task_id"])["status"] == "completed")
+
+        response = client.get_task(response["task_id"])
+        assert response["status"] == "completed"
+        assert "result" in response
+        assert "users" in response["result"]
+        # Verify that all users in the response have deactivated_at field
+        for user in response["result"]["users"]:
+            assert "deactivated_at" in user
+            assert user["id"] in user_ids
+
     def test_reactivate_user(self, client: StreamChat, random_user: Dict):
         response = client.deactivate_user(random_user["id"])
         assert "user" in response
