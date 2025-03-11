@@ -178,6 +178,11 @@ class StreamChat(StreamChatInterface):
     def deactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return self.post(f"users/{user_id}/deactivate", data=options)
 
+    def deactivate_users(
+        self, user_ids: Iterable[str], **options: Any
+    ) -> StreamResponse:
+        return self.post("users/deactivate", data=dict(options, user_ids=user_ids))
+
     def reactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return self.post(f"users/{user_id}/reactivate", data=options)
 

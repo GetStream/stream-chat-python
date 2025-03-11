@@ -190,6 +190,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def deactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return await self.post(f"users/{user_id}/deactivate", data=options)
 
+    async def deactivate_users(
+        self, user_ids: Iterable[str], **options: Any
+    ) -> StreamResponse:
+        return await self.post(
+            "users/deactivate", data=dict(options, user_ids=user_ids)
+        )
+
     async def reactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return await self.post(f"users/{user_id}/reactivate", data=options)
 

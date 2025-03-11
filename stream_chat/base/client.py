@@ -257,6 +257,21 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def deactivate_users(
+        self, user_ids: Iterable[str], **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deactivates multiple users in a batch operation.
+        Deactivated users cannot connect to Stream Chat, and can't send or receive messages.
+        To reactivate users, use `reactivate_user` method for each user.
+
+        :param user_ids: a list of user IDs to deactivate
+        :param options: additional options
+        :return: task_id
+        """
+        pass
+
+    @abc.abstractmethod
     def reactivate_user(
         self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
