@@ -818,6 +818,83 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
         return await self.post("unread_batch", data={"user_ids": user_ids})
 
+    async def create_reminder(
+        self,
+        message_id: str,
+        user_id: str,
+        remind_at: Optional[datetime.datetime] = None,
+    ) -> StreamResponse:
+        """
+        Creates a reminder for a message.
+
+        :param message_id: The ID of the message to create a reminder for
+        :param user_id: The ID of the user creating the reminder
+        :param remind_at: When to remind the user (optional)
+        :return: API response
+        """
+        data = {"user_id": user_id}
+        if remind_at is not None:
+            if isinstance(remind_at, datetime.datetime):
+                remind_at = remind_at.isoformat()
+            data["remind_at"] = remind_at
+
+        return await self.post(f"messages/{message_id}/reminders", data=data)
+
+    async def update_reminder(
+        self,
+        message_id: str,
+        user_id: str,
+        remind_at: Optional[datetime.datetime] = None,
+    ) -> StreamResponse:
+        """
+        Updates a reminder for a message.
+
+        :param message_id: The ID of the message with the reminder
+        :param user_id: The ID of the user who owns the reminder
+        :param remind_at: When to remind the user (optional)
+        :return: API response
+        """
+        data = {"user_id": user_id}
+        if remind_at is not None:
+            if isinstance(remind_at, datetime.datetime):
+                remind_at = remind_at.isoformat()
+            data["remind_at"] = remind_at
+        return await self.patch(f"messages/{message_id}/reminders", data=data)
+
+    async def delete_reminder(self, message_id: str, user_id: str) -> StreamResponse:
+        """
+        Deletes a reminder for a message.
+
+        :param message_id: The ID of the message with the reminder
+        :param user_id: The ID of the user who owns the reminder
+        :return: API response
+        """
+        return await self.delete(
+            f"messages/{message_id}/reminders", params={"user_id": user_id}
+        )
+
+    async def query_reminders(
+        self,
+        user_id: str,
+        filter_conditions: Dict = None,
+        sort: List[Dict] = None,
+        **options: Any,
+    ) -> StreamResponse:
+        """
+        Queries reminders based on filter conditions.
+
+        :param user_id: The ID of the user whose reminders to query
+        :param filter_conditions: Conditions to filter reminders
+        :param sort: Sort parameters (default: [{ field: 'remind_at', direction: 1 }])
+        :param options: Additional query options like limit, offset
+        :return: API response with reminders
+        """
+        params = options.copy()
+        params["filter_conditions"] = filter_conditions or {}
+        params["sort"] = sort or [{"field": "remind_at", "direction": 1}]
+        params["user_id"] = user_id
+        return await self.post("reminders/query", data=params)
+
     async def close(self) -> None:
         await self.session.close()
 

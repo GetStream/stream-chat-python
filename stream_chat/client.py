@@ -777,3 +777,71 @@ class StreamChat(StreamChatInterface):
 
     def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
         return self.post("unread_batch", data={"user_ids": user_ids})
+
+    def create_reminder(
+        self, message_id: str, user_id: str, remind_at: Optional[datetime.datetime] = None
+    ) -> StreamResponse:
+        """
+        Creates a reminder for a message.
+
+        :param message_id: The ID of the message to create a reminder for
+        :param user_id: The ID of the user creating the reminder
+        :param remind_at: When to remind the user (optional)
+        :return: API response
+        """
+        data = {"user_id": user_id}
+        if remind_at is not None:
+            # Format as ISO 8601 date string without microseconds
+            data["remind_at"] = remind_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return self.post(f"messages/{message_id}/reminders", data=data)
+
+    def update_reminder(
+        self, message_id: str, user_id: str, remind_at: Optional[datetime.datetime] = None
+    ) -> StreamResponse:
+        """
+        Updates a reminder for a message.
+
+        :param message_id: The ID of the message with the reminder
+        :param user_id: The ID of the user who owns the reminder
+        :param remind_at: When to remind the user (optional)
+        :return: API response
+        """
+        data = {"user_id": user_id}
+        if remind_at is not None:
+            # Format as ISO 8601 date string without microseconds
+            data["remind_at"] = remind_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return self.patch(f"messages/{message_id}/reminders", data=data)
+
+    def delete_reminder(self, message_id: str, user_id: str) -> StreamResponse:
+        """
+        Deletes a reminder for a message.
+
+        :param message_id: The ID of the message with the reminder
+        :param user_id: The ID of the user who owns the reminder
+        :return: API response
+        """
+        return self.delete(
+            f"messages/{message_id}/reminders", params={"user_id": user_id}
+        )
+
+    def query_reminders(
+        self,
+        user_id: str,
+        filter_conditions: Dict = None,
+        sort: List[Dict] = None,
+        **options: Any,
+    ) -> StreamResponse:
+        """
+        Queries reminders based on filter conditions.
+
+        :param user_id: The ID of the user whose reminders to query
+        :param filter_conditions: Conditions to filter reminders
+        :param sort: Sort parameters (default: [{ field: 'remind_at', direction: 1 }])
+        :param options: Additional query options like limit, offset
+        :return: API response with reminders
+        """
+        params = options.copy()
+        params["filter_conditions"] = filter_conditions or {}
+        params["sort"] = sort or [{"field": "remind_at", "direction": 1}]
+        params["user_id"] = user_id
+        return self.post("reminders/query", data=params)

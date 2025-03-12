@@ -1369,6 +1369,72 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def create_reminder(
+        self,
+        message_id: str,
+        user_id: str,
+        remind_at: Optional[datetime.datetime] = None,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Creates a reminder for a message.
+
+        :param message_id: The ID of the message to create a reminder for
+        :param user_id: The ID of the user creating the reminder
+        :param remind_at: When to remind the user (optional)
+        :return: API response
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_reminder(
+        self,
+        message_id: str,
+        user_id: str,
+        remind_at: Optional[datetime.datetime] = None,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates a reminder for a message.
+
+        :param message_id: The ID of the message with the reminder
+        :param user_id: The ID of the user who owns the reminder
+        :param remind_at: When to remind the user (optional)
+        :return: API response
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_reminder(
+        self, message_id: str, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes a reminder for a message.
+
+        :param message_id: The ID of the message with the reminder
+        :param user_id: The ID of the user who owns the reminder
+        :return: API response
+        """
+        pass
+
+    @abc.abstractmethod
+    def query_reminders(
+        self,
+        user_id: str,
+        filter_conditions: Dict = None,
+        sort: List[Dict] = None,
+        **options: Any,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Queries reminders based on filter conditions.
+
+        :param user_id: The ID of the user whose reminders to query
+        :param filter_conditions: Conditions to filter reminders
+        :param sort: Sort parameters (default: [{ field: 'remind_at', direction: 1 }])
+        :param options: Additional query options like limit, offset
+        :return: API response with reminders
+        """
+        pass
+
     #####################
     #  Private methods  #
     #####################
