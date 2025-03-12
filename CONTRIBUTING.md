@@ -36,6 +36,57 @@ We use Black (code formatter), isort (code formatter), flake8 (linter) and mypy 
 $ make lint
 ```
 
+### Using Docker for development
+
+You can also use Docker to run tests and linters without setting up a local Python environment. This is especially useful for ensuring consistent behavior across different environments.
+
+#### Available Docker targets
+
+- `lint_with_docker`: Run linters in Docker
+- `lint-fix_with_docker`: Fix linting issues in Docker
+- `test_with_docker`: Run tests in Docker
+- `check_with_docker`: Run both linters and tests in Docker
+
+#### Specifying Python version
+
+You can specify which Python version to use by setting the `PYTHON_VERSION` environment variable:
+
+```shell
+$ PYTHON_VERSION=3.9 make lint_with_docker
+```
+
+The default Python version is 3.8 if not specified.
+
+#### Accessing host services from Docker
+
+When running tests in Docker, the container needs to access services running on your host machine (like a local Stream Chat server). The Docker targets use `host.docker.internal` to access the host machine, which is automatically configured with the `--add-host=host.docker.internal:host-gateway` flag.
+
+> ⚠️ **Note**: The `host.docker.internal` DNS name works on Docker for Mac, Docker for Windows, and recent versions of Docker for Linux. If you're using an older version of Docker for Linux, you might need to use your host's actual IP address instead.
+
+For tests that need to access a Stream Chat server running on your host machine, the Docker targets automatically set `STREAM_HOST=http://host.docker.internal:3030`.
+
+#### Examples
+
+Run linters in Docker:
+```shell
+$ make lint_with_docker
+```
+
+Fix linting issues in Docker:
+```shell
+$ make lint-fix_with_docker
+```
+
+Run tests in Docker:
+```shell
+$ make test_with_docker
+```
+
+Run both linters and tests in Docker:
+```shell
+$ make check_with_docker
+```
+
 ## Commit message convention
 
 Since we're autogenerating our [CHANGELOG](./CHANGELOG.md), we need to follow a specific commit message convention.
