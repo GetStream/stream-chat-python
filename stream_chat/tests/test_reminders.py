@@ -1,7 +1,4 @@
-import uuid
 from datetime import datetime, timedelta, timezone
-
-import pytest
 
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException

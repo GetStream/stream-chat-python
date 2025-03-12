@@ -779,7 +779,10 @@ class StreamChat(StreamChatInterface):
         return self.post("unread_batch", data={"user_ids": user_ids})
 
     def create_reminder(
-        self, message_id: str, user_id: str, remind_at: Optional[datetime.datetime] = None
+        self,
+        message_id: str,
+        user_id: str,
+        remind_at: Optional[datetime.datetime] = None,
     ) -> StreamResponse:
         """
         Creates a reminder for a message.
@@ -796,7 +799,10 @@ class StreamChat(StreamChatInterface):
         return self.post(f"messages/{message_id}/reminders", data=data)
 
     def update_reminder(
-        self, message_id: str, user_id: str, remind_at: Optional[datetime.datetime] = None
+        self,
+        message_id: str,
+        user_id: str,
+        remind_at: Optional[datetime.datetime] = None,
     ) -> StreamResponse:
         """
         Updates a reminder for a message.

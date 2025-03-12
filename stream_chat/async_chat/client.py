@@ -833,10 +833,14 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         :return: API response
         """
         data = {"user_id": user_id}
+        remind_at_timestamp = ""
         if remind_at is not None:
             if isinstance(remind_at, datetime.datetime):
-                remind_at = remind_at.isoformat()
-            data["remind_at"] = remind_at
+                remind_at_timestamp = remind_at.isoformat()
+            else:
+                remind_at_timestamp = str(remind_at)
+
+            data["remind_at"] = remind_at_timestamp
 
         return await self.post(f"messages/{message_id}/reminders", data=data)
 
@@ -855,10 +859,14 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         :return: API response
         """
         data = {"user_id": user_id}
+        remind_at_timestamp = ""
         if remind_at is not None:
             if isinstance(remind_at, datetime.datetime):
-                remind_at = remind_at.isoformat()
-            data["remind_at"] = remind_at
+                remind_at_timestamp = remind_at.isoformat()
+            else:
+                remind_at_timestamp = str(remind_at)
+
+            data["remind_at"] = remind_at_timestamp
         return await self.patch(f"messages/{message_id}/reminders", data=data)
 
     async def delete_reminder(self, message_id: str, user_id: str) -> StreamResponse:
