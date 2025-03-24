@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from stream_chat.base.channel import ChannelInterface, add_user_id
 from stream_chat.base.exceptions import StreamChannelException
@@ -247,3 +247,23 @@ class Channel(ChannelInterface):
 
         payload = {"set": to_set or {}, "unset": to_unset or []}
         return await self.client.patch(f"{self.url}/member/{user_id}", data=payload)
+
+    async def create_draft(self, message: Dict, user_id: str) -> StreamResponse:
+        payload = {"message": add_user_id(message, user_id)}
+        return await self.client.post(f"{self.url}/draft", data=payload)
+
+    async def delete_draft(
+        self, user_id: str, parent_id: Optional[str] = None
+    ) -> StreamResponse:
+        params = {"user_id": user_id}
+        if parent_id:
+            params["parent_id"] = parent_id
+        return await self.client.delete(f"{self.url}/draft", params=params)
+
+    async def get_draft(
+        self, user_id: str, parent_id: Optional[str] = None
+    ) -> StreamResponse:
+        params = {"user_id": user_id}
+        if parent_id:
+            params["parent_id"] = parent_id
+        return await self.client.get(f"{self.url}/draft", params=params)
