@@ -177,13 +177,9 @@ class TestClient:
         user_id = str(uuid.uuid4())
         client.upsert_user({"id": user_id, "name": "Test User"})
 
-        response = client.update_user_partial({
-            "id": user_id,
-            "set": {
-                "team": "blue",
-                "teams_role": {"blue": "admin"}
-            }
-        })
+        response = client.update_user_partial(
+            {"id": user_id, "set": {"team": "blue", "teams_role": {"blue": "admin"}}}
+        )
 
         assert "users" in response
         assert user_id in response["users"]
