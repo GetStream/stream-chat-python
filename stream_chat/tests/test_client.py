@@ -143,6 +143,18 @@ class TestClient:
         assert "users" in response
         assert user["id"] in response["users"]
 
+    def test_update_user_with_team(self, client: StreamChat):
+        user = {
+            "id": str(uuid.uuid4()),
+            "team": "blue",
+            "teams_role": {"blue": "admin"}
+        }
+        response = client.upsert_user(user)
+        assert "users" in response
+        assert user["id"] in response["users"]
+        assert response["users"][user["id"]]["team"] == "blue"
+        assert response["users"][user["id"]]["teams_role"]["blue"] == "admin"
+
     def test_update_users(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
         response = client.upsert_users([user])
@@ -160,6 +172,23 @@ class TestClient:
         assert "users" in response
         assert user_id in response["users"]
         assert response["users"][user_id]["field"] == "updated"
+
+    def test_update_user_partial_with_team(self, client: StreamChat):
+        user_id = str(uuid.uuid4())
+        client.upsert_user({"id": user_id, "name": "Test User"})
+
+        response = client.update_user_partial({
+            "id": user_id,
+            "set": {
+                "team": "blue",
+                "teams_role": {"blue": "admin"}
+            }
+        })
+
+        assert "users" in response
+        assert user_id in response["users"]
+        assert response["users"][user_id]["team"] == "blue"
+        assert response["users"][user_id]["teams_role"]["blue"] == "admin"
 
     def test_delete_user(self, client: StreamChat, random_user: Dict):
         response = client.delete_user(random_user["id"])
