@@ -147,7 +147,7 @@ class TestClient:
         user = {
             "id": str(uuid.uuid4()),
             "team": "blue",
-            "teams_role": {"blue": "admin"}
+            "teams_role": {"blue": "admin"},
         }
         response = client.upsert_user(user)
         assert "users" in response
