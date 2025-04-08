@@ -8,6 +8,7 @@ import pytest
 from stream_chat.async_chat.channel import Channel
 from stream_chat.async_chat.client import StreamChatAsync
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.tests.async_chat.conftest import hard_delete_users
 
 
 @pytest.mark.incremental
@@ -34,6 +35,7 @@ class TestChannel:
 
         await channel.create(random_users[0]["id"])
         assert channel.id is not None
+        await channel.delete(hard=True)
 
     async def test_create_with_options(
         self, client: StreamChatAsync, random_users: List[Dict]
@@ -45,6 +47,7 @@ class TestChannel:
 
         await channel.create(random_users[0]["id"], hide_for_creator=True)
         assert channel.id is not None
+        await channel.delete(hard=True)
 
     async def test_send_message_with_options(self, channel: Channel, random_user: Dict):
         response = await channel.send_message(
@@ -54,26 +57,23 @@ class TestChannel:
         assert response["message"]["text"] == "hi"
 
     async def test_send_message_with_restricted_visibility(
-        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+        self, channel: Channel, random_users: List[Dict]
     ):
-        # Create test users first
-        restricted_users = [
-            {"id": "amy", "name": "Amy"},
-            {"id": "paul", "name": "Paul"},
-        ]
-        await client.upsert_users(restricted_users)
+        amy = random_users[0]["id"]
+        paul = random_users[1]["id"]
+        user = random_users[2]["id"]
 
         # Add users to channel
-        await channel.add_members([u["id"] for u in restricted_users])
+        await channel.add_members([amy, paul])
 
         # Send message with restricted visibility
         response = await channel.send_message(
-            {"text": "hi", "restricted_visibility": ["amy", "paul"]}, random_user["id"]
+            {"text": "hi", "restricted_visibility": [amy, paul]}, user
         )
 
         assert "message" in response
         assert response["message"]["text"] == "hi"
-        assert response["message"]["restricted_visibility"] == ["amy", "paul"]
+        assert response["message"]["restricted_visibility"] == [amy, paul]
 
     async def test_send_event(self, channel: Channel, random_user: Dict):
         response = await channel.send_event({"type": "typing.start"}, random_user["id"])
@@ -303,39 +303,44 @@ class TestChannel:
         )
         assert len(response["channels"]) == 1
 
-    async def test_invites(self, client: StreamChatAsync, channel: Channel):
-        members = ["john", "paul", "george", "pete", "ringo", "eric"]
-        await client.upsert_users([{"id": m} for m in members])
+    async def test_invites(self, client: StreamChatAsync, random_users: List[Dict]):
+        john = random_users[0]["id"]
+        ringo = random_users[1]["id"]
+        eric = random_users[2]["id"]
+
         channel = client.channel(
             "team",
             "beatles-" + str(uuid.uuid4()),
-            {"members": members, "invites": ["ringo", "eric"]},
+            {"members": [john], "invites": [ringo, eric]},
         )
-        await channel.create("john")
+        await channel.create(john)
         # accept the invite when not a member
         with pytest.raises(StreamAPIException):
-            await channel.accept_invite("brian")
+            await channel.accept_invite("brian" + str(uuid.uuid4()))
         # accept the invite when a member
-        accept = await channel.accept_invite("ringo")
+        accept = await channel.accept_invite(ringo)
         for m in accept["members"]:
-            if m["user_id"] == "ringo":
+            if m["user_id"] == ringo:
                 assert m["invited"] is True
                 assert "invite_accepted_at" in m
         # can accept again, noop
-        await channel.accept_invite("ringo")
+        await channel.accept_invite(ringo)
 
-        reject = await channel.reject_invite("eric")
+        reject = await channel.reject_invite(eric)
         for m in reject["members"]:
-            if m["user_id"] == "eric":
+            if m["user_id"] == eric:
                 assert m["invited"] is True
                 assert "invite_rejected_at" in m
         # can reject again, noop
-        await channel.reject_invite("eric")
+        await channel.reject_invite(eric)
+        await channel.delete(hard=True)
 
     async def test_query_members(self, client: StreamChatAsync, channel: Channel):
-        members = ["paul", "george", "john", "jessica", "john2"]
-        await client.upsert_users([{"id": m, "name": m} for m in members])
-        for member in members:
+        rand = str(uuid.uuid4())
+        user_ids = ["paul", "george", "john", "jessica", "john2"]
+        user_ids = [f"{n}-{rand}" for n in user_ids]
+        await client.upsert_users([{"id": m, "name": m} for m in user_ids])
+        for member in user_ids:
             await channel.add_members([member])
 
         response = await channel.query_members(
@@ -346,8 +351,10 @@ class TestChannel:
         )
 
         assert len(response) == 2
-        assert response[0]["user"]["id"] == "jessica"
-        assert response[1]["user"]["id"] == "john2"
+        assert response[0]["user"]["id"] == f"jessica-{rand}"
+        assert response[1]["user"]["id"] == f"john2-{rand}"
+
+        await hard_delete_users(client, user_ids)
 
     async def test_mute_unmute(
         self, client: StreamChatAsync, channel: Channel, random_users: List[Dict]

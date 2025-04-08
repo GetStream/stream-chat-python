@@ -86,7 +86,7 @@ async def channel(client: StreamChatAsync, random_user: Dict):
     yield channel
 
     try:
-        await channel.delete()
+        await client.delete_channels([channel.cid], hard_delete=True)
     except Exception:
         pass
 
@@ -128,10 +128,10 @@ async def fellowship_of_the_ring(client: StreamChatAsync):
     await channel.create("gandalf")
     yield
     try:
-        await channel.delete()
+        await channel.delete(hard=True)
+        await hard_delete_users(client, [m["id"] for m in members])
     except Exception:
         pass
-    await hard_delete_users(client, [m["id"] for m in members])
 
 
 async def hard_delete_users(client: StreamChatAsync, user_ids: List[str]):

@@ -165,7 +165,9 @@ class ChannelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def delete(
+        self, hard: bool = False
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Delete the channel. Messages are permanently removed.
 
