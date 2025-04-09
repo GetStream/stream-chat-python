@@ -15,6 +15,7 @@ import pytest
 from stream_chat.async_chat import StreamChatAsync
 from stream_chat.async_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
+from stream_chat.tests.async_chat.conftest import hard_delete_users
 from stream_chat.tests.utils import wait_for_async
 
 
@@ -140,23 +141,26 @@ class TestClient:
         assert "users" in response
         assert user["id"] in response["users"]
 
+        await hard_delete_users(client, [user["id"]])
+
     async def test_update_users(self, client: StreamChatAsync):
         user = {"id": str(uuid.uuid4())}
         response = await client.upsert_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
 
-    async def test_update_user_partial(self, client: StreamChatAsync):
-        user_id = str(uuid.uuid4())
-        await client.upsert_user({"id": user_id, "field": "value"})
+        await hard_delete_users(client, [user["id"]])
 
+    async def test_update_user_partial(
+        self, client: StreamChatAsync, random_user: Dict
+    ):
         response = await client.update_user_partial(
-            {"id": user_id, "set": {"field": "updated"}}
+            {"id": random_user["id"], "set": {"field": "updated"}}
         )
 
         assert "users" in response
-        assert user_id in response["users"]
-        assert response["users"][user_id]["field"] == "updated"
+        assert random_user["id"] in response["users"]
+        assert response["users"][random_user["id"]]["field"] == "updated"
 
     async def test_delete_user(self, client: StreamChatAsync, random_user: Dict):
         response = await client.delete_user(random_user["id"])
@@ -364,22 +368,22 @@ class TestClient:
         assert response["message"]["awesome"] is True
 
     async def test_update_message_restricted_visibility(
-        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+        self,
+        client: StreamChatAsync,
+        channel: Channel,
+        random_users: List[Dict],
     ):
-        # Create test users first
-        restricted_users = [
-            {"id": "amy", "name": "Amy"},
-            {"id": "paul", "name": "Paul"},
-        ]
-        await client.upsert_users(restricted_users)
+        amy = random_users[0]["id"]
+        paul = random_users[1]["id"]
+        user = random_users[2]["id"]
 
         # Add users to channel
-        await channel.add_members([u["id"] for u in restricted_users])
+        await channel.add_members([amy, paul])
 
         # Send initial message
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
-            {"id": msg_id, "text": "hello world"}, random_user["id"]
+            {"id": msg_id, "text": "hello world"}, user
         )
         assert response["message"]["text"] == "hello world"
 
@@ -388,38 +392,38 @@ class TestClient:
             {
                 "id": msg_id,
                 "text": "helloworld",
-                "restricted_visibility": ["amy", "paul"],
+                "restricted_visibility": [amy, paul],
                 "user": {"id": response["message"]["user"]["id"]},
             }
         )
         assert response["message"]["text"] == "helloworld"
-        assert response["message"]["restricted_visibility"] == ["amy", "paul"]
+        assert response["message"]["restricted_visibility"] == [amy, paul]
 
     async def test_update_message_partial_restricted_visibility(
-        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+        self,
+        client: StreamChatAsync,
+        channel: Channel,
+        random_users: List[Dict],
     ):
-        # Create test users first
-        restricted_users = [
-            {"id": "amy", "name": "Amy"},
-            {"id": "paul", "name": "Paul"},
-        ]
-        client.upsert_users(restricted_users)
+        amy = random_users[0]["id"]
+        paul = random_users[1]["id"]
+        user = random_users[2]["id"]
 
         # Add users to channel
-        channel.add_members([u["id"] for u in restricted_users])
+        await channel.add_members([amy, paul])
 
         msg_id = str(uuid.uuid4())
         response = await channel.send_message(
-            {"id": msg_id, "text": "hello world"}, random_user["id"]
+            {"id": msg_id, "text": "hello world"}, user
         )
         assert response["message"]["text"] == "hello world"
         response = await client.update_message_partial(
             msg_id,
-            dict(set=dict(text="helloworld", restricted_visibility=["amy"])),
-            random_user["id"],
+            dict(set=dict(text="helloworld", restricted_visibility=[amy])),
+            user,
         )
 
-        assert response["message"]["restricted_visibility"] == ["amy"]
+        assert response["message"]["restricted_visibility"] == [amy]
 
     async def test_delete_message(
         self, client: StreamChatAsync, channel: Channel, random_user: Dict
@@ -615,6 +619,7 @@ class TestClient:
         await channel.send_message(
             {"text": "Does 'cious' count as one or two?"}, random_user["id"]
         )
+        time.sleep(1)  # wait for the message to be indexed in elasticsearch
         response = await client.search(
             {"type": "messaging"}, query, **{"limit": 2, "offset": 0}
         )
@@ -638,6 +643,7 @@ class TestClient:
         await channel.send_message(
             {"text": "Does 'cious' count as one or two?"}, random_user["id"]
         )
+        time.sleep(1)  # wait for the message to be indexed in elasticsearch
         response = await client.search(
             {"type": "messaging"},
             {"text": {"$q": query}},
@@ -724,13 +730,17 @@ class TestClient:
         assert response["status"] == "error"
         assert "publishing the message failed." in response["error"]
 
-    async def test_guest_user(self, client: StreamChatAsync, random_user: Dict):
+    async def test_guest_user(self, client: StreamChatAsync):
         try:
-            response = await client.set_guest_user({"user": {"id": str(uuid.uuid4())}})
+            user_id = str(uuid.uuid4())
+            response = await client.set_guest_user({"user": {"id": user_id}})
             assert "access_token" in response
         except StreamAPIException:
             # Guest user isn't turned on for every test app
             pass
+
+        # clean up
+        await hard_delete_users(client, [user_id])
 
     async def test_run_message_actions(
         self, client: StreamChatAsync, channel: Channel, random_user: Dict
@@ -893,14 +903,14 @@ class TestClient:
         assert len(list_resp["import_tasks"]) == 1
 
     async def test_unread_counts(
-        self, client: StreamChatAsync, channel, random_user: Dict
+        self, client: StreamChatAsync, channel, random_users: List[Dict]
     ):
-        await channel.add_members([random_user["id"]])
+        user1 = random_users[0]["id"]
+        user2 = random_users[1]["id"]
+        await channel.add_members([user1])
         msg_id = str(uuid.uuid4())
-        await channel.send_message(
-            {"id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
-        )
-        response = await client.unread_counts(random_user["id"])
+        await channel.send_message({"id": msg_id, "text": "helloworld"}, user2)
+        response = await client.unread_counts(user1)
         assert "total_unread_count" in response
         assert "channels" in response
         assert "channel_type" in response
@@ -910,13 +920,9 @@ class TestClient:
         assert len(response["channel_type"]) == 1
 
         # test threads unread counts
-        await channel.send_message(
-            {"parent_id": msg_id, "text": "helloworld"}, random_user["id"]
-        )
-        await channel.send_message(
-            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
-        )
-        response = await client.unread_counts(random_user["id"])
+        await channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user1)
+        await channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user2)
+        response = await client.unread_counts(user1)
         assert "total_unread_threads_count" in response
         assert "threads" in response
         assert response["total_unread_threads_count"] == 1
@@ -924,16 +930,16 @@ class TestClient:
         assert response["threads"][0]["parent_message_id"] == msg_id
 
     async def test_unread_counts_batch(
-        self, client: StreamChatAsync, channel, random_users: Dict
+        self, client: StreamChatAsync, channel, random_users: List[Dict]
     ):
-        await channel.add_members([x["id"] for x in random_users])
+        user1 = random_users[0]["id"]
+        members = [x["id"] for x in random_users[1:]]
+        await channel.add_members(members)
         msg_id = str(uuid.uuid4())
-        await channel.send_message(
-            {"id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
-        )
-        response = await client.unread_counts_batch([x["id"] for x in random_users])
+        await channel.send_message({"id": msg_id, "text": "helloworld"}, user1)
+        response = await client.unread_counts_batch(members)
         assert "counts_by_user" in response
-        for user_id in [x["id"] for x in random_users]:
+        for user_id in members:
             assert user_id in response["counts_by_user"]
             assert response["counts_by_user"][user_id]["total_unread_count"] == 1
 
@@ -943,11 +949,9 @@ class TestClient:
             )
 
         # test threads unread counts
-        await channel.send_message(
-            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
-        )
-        response = await client.unread_counts_batch([x["id"] for x in random_users])
-        for user_id in [x["id"] for x in random_users]:
+        await channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user1)
+        response = await client.unread_counts_batch(members)
+        for user_id in members:
             assert user_id in response["counts_by_user"]
             assert (
                 response["counts_by_user"][user_id]["total_unread_threads_count"] == 1
