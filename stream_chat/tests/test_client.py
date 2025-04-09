@@ -179,6 +179,9 @@ class TestClient:
 
     def test_update_user_partial_with_team(self, client: StreamChat, random_user: Dict):
         user_id = random_user["id"]
+        # add user to the team
+        client.update_user_partial({"id": user_id, "set": {"teams": ["blue"]}})
+
         response = client.update_user_partial(
             {"id": user_id, "set": {"team": "blue", "teams_role": {"blue": "admin"}}}
         )
