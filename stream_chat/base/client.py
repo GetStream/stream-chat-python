@@ -9,6 +9,7 @@ from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Unio
 
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -1382,6 +1383,16 @@ class StreamChatInterface(abc.ABC):
         """
         Get unread counts for multiple users at once.
         """
+        pass
+
+    @abc.abstractmethod
+    def query_drafts(
+        self,
+        user_id: str,
+        filter: Optional[QueryDraftsFilter] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryDraftsOptions] = None,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     #####################
