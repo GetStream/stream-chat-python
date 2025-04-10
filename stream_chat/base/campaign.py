@@ -3,7 +3,7 @@ import datetime
 from typing import Awaitable, Optional, Union
 
 from stream_chat.base.client import StreamChatInterface
-from stream_chat.types.campaign import CampaignData
+from stream_chat.types.campaign import CampaignData, GetCampaignOptions
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -25,7 +25,9 @@ class CampaignInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get(self) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def get(
+        self, options: Optional[GetCampaignOptions] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         pass
 
     @abc.abstractmethod
