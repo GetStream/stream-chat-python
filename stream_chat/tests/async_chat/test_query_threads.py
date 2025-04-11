@@ -66,7 +66,7 @@ class TestQueryThreads:
             filter=filter_conditions,
             sort=sort_conditions,
             limit=1,
-            user_id=random_user["id"]
+            user_id=random_user["id"],
         )
 
         assert isinstance(response, StreamResponse)
