@@ -568,7 +568,7 @@ class StreamChatInterface(abc.ABC):
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Allows you to query threads using filter and sort. You can find the complete list of supported operators in the query syntax section of the docs.
-        
+
         :param filter: Filter conditions for the query
         :param sort: Sort conditions for the query
         :return: StreamResponse containing the threads

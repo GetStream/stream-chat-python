@@ -11,9 +11,14 @@ class QueryThreadsInterface(abc.ABC):
     @property
     def url(self):
         return "threads"
-    
+
     @abc.abstractmethod
-    def query_threads(self, filter:Dict[str, Dict[str, Any]], sort:List[Dict[str, Any]], **options:Any) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+    def query_threads(
+        self,
+        filter: Dict[str, Dict[str, Any]],
+        sort: List[Dict[str, Any]],
+        **options: Any,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Get a list of threads given filter and sort options
 
