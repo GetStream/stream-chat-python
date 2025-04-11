@@ -563,6 +563,19 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def query_threads(
+        self, filter: Dict = None, sort: List[Dict] = None, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Allows you to query threads using filter and sort. You can find the complete list of supported operators in the query syntax section of the docs.
+        
+        :param filter: Filter conditions for the query
+        :param sort: Sort conditions for the query
+        :return: StreamResponse containing the threads
+        """
+        pass
+
+    @abc.abstractmethod
     def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
