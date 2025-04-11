@@ -360,6 +360,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         )
         return await self.post("messages/history", data=params)
 
+    async def query_threads(
+        self, filter: Dict = None, sort: List[Dict] = None, **options: Any
+    ) -> StreamResponse:
+        params = options.copy()
+        params.update({"filter": filter, "sort": self.normalize_sort(sort)})
+        return await self.post("threads", data=params)
+
     async def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
     ) -> StreamResponse:
