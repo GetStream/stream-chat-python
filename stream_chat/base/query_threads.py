@@ -1,15 +1,17 @@
 import abc
 from typing import Any, Awaitable, Dict, List, Union
 
+from stream_chat.base.client import StreamChatInterface
 from stream_chat.types.stream_response import StreamResponse
 
 
 class QueryThreadsInterface(abc.ABC):
-    def __init__(self):
-        pass
+    @abc.abstractmethod
+    def __init__(self, client: StreamChatInterface):
+        self.client = client
 
     @property
-    def url(self):
+    def url(self) -> str:
         return "threads"
 
     @abc.abstractmethod
