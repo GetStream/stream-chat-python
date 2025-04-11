@@ -26,7 +26,7 @@ class TestQueryThreads:
         sort_conditions = [{"field": "created_at", "direction": -1}]
 
         response = await client.query_threads(
-            filter=filter_conditions, sort=sort_conditions
+            filter=filter_conditions, sort=sort_conditions, user_id=random_user["id"]
         )
 
         assert isinstance(response, StreamResponse)
@@ -66,6 +66,7 @@ class TestQueryThreads:
             filter=filter_conditions,
             sort=sort_conditions,
             limit=1,
+            user_id=random_user["id"]
         )
 
         assert isinstance(response, StreamResponse)
