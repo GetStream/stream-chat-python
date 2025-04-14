@@ -21,6 +21,7 @@ from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -831,6 +832,28 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
         return await self.post("unread_batch", data={"user_ids": user_ids})
+
+    async def query_drafts(
+        self,
+        user_id: str,
+        filter: Optional[QueryDraftsFilter] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryDraftsOptions] = None,
+    ) -> StreamResponse:
+        data: Dict[str, Union[str, Dict[str, Any], List[SortParam]]] = {
+            "user_id": user_id
+        }
+
+        if filter is not None:
+            data["filter"] = cast(dict, filter)
+
+        if sort is not None:
+            data["sort"] = cast(dict, sort)
+
+        if options is not None:
+            data.update(cast(dict, options))
+
+        return await self.post("drafts/query", data=data)
 
     async def close(self) -> None:
         await self.session.close()

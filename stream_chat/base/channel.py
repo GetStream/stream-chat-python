@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Awaitable, Dict, Iterable, List, Union
+from typing import Any, Awaitable, Dict, Iterable, List, Optional, Union
 
 from stream_chat.base.client import StreamChatInterface
 from stream_chat.base.exceptions import StreamChannelException
@@ -485,6 +485,45 @@ class ChannelInterface(abc.ABC):
 
         :param to_set: a dictionary of key/value pairs to set or to override
         :param to_unset: a list of keys to clear
+        """
+        pass
+
+    @abc.abstractmethod
+    def create_draft(
+        self, message: Dict, user_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Creates or updates a draft message in a channel.
+
+        :param message: The message object
+        :param user_id: The ID of the user creating the draft
+        :return: The Server Response
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_draft(
+        self, user_id: str, parent_id: Optional[str] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Deletes a draft message from a channel.
+
+        :param user_id: The ID of the user who owns the draft
+        :param parent_id: Optional ID of the parent message if this is a thread draft
+        :return: The Server Response
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_draft(
+        self, user_id: str, parent_id: Optional[str] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Retrieves a draft message from a channel.
+
+        :param user_id: The ID of the user who owns the draft
+        :param parent_id: Optional ID of the parent message if this is a thread draft
+        :return: The Server Response
         """
         pass
 

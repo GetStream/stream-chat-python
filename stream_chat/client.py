@@ -10,6 +10,7 @@ from stream_chat.campaign import Campaign
 from stream_chat.segment import Segment
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -789,3 +790,21 @@ class StreamChat(StreamChatInterface):
 
     def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
         return self.post("unread_batch", data={"user_ids": user_ids})
+
+    def query_drafts(
+        self,
+        user_id: str,
+        filter: Optional[QueryDraftsFilter] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryDraftsOptions] = None,
+    ) -> StreamResponse:
+        data: Dict[str, Union[str, Dict[str, Any], List[SortParam]]] = {
+            "user_id": user_id
+        }
+        if filter is not None:
+            data["filter"] = cast(dict, filter)
+        if sort is not None:
+            data["sort"] = cast(dict, sort)
+        if options is not None:
+            data.update(cast(dict, options))
+        return self.post("drafts/query", data=data)
