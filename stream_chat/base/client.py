@@ -8,7 +8,11 @@ import sys
 from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Union
 
 from stream_chat.types.base import SortParam
-from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.campaign import (
+    CampaignData,
+    QueryCampaignsOptions,
+    GetCampaignOptions,
+)
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -1112,10 +1116,14 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def get_campaign(
-        self, campaign_id: str
+        self, campaign_id: str, options: Optional[GetCampaignOptions] = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Create a campaign
+        Get a campaign
+        
+        :param campaign_id: ID of the campaign to get
+        :param options: Optional parameters for the request
+        :return: Campaign data
         """
         pass
 

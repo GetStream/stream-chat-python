@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict
+from typing import Dict, List
 
 import pytest
 
@@ -60,6 +60,37 @@ class TestCampaign:
         assert deleted.is_ok()
 
         await client.delete_segment(segment_id=segment_id)
+
+    async def test_get_campaign_with_user_pagination(
+        self, client: StreamChatAsync, random_users: List[Dict]
+    ):
+        # Create a campaign with user_ids
+        campaign = client.campaign(
+            data={
+                "message_template": {
+                    "text": "Test message",
+                },
+                "user_ids": [user["id"] for user in random_users],
+                "sender_id": random_users[0]["id"],
+                "name": "test campaign with users",
+            }
+        )
+        created = await campaign.create()
+        assert created.is_ok()
+        campaign_id = created["campaign"]["id"]
+
+        # Test get_campaign with user pagination options
+        response = await campaign.get(
+            options={"users": {"limit": 2}}  # Limit to 2 users per page
+        )
+        assert response.is_ok()
+        assert "campaign" in response
+        assert response["campaign"]["id"] == campaign_id
+        assert "users" in response["campaign"]
+        assert len(response["campaign"]["users"]) <= 2  # Verify pagination limit worked
+
+        # Cleanup
+        await campaign.delete()
 
     async def test_campaign_start_stop(
         self, client: StreamChatAsync, random_user: Dict
