@@ -22,7 +22,7 @@ class TestQueryThreads:
         )
 
         # Query threads with filter and sort
-        filter_conditions = {"parent_id": parent_message["message"]["id"]}
+        filter_conditions = {"parent_message_id": parent_message["message"]["id"]}
         sort_conditions = [{"field": "created_at", "direction": -1}]
 
         response = await client.query_threads(
@@ -43,23 +43,22 @@ class TestQueryThreads:
     async def test_query_threads_with_options(
         self, client: StreamChatAsync, channel, random_user: Dict
     ):
-        # Create a thread with multiple messages
-        parent_message = await channel.send_message(
-            {"text": "Parent message"}, random_user["id"]
-        )
-        thread_messages = []
+
         for i in range(3):
-            msg = await channel.send_message(
+            parent_msg = await channel.send_message(
+                {"text": f"Parent message {i}"}, random_user["id"]
+            )
+
+            await channel.send_message(
                 {
                     "text": f"Thread message {i}",
-                    "parent_id": parent_message["message"]["id"],
+                    "parent_id": parent_msg["message"]["id"],
                 },
                 random_user["id"],
             )
-            thread_messages.append(msg)
 
         # Query threads with limit and offset
-        filter_conditions = {"parent_id": parent_message["message"]["id"]}
+        filter_conditions = {"channel_cid": channel.cid}
         sort_conditions = [{"field": "created_at", "direction": -1}]
 
         response = await client.query_threads(

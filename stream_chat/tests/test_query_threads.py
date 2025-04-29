@@ -17,7 +17,7 @@ class TestQueryThreads:
             random_user["id"],
         )
 
-        filter_conditions = {"parent_id": parent_message["message"]["id"]}
+        filter_conditions = {"parent_message_id": parent_message["message"]["id"]}
         sort_conditions = [{"field": "created_at", "direction": -1}]
 
         response = client.query_threads(
@@ -36,21 +36,20 @@ class TestQueryThreads:
     def test_query_threads_with_options(
         self, client: StreamChat, channel, random_user: Dict
     ):
-        parent_message = channel.send_message(
-            {"text": "Parent message"}, random_user["id"]
-        )
-        thread_messages = []
         for i in range(3):
-            msg = channel.send_message(
+            parent_msg = channel.send_message(
+                {"text": f"Parent message {i}"}, random_user["id"]
+            )
+
+            channel.send_message(
                 {
                     "text": f"Thread message {i}",
-                    "parent_id": parent_message["message"]["id"],
+                    "parent_id": parent_msg["message"]["id"],
                 },
                 random_user["id"],
             )
-            thread_messages.append(msg)
 
-        filter_conditions = {"parent_id": parent_message["message"]["id"]}
+        filter_conditions = {"channel_cid": channel.cid}
         sort_conditions = [{"field": "created_at", "direction": -1}]
 
         response = client.query_threads(
