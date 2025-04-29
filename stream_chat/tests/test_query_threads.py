@@ -41,7 +41,7 @@ class TestQueryThreads:
                 {"text": f"Parent message {i}"}, random_user["id"]
             )
 
-            thread_msg = channel.send_message(
+            channel.send_message(
                 {
                     "text": f"Thread message {i}",
                     "parent_id": parent_msg["message"]["id"],
