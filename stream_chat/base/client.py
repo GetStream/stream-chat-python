@@ -356,6 +356,37 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def block_user(
+        self, blocked_user_id: str, user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Blocks a user. When a user is blocked, they will not be able to communicate with the
+        blocking user in 1-on-1 channels, and will not be able to add the blocking user to channels.
+        To unblock a user, use `unblock_user` method.
+        """
+        pass
+
+    @abc.abstractmethod
+    def unblock_user(
+        self, blocked_user_id: str, user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Unblocks a user. This allows the previously blocked user to communicate with the
+        unblocking user in 1-on-1 channels again, and all previous messages become visible.
+        To block a user, use `block_user` method.
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_blocked_users(
+        self, user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Retrieves the list of users that have been blocked by the specified user.
+        """
+        pass
+
+    @abc.abstractmethod
     def run_message_action(
         self, message_id: str, data: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:

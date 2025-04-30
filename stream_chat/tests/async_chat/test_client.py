@@ -304,6 +304,29 @@ class TestClient:
         )
         assert len(resp["bans"]) == 1
 
+    async def test_block_user(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
+        await client.block_user(random_user["id"], server_user["id"])
+        response = await client.get_blocked_users(server_user["id"])
+        assert len(response["blocks"]) > 0
+
+    async def test_unblock_user(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
+        await client.block_user(random_user["id"], server_user["id"])
+        await client.unblock_user(random_user["id"], server_user["id"])
+
+        response = await client.get_blocked_users(server_user["id"])
+        assert len(response["blocks"]) == 0
+
+    async def test_get_blocked_users(
+        self, client: StreamChatAsync, random_user, server_user: Dict
+    ):
+        await client.block_user(random_user["id"], server_user["id"])
+        response = await client.get_blocked_users(server_user["id"])
+        assert len(response["blocks"]) > 0
+
     async def test_flag_user(
         self, client: StreamChatAsync, random_user, server_user: Dict
     ):

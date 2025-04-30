@@ -209,6 +209,22 @@ class StreamChat(StreamChatInterface):
             "query_banned_users", params={"payload": json.dumps(query_conditions)}
         )
 
+    def block_user(
+        self, blocked_user_id: str, user_id: str, **options: Any
+    ) -> StreamResponse:
+        data = {"blocked_user_id": blocked_user_id, "user_id": user_id, **options}
+        return self.post("users/block", data=data)
+
+    def unblock_user(
+        self, blocked_user_id: str, user_id: str, **options: Any
+    ) -> StreamResponse:
+        data = {"blocked_user_id": blocked_user_id, "user_id": user_id, **options}
+        return self.post("users/unblock", data=data)
+
+    def get_blocked_users(self, user_id: str, **options: Any) -> StreamResponse:
+        params = {"user_id": user_id, **options}
+        return self.get("users/block", params=params)
+
     def run_message_action(self, message_id: str, data: Dict) -> StreamResponse:
         return self.post(f"messages/{message_id}/action", data=data)
 
