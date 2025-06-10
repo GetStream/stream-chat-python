@@ -10,6 +10,7 @@ from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Unio
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
 from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
+from stream_chat.types.shared_locations import SharedLocationsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -1437,6 +1438,20 @@ class StreamChatInterface(abc.ABC):
         sort: Optional[List[SortParam]] = None,
         options: Optional[QueryDraftsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def get_user_locations(self, user_id: str, **options: Any) -> StreamResponse:
+        """
+        Get the locations of a user.
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_user_location(self, message_id: str, options: Optional[SharedLocationsOptions] = None) -> StreamResponse:
+        """
+        Update the location of a user.
+        """
         pass
 
     #####################

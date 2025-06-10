@@ -22,6 +22,7 @@ from stream_chat.async_chat.segment import Segment
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
 from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
+from stream_chat.types.shared_locations import SharedLocationsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -884,3 +885,16 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         exc_tb: Optional[TracebackType],
     ) -> None:
         await self.close()
+
+    async def get_user_locations(self, user_id: str, **options: Any) -> StreamResponse:
+        params = {"user_id": user_id, **options}
+        return await self.get("users/live_locations", params=params)
+
+    async def update_user_location(
+        self, message_id: str, options: Optional[SharedLocationsOptions] = None,
+    ) -> StreamResponse:
+        data = {"message_id": message_id, **options}
+        if options is not None:
+            data.update(cast(dict, options))
+        return await self.put("users/live_locations", data=data)
+    
