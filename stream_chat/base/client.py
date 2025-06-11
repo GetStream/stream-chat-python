@@ -17,6 +17,7 @@ from stream_chat.types.segment import (
     SegmentType,
     SegmentUpdatableFields,
 )
+from stream_chat.types.shared_locations import SharedLocationsOptions
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -1437,6 +1438,24 @@ class StreamChatInterface(abc.ABC):
         sort: Optional[List[SortParam]] = None,
         options: Optional[QueryDraftsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        pass
+
+    @abc.abstractmethod
+    def get_user_locations(
+        self, user_id: str, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Get the locations of a user.
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_user_location(
+        self, message_id: str, options: Optional[SharedLocationsOptions] = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Update the location of a user.
+        """
         pass
 
     #####################
