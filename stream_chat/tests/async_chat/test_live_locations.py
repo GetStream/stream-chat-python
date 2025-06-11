@@ -1,5 +1,6 @@
-import pytest
 from typing import Dict
+
+import pytest
 
 from stream_chat.async_chat.client import StreamChatAsync
 
