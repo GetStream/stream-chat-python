@@ -17,7 +17,10 @@ class TestLiveLocations:
             "longitude": -122.4194,
         }
 
-        channel.send_message({"text": "Message with location", "shared_location": shared_location}, random_user["id"])
+        channel.send_message(
+            {"text": "Message with location", "shared_location": shared_location},
+            random_user["id"],
+        )
 
         # Get user locations
         response = await client.get_user_locations(random_user["id"])
@@ -25,11 +28,15 @@ class TestLiveLocations:
         assert "active_live_locations" in response
         assert isinstance(response["active_live_locations"], list)
 
-    async def test_update_user_location(self, client: StreamChatAsync, random_user: Dict):
+    async def test_update_user_location(
+        self, client: StreamChatAsync, random_user: Dict
+    ):
         # First create a message to attach location to
         channel = client.channel("messaging", str(random_user["id"]))
         await channel.create(random_user["id"])
-        msg = await channel.send_message({"text": "Message with location"}, random_user["id"])
+        msg = await channel.send_message(
+            {"text": "Message with location"}, random_user["id"]
+        )
         message_id = msg["message"]["id"]
 
         # Update user location
@@ -55,4 +62,4 @@ class TestLiveLocations:
         try:
             await channel.delete()
         except Exception:
-            pass 
+            pass

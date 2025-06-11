@@ -17,7 +17,10 @@ class TestLiveLocations:
             "longitude": -122.4194,
         }
 
-        channel.send_message({"text": "Message with location", "shared_location": shared_location}, random_user["id"])
+        channel.send_message(
+            {"text": "Message with location", "shared_location": shared_location},
+            random_user["id"],
+        )
 
         # Get user locations
         response = client.get_user_locations(random_user["id"])
@@ -36,7 +39,10 @@ class TestLiveLocations:
             "longitude": -122.4194,
         }
 
-        msg = channel.send_message({"text": "Message with location", "shared_location": shared_location}, random_user["id"])
+        msg = channel.send_message(
+            {"text": "Message with location", "shared_location": shared_location},
+            random_user["id"],
+        )
         message_id = msg["message"]["id"]
 
         # Update user location
@@ -62,4 +68,4 @@ class TestLiveLocations:
         try:
             channel.delete()
         except Exception:
-            pass 
+            pass

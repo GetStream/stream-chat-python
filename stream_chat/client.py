@@ -831,7 +831,9 @@ class StreamChat(StreamChatInterface):
         return self.get("users/live_locations", params=params)
 
     def update_user_location(
-        self, message_id: str, options: Optional[SharedLocationsOptions] = None,
+        self,
+        message_id: str,
+        options: Optional[SharedLocationsOptions] = None,
     ) -> StreamResponse:
         data = {"message_id": message_id}
         if options is not None:

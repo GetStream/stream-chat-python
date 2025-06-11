@@ -873,7 +873,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.get("users/live_locations", params=params)
 
     async def update_user_location(
-        self, message_id: str, options: Optional[SharedLocationsOptions] = None,
+        self,
+        message_id: str,
+        options: Optional[SharedLocationsOptions] = None,
     ) -> StreamResponse:
         data = {"message_id": message_id}
         if options is not None:
@@ -893,5 +895,3 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         exc_tb: Optional[TracebackType],
     ) -> None:
         await self.close()
-
-    
