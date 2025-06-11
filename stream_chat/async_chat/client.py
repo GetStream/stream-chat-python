@@ -21,6 +21,7 @@ from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -190,6 +191,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def deactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return await self.post(f"users/{user_id}/deactivate", data=options)
 
+    async def deactivate_users(
+        self, user_ids: Iterable[str], **options: Any
+    ) -> StreamResponse:
+        return await self.post(
+            "users/deactivate", data=dict(options, user_ids=user_ids)
+        )
+
     async def reactivate_user(self, user_id: str, **options: Any) -> StreamResponse:
         return await self.post(f"users/{user_id}/reactivate", data=options)
 
@@ -214,6 +222,22 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.get(
             "query_banned_users", params={"payload": json.dumps(query_conditions)}
         )
+
+    async def block_user(
+        self, blocked_user_id: str, user_id: str, **options: Any
+    ) -> StreamResponse:
+        data = {"blocked_user_id": blocked_user_id, "user_id": user_id, **options}
+        return await self.post("users/block", data=data)
+
+    async def unblock_user(
+        self, blocked_user_id: str, user_id: str, **options: Any
+    ) -> StreamResponse:
+        data = {"blocked_user_id": blocked_user_id, "user_id": user_id, **options}
+        return await self.post("users/unblock", data=data)
+
+    async def get_blocked_users(self, user_id: str, **options: Any) -> StreamResponse:
+        params = {"user_id": user_id, **options}
+        return await self.get("users/block", params=params)
 
     async def run_message_action(self, message_id: str, data: Dict) -> StreamResponse:
         return await self.post(f"messages/{message_id}/action", data=data)
@@ -352,6 +376,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             }
         )
         return await self.post("messages/history", data=params)
+
+    async def query_threads(
+        self, filter: Dict = None, sort: List[Dict] = None, **options: Any
+    ) -> StreamResponse:
+        params = options.copy()
+        params.update({"filter": filter, "sort": self.normalize_sort(sort)})
+        return await self.post("threads", data=params)
 
     async def query_users(
         self, filter_conditions: Dict, sort: List[Dict] = None, **options: Any
@@ -817,6 +848,28 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def unread_counts_batch(self, user_ids: List[str]) -> StreamResponse:
         return await self.post("unread_batch", data={"user_ids": user_ids})
+
+    async def query_drafts(
+        self,
+        user_id: str,
+        filter: Optional[QueryDraftsFilter] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryDraftsOptions] = None,
+    ) -> StreamResponse:
+        data: Dict[str, Union[str, Dict[str, Any], List[SortParam]]] = {
+            "user_id": user_id
+        }
+
+        if filter is not None:
+            data["filter"] = cast(dict, filter)
+
+        if sort is not None:
+            data["sort"] = cast(dict, sort)
+
+        if options is not None:
+            data.update(cast(dict, options))
+
+        return await self.post("drafts/query", data=data)
 
     async def create_reminder(
         self,

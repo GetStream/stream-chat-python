@@ -15,6 +15,7 @@ import requests
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
 from stream_chat.channel import Channel
+from stream_chat.tests.conftest import hard_delete_users
 from stream_chat.tests.utils import wait_for
 
 
@@ -142,24 +143,53 @@ class TestClient:
         response = client.upsert_user(user)
         assert "users" in response
         assert user["id"] in response["users"]
+        # clean up
+        hard_delete_users(client, [user["id"]])
+
+    def test_update_user_with_team(self, client: StreamChat):
+        user = {
+            "id": str(uuid.uuid4()),
+            "team": "blue",
+            "teams_role": {"blue": "admin"},
+        }
+        response = client.upsert_user(user)
+        assert "users" in response
+        assert user["id"] in response["users"]
+        assert response["users"][user["id"]]["team"] == "blue"
+        assert response["users"][user["id"]]["teams_role"]["blue"] == "admin"
+        # clean up
+        hard_delete_users(client, [user["id"]])
 
     def test_update_users(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
         response = client.upsert_users([user])
         assert "users" in response
         assert user["id"] in response["users"]
+        # clean up
+        hard_delete_users(client, [user["id"]])
 
-    def test_update_user_partial(self, client: StreamChat):
-        user_id = str(uuid.uuid4())
-        client.upsert_user({"id": user_id, "field": "value"})
+    def test_update_user_partial(self, client: StreamChat, random_user: Dict):
+        response = client.update_user_partial(
+            {"id": random_user["id"], "set": {"field": "updated"}}
+        )
+
+        assert "users" in response
+        assert random_user["id"] in response["users"]
+        assert response["users"][random_user["id"]]["field"] == "updated"
+
+    def test_update_user_partial_with_team(self, client: StreamChat, random_user: Dict):
+        user_id = random_user["id"]
+        # add user to the team
+        client.update_user_partial({"id": user_id, "set": {"teams": ["blue"]}})
 
         response = client.update_user_partial(
-            {"id": user_id, "set": {"field": "updated"}}
+            {"id": user_id, "set": {"team": "blue", "teams_role": {"blue": "admin"}}}
         )
 
         assert "users" in response
         assert user_id in response["users"]
-        assert response["users"][user_id]["field"] == "updated"
+        assert response["users"][user_id]["team"] == "blue"
+        assert response["users"][user_id]["teams_role"]["blue"] == "admin"
 
     def test_delete_user(self, client: StreamChat, random_user: Dict):
         response = client.delete_user(random_user["id"])
@@ -196,6 +226,23 @@ class TestClient:
         response = client.deactivate_user(random_user["id"])
         assert "user" in response
         assert random_user["id"] == response["user"]["id"]
+
+    def test_deactivate_users(self, client: StreamChat, random_users: Dict):
+        user_ids = [user["id"] for user in random_users]
+        response = client.deactivate_users(user_ids)
+        assert "task_id" in response
+        assert len(response["task_id"]) == 36  # task_id is a UUID
+
+        wait_for(lambda: client.get_task(response["task_id"])["status"] == "completed")
+
+        response = client.get_task(response["task_id"])
+        assert response["status"] == "completed"
+        assert "result" in response
+        assert "users" in response["result"]
+        # Verify that all users in the response have deactivated_at field
+        for user in response["result"]["users"]:
+            assert "deactivated_at" in user
+            assert user["id"] in user_ids
 
     def test_reactivate_user(self, client: StreamChat, random_user: Dict):
         response = client.deactivate_user(random_user["id"])
@@ -271,6 +318,25 @@ class TestClient:
             {"filter_conditions": {"reason": "because"}, "limit": 1}
         )
         assert len(resp["bans"]) == 1
+
+    def test_block_user(self, client: StreamChat, random_user, server_user: Dict):
+        client.block_user(random_user["id"], server_user["id"])
+        response = client.get_blocked_users(server_user["id"])
+        assert len(response["blocks"]) > 0
+
+    def test_unblock_user(self, client: StreamChat, random_user, server_user: Dict):
+        client.block_user(random_user["id"], server_user["id"])
+        client.unblock_user(random_user["id"], server_user["id"])
+
+        response = client.get_blocked_users(server_user["id"])
+        assert len(response["blocks"]) == 0
+
+    def test_get_blocked_users(
+        self, client: StreamChat, random_user, server_user: Dict
+    ):
+        client.block_user(random_user["id"], server_user["id"])
+        response = client.get_blocked_users(server_user["id"])
+        assert len(response["blocks"]) > 0
 
     def test_flag_user(self, client: StreamChat, random_user, server_user: Dict):
         client.flag_user(random_user["id"], user_id=server_user["id"])
@@ -384,23 +450,20 @@ class TestClient:
         assert response["message"]["awesome"] is True
 
     def test_update_message_restricted_visibility(
-        self, client: StreamChat, channel: Channel, random_user: Dict
+        self,
+        client: StreamChat,
+        channel: Channel,
+        random_users: List[Dict],
     ):
-        # Create test users first
-        restricted_users = [
-            {"id": "amy", "name": "Amy"},
-            {"id": "paul", "name": "Paul"},
-        ]
-        client.upsert_users(restricted_users)
-
+        amy = random_users[0]["id"]
+        paul = random_users[1]["id"]
+        user = random_users[2]["id"]
         # Add users to channel
-        channel.add_members([u["id"] for u in restricted_users])
+        channel.add_members([amy, paul])
 
         # Send initial message
         msg_id = str(uuid.uuid4())
-        response = channel.send_message(
-            {"id": msg_id, "text": "hello world"}, random_user["id"]
-        )
+        response = channel.send_message({"id": msg_id, "text": "hello world"}, user)
         assert response["message"]["text"] == "hello world"
 
         # Update message with restricted visibility
@@ -408,38 +471,35 @@ class TestClient:
             {
                 "id": msg_id,
                 "text": "helloworld",
-                "restricted_visibility": ["amy", "paul"],
+                "restricted_visibility": [amy, paul],
                 "user": {"id": response["message"]["user"]["id"]},
             }
         )
         assert response["message"]["text"] == "helloworld"
-        assert response["message"]["restricted_visibility"] == ["amy", "paul"]
+        assert response["message"]["restricted_visibility"] == [amy, paul]
 
     def test_update_message_partial_restricted_visibility(
-        self, client: StreamChat, channel: Channel, random_user: Dict
+        self,
+        client: StreamChat,
+        channel: Channel,
+        random_users: List[Dict],
     ):
-        # Create test users first
-        restricted_users = [
-            {"id": "amy", "name": "Amy"},
-            {"id": "paul", "name": "Paul"},
-        ]
-        client.upsert_users(restricted_users)
-
+        amy = random_users[0]["id"]
+        paul = random_users[1]["id"]
+        user = random_users[2]["id"]
         # Add users to channel
-        channel.add_members([u["id"] for u in restricted_users])
+        channel.add_members([amy, paul])
 
         msg_id = str(uuid.uuid4())
-        response = channel.send_message(
-            {"id": msg_id, "text": "hello world"}, random_user["id"]
-        )
+        response = channel.send_message({"id": msg_id, "text": "hello world"}, user)
         assert response["message"]["text"] == "hello world"
         response = client.update_message_partial(
             msg_id,
-            dict(set=dict(text="helloworld", restricted_visibility=["amy"])),
-            random_user["id"],
+            dict(set=dict(text="helloworld", restricted_visibility=[amy])),
+            user,
         )
 
-        assert response["message"]["restricted_visibility"] == ["amy"]
+        assert response["message"]["restricted_visibility"] == [amy]
 
     def test_delete_message(self, client: StreamChat, channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
@@ -563,6 +623,7 @@ class TestClient:
         channel.send_message(
             {"text": "Does 'cious' count as one or two?"}, random_user["id"]
         )
+        time.sleep(1)  # wait for the message to be indexed in elasticsearch
         response = client.search(
             {"type": "messaging"}, query, **{"limit": 2, "offset": 0}
         )
@@ -586,6 +647,7 @@ class TestClient:
         channel.send_message(
             {"text": "Does 'cious' count as one or two?"}, random_user["id"]
         )
+        time.sleep(1)  # wait for the message to be indexed in elasticsearch
         response = client.search(
             {"type": "messaging"},
             {"text": {"$q": query}},
@@ -668,13 +730,17 @@ class TestClient:
         assert response["status"] == "error"
         assert "publishing the message failed." in response["error"]
 
-    def test_guest_user(self, client: StreamChat, random_user: Dict):
+    def test_guest_user(self, client: StreamChat):
         try:
-            response = client.set_guest_user({"user": {"id": str(uuid.uuid4())}})
+            user_id = str(uuid.uuid4())
+            response = client.set_guest_user({"user": {"id": user_id}})
             assert "access_token" in response
         except StreamAPIException:
             # Guest user isn't turned on for every test app
             pass
+
+        # clean up
+        hard_delete_users(client, [user_id])
 
     def test_run_message_actions(
         self, client: StreamChat, channel: Channel, random_user: Dict
@@ -849,11 +915,13 @@ class TestClient:
         list_resp = client.list_imports({"limit": 1})
         assert len(list_resp["import_tasks"]) == 1
 
-    def test_unread_counts(self, client: StreamChat, channel, random_user: Dict):
-        channel.add_members([random_user["id"]])
+    def test_unread_counts(self, client: StreamChat, channel, random_users: List[Dict]):
+        user1 = random_users[0]["id"]
+        user2 = random_users[1]["id"]
+        channel.add_members([user1])
         msg_id = str(uuid.uuid4())
-        channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
-        response = client.unread_counts(random_user["id"])
+        channel.send_message({"id": msg_id, "text": "helloworld"}, user2)
+        response = client.unread_counts(user1)
         assert "total_unread_count" in response
         assert "channels" in response
         assert "channel_type" in response
@@ -863,26 +931,26 @@ class TestClient:
         assert len(response["channel_type"]) == 1
 
         # test threads unread counts
-        channel.send_message(
-            {"parent_id": msg_id, "text": "helloworld"}, random_user["id"]
-        )
-        channel.send_message(
-            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
-        )
-        response = client.unread_counts(random_user["id"])
+        channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user1)
+        channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user2)
+        response = client.unread_counts(user1)
         assert "total_unread_threads_count" in response
         assert "threads" in response
         assert response["total_unread_threads_count"] == 1
         assert len(response["threads"]) == 1
         assert response["threads"][0]["parent_message_id"] == msg_id
 
-    def test_unread_counts_batch(self, client: StreamChat, channel, random_users: Dict):
-        channel.add_members([x["id"] for x in random_users])
+    def test_unread_counts_batch(
+        self, client: StreamChat, channel, random_users: List[Dict]
+    ):
+        user1 = random_users[0]["id"]
+        members = [x["id"] for x in random_users[1:]]
+        channel.add_members(members)
         msg_id = str(uuid.uuid4())
-        channel.send_message({"id": msg_id, "text": "helloworld"}, str(uuid.uuid4()))
-        response = client.unread_counts_batch([x["id"] for x in random_users])
+        channel.send_message({"id": msg_id, "text": "helloworld"}, user1)
+        response = client.unread_counts_batch(members)
         assert "counts_by_user" in response
-        for user_id in [x["id"] for x in random_users]:
+        for user_id in members:
             assert user_id in response["counts_by_user"]
             assert response["counts_by_user"][user_id]["total_unread_count"] == 1
 
@@ -890,11 +958,9 @@ class TestClient:
             channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user_id)
 
         # test threads unread counts
-        channel.send_message(
-            {"parent_id": msg_id, "text": "helloworld"}, str(uuid.uuid4())
-        )
-        response = client.unread_counts_batch([x["id"] for x in random_users])
-        for user_id in [x["id"] for x in random_users]:
+        channel.send_message({"parent_id": msg_id, "text": "helloworld"}, user1)
+        response = client.unread_counts_batch(members)
+        for user_id in members:
             assert user_id in response["counts_by_user"]
             assert (
                 response["counts_by_user"][user_id]["total_unread_threads_count"] == 1

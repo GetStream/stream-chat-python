@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from stream_chat.base.channel import ChannelInterface, add_user_id
 from stream_chat.base.exceptions import StreamChannelException
@@ -82,8 +82,8 @@ class Channel(ChannelInterface):
         payload = {"set": to_set or {}, "unset": to_unset or []}
         return self.client.patch(self.url, data=payload)
 
-    def delete(self) -> StreamResponse:
-        return self.client.delete(self.url)
+    def delete(self, hard: bool = False) -> StreamResponse:
+        return self.client.delete(self.url, params={"hard_delete": hard})
 
     def truncate(self, **options: Any) -> StreamResponse:
         return self.client.post(f"{self.url}/truncate", data=options)
@@ -248,3 +248,26 @@ class Channel(ChannelInterface):
 
         payload = {"set": to_set or {}, "unset": to_unset or []}
         return self.client.patch(f"{self.url}/member/{user_id}", data=payload)
+
+    def create_draft(self, message: Dict, user_id: str) -> StreamResponse:
+        message["user_id"] = user_id
+        payload = {"message": message}
+        return self.client.post(f"{self.url}/draft", data=payload)
+
+    def delete_draft(
+        self, user_id: str, parent_id: Optional[str] = None
+    ) -> StreamResponse:
+        params = {"user_id": user_id}
+        if parent_id:
+            params["parent_id"] = parent_id
+
+        return self.client.delete(f"{self.url}/draft", params=params)
+
+    def get_draft(
+        self, user_id: str, parent_id: Optional[str] = None
+    ) -> StreamResponse:
+        params = {"user_id": user_id}
+        if parent_id:
+            params["parent_id"] = parent_id
+
+        return self.client.get(f"{self.url}/draft", params=params)

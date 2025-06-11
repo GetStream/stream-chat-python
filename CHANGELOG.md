@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.24.0](https://github.com/GetStream/stream-chat-python/compare/v4.23.0...v4.24.0) (2025-04-07)
+
+## [4.23.0](https://github.com/GetStream/stream-chat-python/compare/v4.22.0...v4.23.0) (2025-03-11)
+
 ## [4.22.0](https://github.com/GetStream/stream-chat-python/compare/v4.21.0...v4.22.0) (2025-02-18)
 
 ## [4.21.0](https://github.com/GetStream/stream-chat-python/compare/v4.20.0...v4.21.0) (2025-02-11)

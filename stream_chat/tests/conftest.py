@@ -77,7 +77,7 @@ def channel(client: StreamChat, random_user: Dict):
     yield channel
 
     try:
-        channel.delete()
+        client.delete_channels([channel.cid], hard_delete=True)
     except Exception:
         pass
 
@@ -120,10 +120,10 @@ def fellowship_of_the_ring(client: StreamChat):
     yield
 
     try:
-        channel.delete()
+        channel.delete(hard=True)
+        hard_delete_users(client, [m["id"] for m in members])
     except Exception:
         pass
-    hard_delete_users(client, [m["id"] for m in members])
 
 
 def hard_delete_users(client: StreamChat, user_ids: List[str]):
