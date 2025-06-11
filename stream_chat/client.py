@@ -18,6 +18,7 @@ from stream_chat.types.segment import (
     SegmentType,
     SegmentUpdatableFields,
 )
+from stream_chat.types.shared_locations import SharedLocationsOptions
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -824,3 +825,15 @@ class StreamChat(StreamChatInterface):
         if options is not None:
             data.update(cast(dict, options))
         return self.post("drafts/query", data=data)
+
+    def get_user_locations(self, user_id: str, **options: Any) -> StreamResponse:
+        params = {"user_id": user_id, **options}
+        return self.get("users/live_locations", params=params)
+
+    def update_user_location(
+        self, message_id: str, options: Optional[SharedLocationsOptions] = None,
+    ) -> StreamResponse:
+        data = {"message_id": message_id}
+        if options is not None:
+            data.update(cast(dict, options))
+        return self.put("users/live_locations", data=data)
