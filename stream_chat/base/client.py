@@ -1441,7 +1441,7 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_user_locations(self, user_id: str, **options: Any) -> StreamResponse:
+    def get_user_locations(self, user_id: str, **options: Any) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Get the locations of a user.
         """
@@ -1450,7 +1450,7 @@ class StreamChatInterface(abc.ABC):
     @abc.abstractmethod
     def update_user_location(
         self, message_id: str, options: Optional[SharedLocationsOptions] = None
-    ) -> StreamResponse:
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update the location of a user.
         """
