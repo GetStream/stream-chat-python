@@ -7,6 +7,18 @@ from stream_chat.base.exceptions import StreamAPIException
 
 
 class TestReminders:
+    @pytest.fixture(autouse=True)
+    @pytest.mark.asyncio
+    async def setup_channel_for_reminders(self, channel: "Channel"):
+        await channel.update_partial(
+            {"config_overrides": {"user_message_reminders": True}},
+        )
+        yield
+        await channel.update_partial(
+            {"config_overrides": {"user_message_reminders": False}},
+        )
+
+
     @pytest.mark.asyncio
     async def test_create_reminder(self, client: StreamChatAsync, channel, random_user):
         # First, send a message to create a reminder for
