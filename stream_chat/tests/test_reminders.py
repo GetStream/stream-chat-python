@@ -8,7 +8,7 @@ from stream_chat.base.exceptions import StreamAPIException
 
 class TestReminders:
     @pytest.fixture(autouse=True)
-    def setup_channel_for_reminders(self, channel: "Channel"):
+    def setup_channel_for_reminders(self, channel):
         channel.update_partial(
             {"config_overrides": {"user_message_reminders": True}},
         )

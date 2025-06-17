@@ -9,7 +9,7 @@ from stream_chat.base.exceptions import StreamAPIException
 class TestReminders:
     @pytest.fixture(autouse=True)
     @pytest.mark.asyncio
-    async def setup_channel_for_reminders(self, channel: "Channel"):
+    async def setup_channel_for_reminders(self, channel):
         await channel.update_partial(
             {"config_overrides": {"user_message_reminders": True}},
         )
