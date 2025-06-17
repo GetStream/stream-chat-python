@@ -18,7 +18,6 @@ class TestReminders:
             {"config_overrides": {"user_message_reminders": False}},
         )
 
-
     @pytest.mark.asyncio
     async def test_create_reminder(self, client: StreamChatAsync, channel, random_user):
         # First, send a message to create a reminder for
