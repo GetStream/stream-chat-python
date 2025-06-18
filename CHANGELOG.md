@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.25.0](https://github.com/GetStream/stream-chat-python/compare/v4.24.0...v4.25.0) (2025-06-18)
+
+
+### Bug Fixes
+
+* add block user methods ([#199](https://github.com/GetStream/stream-chat-python/issues/199)) ([6364604](https://github.com/GetStream/stream-chat-python/commit/6364604e6ce17491e66c7b2e68b197e5de0ec25c))
+* make sure we don't have left over users and channels ([#197](https://github.com/GetStream/stream-chat-python/issues/197)) ([564e947](https://github.com/GetStream/stream-chat-python/commit/564e94741a7069e26670c57bb3183e41db1c955e))
+
 ## [4.24.0](https://github.com/GetStream/stream-chat-python/compare/v4.23.0...v4.24.0) (2025-04-07)
 
 ## [4.23.0](https://github.com/GetStream/stream-chat-python/compare/v4.22.0...v4.23.0) (2025-03-11)
