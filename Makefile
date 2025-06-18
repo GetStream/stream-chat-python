@@ -1,8 +1,9 @@
 STREAM_KEY ?= NOT_EXIST
 STREAM_SECRET ?= NOT_EXIST
+PYTHON_VERSION ?= 3.8
 
 # These targets are not files
-.PHONY: help check test lint lint-fix
+.PHONY: help check test lint lint-fix test_with_docker lint_with_docker lint-fix_with_docker
 
 help: ## Display this help message
 	@echo "Please use \`make <target>\` where <target> is one of"
@@ -14,7 +15,7 @@ lint:  ## Run linters
 	flake8 --ignore=E501,W503 stream_chat
 	mypy stream_chat
 
-lint-fix:
+lint-fix:  ## Fix linting issues
 	black stream_chat
 	isort stream_chat
 
@@ -22,6 +23,17 @@ test:  ## Run tests
 	STREAM_KEY=$(STREAM_KEY) STREAM_SECRET=$(STREAM_SECRET) pytest --cov=stream_chat stream_chat/tests
 
 check: lint test  ## Run linters + tests
+
+lint_with_docker:  ## Run linters in Docker (set PYTHON_VERSION to change Python version)
+	docker run -t -i -w /code -v $(PWD):/code python:$(PYTHON_VERSION) sh -c "pip install black flake8 mypy types-requests && black --check stream_chat && flake8 --ignore=E501,W503 stream_chat && mypy stream_chat || true"
+
+lint-fix_with_docker:  ## Fix linting issues in Docker (set PYTHON_VERSION to change Python version)
+	docker run -t -i -w /code -v $(PWD):/code python:$(PYTHON_VERSION) sh -c "pip install black isort && black stream_chat && isort stream_chat"
+
+test_with_docker:  ## Run tests in Docker (set PYTHON_VERSION to change Python version)
+	docker run -t -i -w /code -v $(PWD):/code --add-host=host.docker.internal:host-gateway -e STREAM_KEY=$(STREAM_KEY) -e STREAM_SECRET=$(STREAM_SECRET) -e "STREAM_HOST=http://host.docker.internal:3030" python:$(PYTHON_VERSION) sh -c "pip install -e .[test,ci] && sed -i 's/Optional\[datetime\]/Optional\[datetime.datetime\]/g' stream_chat/client.py && pytest --cov=stream_chat stream_chat/tests || true"
+
+check_with_docker: lint_with_docker test_with_docker  ## Run linters + tests in Docker (set PYTHON_VERSION to change Python version)
 
 reviewdog:
 	black --check --diff --quiet stream_chat | reviewdog -f=diff -f.diff.strip=0 -filter-mode="diff_context" -name=black -reporter=github-pr-review
