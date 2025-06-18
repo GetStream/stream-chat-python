@@ -187,6 +187,9 @@ class TestChannel:
         assert len(resp["messages"]) == 1
 
     async def test_mark_read(self, channel: Channel, random_user: Dict):
+        member = {"user_id": random_user["id"]}
+        await channel.add_members([member])
+
         response = await channel.mark_read(random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "message.read"
