@@ -190,6 +190,9 @@ class TestChannel:
         assert response["members"][0]["channel_role"] == "channel_member"
 
     def test_mark_read(self, channel: Channel, random_user: Dict):
+        member = {"user_id": random_user["id"]}
+        channel.add_members([member])
+
         response = channel.mark_read(random_user["id"])
         assert "event" in response
         assert response["event"]["type"] == "message.read"
