@@ -1505,10 +1505,10 @@ class StreamChatInterface(abc.ABC):
         :return: API response with reminders
         """
         pass
-    
+
     @abc.abstractmethod
     def get_user_locations(
-    self, user_id: str, **options: Any
+        self, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Get the locations of a user.
