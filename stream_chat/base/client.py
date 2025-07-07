@@ -1517,7 +1517,10 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def update_user_location(
-        self, user_id: str, message_id: str, options: Optional[SharedLocationsOptions] = None
+        self,
+        user_id: str,
+        message_id: str,
+        options: Optional[SharedLocationsOptions] = None,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Update the location of a user.
