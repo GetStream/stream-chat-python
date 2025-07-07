@@ -959,13 +959,15 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
     async def update_user_location(
         self,
+        user_id: str,
         message_id: str,
         options: Optional[SharedLocationsOptions] = None,
     ) -> StreamResponse:
         data = {"message_id": message_id}
         if options is not None:
             data.update(cast(dict, options))
-        return await self.put("users/live_locations", data=data)
+        params = {"user_id": user_id, **options}
+        return await self.put("users/live_locations", data=data, params=params)
 
     async def close(self) -> None:
         await self.session.close()

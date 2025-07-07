@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict
 
 import pytest
@@ -7,15 +8,28 @@ from stream_chat.async_chat.client import StreamChatAsync
 
 @pytest.mark.incremental
 class TestLiveLocations:
-    async def test_get_user_locations(self, client: StreamChatAsync, random_user: Dict):
-        # First create a message to attach location to
-        channel = client.channel("messaging", str(random_user["id"]))
-        channel.create(random_user["id"])
+    @pytest.fixture(autouse=True)
+    @pytest.mark.asyncio
+    async def setup_channel_for_shared_locations(self, channel):
+        await channel.update_partial(
+            {"config_overrides": {"shared_locations": True}},
+        )
+        yield
+        await channel.update_partial(
+            {"config_overrides": {"shared_locations": False}},
+        )
 
+    async def test_get_user_locations(
+        self, client: StreamChatAsync, channel, random_user: Dict
+    ):
         # Create a message to attach location to
+        now = datetime.datetime.now(datetime.timezone.utc)
+        one_hour_later = now + datetime.timedelta(hours=1)
         shared_location = {
+            "created_by_device_id": "test_device_id",
             "latitude": 37.7749,
             "longitude": -122.4194,
+            "end_at": one_hour_later.isoformat(),
         }
 
         channel.send_message(
@@ -30,26 +44,36 @@ class TestLiveLocations:
         assert isinstance(response["active_live_locations"], list)
 
     async def test_update_user_location(
-        self, client: StreamChatAsync, random_user: Dict
+        self, client: StreamChatAsync, channel, random_user: Dict
     ):
-        # First create a message to attach location to
-        channel = client.channel("messaging", str(random_user["id"]))
-        await channel.create(random_user["id"])
+        # Create a message to attach location to
+        now = datetime.datetime.now(datetime.timezone.utc)
+        one_hour_later = now + datetime.timedelta(hours=1)
+        shared_location = {
+            "created_by_device_id": "test_device_id",
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "end_at": one_hour_later.isoformat(),
+        }
+
         msg = await channel.send_message(
-            {"text": "Message with location"}, random_user["id"]
+            {"text": "Message with location", "shared_location": shared_location},
+            random_user["id"],
         )
         message_id = msg["message"]["id"]
 
         # Update user location
         location_data = {
+            "created_by_device_id": "test_device_id",
             "latitude": 37.7749,
             "longitude": -122.4194,
         }
-        response = await client.update_user_location(message_id, location_data)
+        response = await client.update_user_location(
+            random_user["id"], message_id, location_data
+        )
 
-        assert "shared_location" in response
-        assert response["shared_location"]["latitude"] == location_data["latitude"]
-        assert response["shared_location"]["longitude"] == location_data["longitude"]
+        assert response["latitude"] == location_data["latitude"]
+        assert response["longitude"] == location_data["longitude"]
 
         # Get user locations to verify
         locations_response = await client.get_user_locations(random_user["id"])
@@ -58,9 +82,3 @@ class TestLiveLocations:
         location = locations_response["active_live_locations"][0]
         assert location["latitude"] == location_data["latitude"]
         assert location["longitude"] == location_data["longitude"]
-
-        # Cleanup
-        try:
-            await channel.delete()
-        except Exception:
-            pass

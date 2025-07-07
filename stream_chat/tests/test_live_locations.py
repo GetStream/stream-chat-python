@@ -8,11 +8,17 @@ from stream_chat import StreamChat
 
 @pytest.mark.incremental
 class TestLiveLocations:
-    def test_get_user_locations(self, client: StreamChat, random_user: Dict):
-        # First create a message to attach location to
-        channel = client.channel("messaging", str(random_user["id"]))
-        channel.create(random_user["id"])
+    @pytest.fixture(autouse=True)
+    def setup_channel_for_shared_locations(self, channel):
+        channel.update_partial(
+            {"config_overrides": {"shared_locations": True}},
+        )
+        yield
+        channel.update_partial(
+            {"config_overrides": {"shared_locations": False}},
+        )
 
+    def test_get_user_locations(self, client: StreamChat, channel, random_user: Dict):
         # Create a message to attach location to
         now = datetime.datetime.now(datetime.timezone.utc)
         one_hour_later = now + datetime.timedelta(hours=1)
@@ -34,11 +40,7 @@ class TestLiveLocations:
         assert "active_live_locations" in response
         assert isinstance(response["active_live_locations"], list)
 
-    def test_update_user_location(self, client: StreamChat, random_user: Dict):
-        # First create a message to attach location to
-        channel = client.channel("messaging", str(random_user["id"]))
-        channel.create(random_user["id"])
-
+    def test_update_user_location(self, client: StreamChat, channel, random_user: Dict):
         # Create a message to attach location to
         now = datetime.datetime.now(datetime.timezone.utc)
         one_hour_later = now + datetime.timedelta(hours=1)
@@ -57,14 +59,16 @@ class TestLiveLocations:
 
         # Update user location
         location_data = {
+            "created_by_device_id": "test_device_id",
             "latitude": 37.7749,
             "longitude": -122.4194,
         }
-        response = client.update_user_location(message_id, location_data)
+        response = client.update_user_location(
+            random_user["id"], message_id, location_data
+        )
 
-        assert "shared_location" in response
-        assert response["shared_location"]["latitude"] == location_data["latitude"]
-        assert response["shared_location"]["longitude"] == location_data["longitude"]
+        assert response["latitude"] == location_data["latitude"]
+        assert response["longitude"] == location_data["longitude"]
 
         # Get user locations to verify
         locations_response = client.get_user_locations(random_user["id"])
@@ -73,9 +77,3 @@ class TestLiveLocations:
         location = locations_response["active_live_locations"][0]
         assert location["latitude"] == location_data["latitude"]
         assert location["longitude"] == location_data["longitude"]
-
-        # Cleanup
-        try:
-            channel.delete()
-        except Exception:
-            pass
