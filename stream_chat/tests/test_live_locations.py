@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict
 
 import pytest
@@ -13,9 +14,13 @@ class TestLiveLocations:
         channel.create(random_user["id"])
 
         # Create a message to attach location to
+        now = datetime.datetime.now(datetime.timezone.utc)
+        one_hour_later = now + datetime.timedelta(hours=1)
         shared_location = {
+            "created_by_device_id": "test_device_id",
             "latitude": 37.7749,
             "longitude": -122.4194,
+            "end_at": one_hour_later.isoformat(),
         }
 
         channel.send_message(
@@ -35,9 +40,13 @@ class TestLiveLocations:
         channel.create(random_user["id"])
 
         # Create a message to attach location to
+        now = datetime.datetime.now(datetime.timezone.utc)
+        one_hour_later = now + datetime.timedelta(hours=1)
         shared_location = {
+            "created_by_device_id": "test_device_id",
             "latitude": 37.7749,
             "longitude": -122.4194,
+            "end_at": one_hour_later.isoformat(),
         }
 
         msg = channel.send_message(
