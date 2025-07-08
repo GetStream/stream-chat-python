@@ -29,6 +29,7 @@ from stream_chat.types.segment import (
     SegmentType,
     SegmentUpdatableFields,
 )
+from stream_chat.types.shared_locations import SharedLocationsOptions
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -859,16 +860,12 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         data: Dict[str, Union[str, Dict[str, Any], List[SortParam]]] = {
             "user_id": user_id
         }
-
         if filter is not None:
             data["filter"] = cast(dict, filter)
-
         if sort is not None:
             data["sort"] = cast(dict, sort)
-
         if options is not None:
             data.update(cast(dict, options))
-
         return await self.post("drafts/query", data=data)
 
     async def create_reminder(
@@ -955,6 +952,22 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         params["sort"] = sort or [{"field": "remind_at", "direction": 1}]
         params["user_id"] = user_id
         return await self.post("reminders/query", data=params)
+
+    async def get_user_locations(self, user_id: str, **options: Any) -> StreamResponse:
+        params = {"user_id": user_id, **options}
+        return await self.get("users/live_locations", params=params)
+
+    async def update_user_location(
+        self,
+        user_id: str,
+        message_id: str,
+        options: Optional[SharedLocationsOptions] = None,
+    ) -> StreamResponse:
+        data = {"message_id": message_id}
+        if options is not None:
+            data.update(cast(dict, options))
+        params = {"user_id": user_id, **options}
+        return await self.put("users/live_locations", data=data, params=params)
 
     async def close(self) -> None:
         await self.session.close()
