@@ -509,6 +509,24 @@ class TestClient:
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id, hard=True)
 
+    def test_delete_message_for_me(self, client: StreamChat, channel, random_user: Dict):
+        """Test deleting a message for a specific user (delete for me functionality)"""
+        msg_id = str(uuid.uuid4())
+        channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
+        
+        # Delete message for the user
+        response = client.delete_message(
+            msg_id, 
+            delete_for_me=True, 
+            deleted_by=random_user["id"]
+        )
+        
+        # Verify the request succeeded
+        assert response.is_ok()
+        
+        # Verify the message is still visible to other users but deleted for the specified user
+        # (This would require additional API calls to verify, but we're just testing the request succeeds)
+
     def test_flag_message(
         self, client: StreamChat, channel, random_user, server_user: Dict
     ):
