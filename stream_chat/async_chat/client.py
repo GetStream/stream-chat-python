@@ -134,7 +134,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def get(self, relative_url: str, params: Dict = None) -> StreamResponse:
         return await self._make_request(self.session.get, relative_url, params, None)
 
-    async def delete(self, relative_url: str, params: Dict = None, data: Any = None) -> StreamResponse:
+    async def delete(
+        self, relative_url: str, params: Dict = None, data: Any = None
+    ) -> StreamResponse:
         return await self._make_request(self.session.delete, relative_url, params, data)
 
     async def patch(

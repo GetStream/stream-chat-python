@@ -123,7 +123,9 @@ class StreamChat(StreamChatInterface):
     def get(self, relative_url: str, params: Dict = None) -> StreamResponse:
         return self._make_request(self.session.get, relative_url, params, None)
 
-    def delete(self, relative_url: str, params: Dict = None, data: Any = None) -> StreamResponse:
+    def delete(
+        self, relative_url: str, params: Dict = None, data: Any = None
+    ) -> StreamResponse:
         return self._make_request(self.session.delete, relative_url, params, data)
 
     def patch(
