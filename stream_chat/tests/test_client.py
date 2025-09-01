@@ -703,8 +703,7 @@ class TestClient:
 
     def test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()
-        # There are now 2 default blocklists + the "Foo" blocklist created by test_create_blocklist
-        assert len(response["blocklists"]) >= 3
+        assert len(response["blocklists"]) == 2
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
