@@ -342,15 +342,13 @@ class StreamChat(StreamChatInterface):
         data.update(options)
         return self.put(f"messages/{message_id}", data=data)
 
-    def delete_message(self, message_id: str, delete_for_me: bool = False, deleted_by: str = None, **options: Any) -> StreamResponse:
-        if delete_for_me and not deleted_by:
-            raise ValueError("deleted_by is required when delete_for_me is True")
-        
+    def delete_message(
+        self, message_id: str, deleted_by: str = None, **options: Any
+    ) -> StreamResponse:
         data = options.copy()
-        if delete_for_me:
-            data["delete_for_me"] = True
+        if deleted_by:
             data["deleted_by"] = deleted_by
-        
+
         return self.delete(f"messages/{message_id}", data)
 
     def undelete_message(self, message_id: str, user_id: str) -> StreamResponse:
