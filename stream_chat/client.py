@@ -98,7 +98,9 @@ class StreamChat(StreamChatInterface):
 
         url = f"{self.base_url}/{relative_url}"
 
-        if method.__name__ in ["post", "put", "patch", "delete"]:
+        if method.__name__ in ["post", "put", "patch"] or (
+            method.__name__ == "delete" and data
+        ):
             serialized = json.dumps(data)
 
         response = method(
@@ -360,7 +362,7 @@ class StreamChat(StreamChatInterface):
 
         params = options.copy()
         if delete_for_me:
-            # Send acting user in the request body for server-side auth compatibility
+            # Send in body with acting user for server-side auth compatibility
             body = {"delete_for_me": True, "user": {"id": deleted_by}}
             return self.delete(f"messages/{message_id}", None, body)
         if deleted_by:
