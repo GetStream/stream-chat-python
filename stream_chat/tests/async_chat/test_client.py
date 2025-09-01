@@ -462,6 +462,23 @@ class TestClient:
         )
         await client.delete_message(msg_id, hard=True)
 
+    async def test_delete_message_for_me(
+        self, client: StreamChatAsync, channel: Channel, random_user: Dict
+    ):
+        """Test deleting a message for a specific user (delete for me functionality)"""
+        msg_id = str(uuid.uuid4())
+        await channel.send_message(
+            {"id": msg_id, "text": "helloworld"}, random_user["id"]
+        )
+
+        # Delete message for the user
+        response = await client.delete_message(
+            msg_id, delete_for_me=True, deleted_by=random_user["id"]
+        )
+
+        # Verify the request succeeded
+        assert response.is_ok()
+
     async def test_flag_message(
         self, client: StreamChatAsync, channel: Channel, random_user, server_user: Dict
     ):
