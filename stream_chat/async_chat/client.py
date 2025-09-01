@@ -356,10 +356,16 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.put(f"messages/{message_id}", data=data)
 
     async def delete_message(
-        self, message_id: str, deleted_by: str = None, **options: Any
+        self, message_id: str, delete_for_me: bool = False, deleted_by: str = None, **options: Any
     ) -> StreamResponse:
+        if delete_for_me and not deleted_by:
+            raise ValueError("deleted_by is required when delete_for_me is True")
+        
         data = options.copy()
-        if deleted_by:
+        if delete_for_me:
+            data["delete_for_me"] = True
+            data["deleted_by"] = deleted_by
+        elif deleted_by:
             data["deleted_by"] = deleted_by
 
         return await self.delete(f"messages/{message_id}", data)

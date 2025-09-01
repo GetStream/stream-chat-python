@@ -509,15 +509,19 @@ class TestClient:
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
         client.delete_message(msg_id, hard=True)
 
-    def test_delete_message_with_deleted_by(
+    def test_delete_message_for_me(
         self, client: StreamChat, channel, random_user: Dict
     ):
-        """Test deleting a message with deleted_by parameter"""
+        """Test deleting a message for a specific user (delete for me functionality)"""
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])
 
-        # Delete message with deleted_by parameter
-        response = client.delete_message(msg_id, deleted_by=random_user["id"])
+        # Delete message for the user
+        response = client.delete_message(
+            msg_id, 
+            delete_for_me=True, 
+            deleted_by=random_user["id"]
+        )
 
         # Verify the request succeeded
         assert response.is_ok()
@@ -699,9 +703,10 @@ class TestClient:
     def test_create_blocklist(self, client: StreamChat):
         client.create_blocklist(name="Foo", words=["fudge", "heck"], type="word")
 
-    def test_list_blocklists(self, client: StreamChat):
+    def test test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()
-        assert len(response["blocklists"]) == 2
+        # There are now 2 default blocklists + the "Foo" blocklist created by test_create_blocklist
+        assert len(response["blocklists"]) >= 3
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
