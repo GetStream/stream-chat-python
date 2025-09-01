@@ -558,13 +558,17 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
-        @abc.abstractmethod
+    @abc.abstractmethod
     def delete_message(
-        self, message_id: str, delete_for_me: bool = False, deleted_by: str = None, **options: Any
+        self,
+        message_id: str,
+        delete_for_me: bool = False,
+        deleted_by: str = None,
+        **options: Any,
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Deletes a message.
-        
+
         Args:
             message_id: The ID of the message to delete
             delete_for_me: If True, deletes the message only for the specified user

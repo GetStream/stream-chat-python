@@ -473,9 +473,7 @@ class TestClient:
 
         # Delete message for the user
         response = await client.delete_message(
-            msg_id, 
-            delete_for_me=True, 
-            deleted_by=random_user["id"]
+            msg_id, delete_for_me=True, deleted_by=random_user["id"]
         )
 
         # Verify the request succeeded

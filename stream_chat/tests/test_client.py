@@ -518,9 +518,7 @@ class TestClient:
 
         # Delete message for the user
         response = client.delete_message(
-            msg_id, 
-            delete_for_me=True, 
-            deleted_by=random_user["id"]
+            msg_id, delete_for_me=True, deleted_by=random_user["id"]
         )
 
         # Verify the request succeeded
@@ -703,7 +701,7 @@ class TestClient:
     def test_create_blocklist(self, client: StreamChat):
         client.create_blocklist(name="Foo", words=["fudge", "heck"], type="word")
 
-    def test test_list_blocklists(self, client: StreamChat):
+    def test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()
         # There are now 2 default blocklists + the "Foo" blocklist created by test_create_blocklist
         assert len(response["blocklists"]) >= 3
