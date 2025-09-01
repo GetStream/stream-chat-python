@@ -84,6 +84,10 @@ class StreamChat(StreamChatInterface):
         data: Any = None,
     ) -> StreamResponse:
         params = params or {}
+        # Convert boolean values to lowercase strings for consistency with async implementation
+        params = {
+            k: str(v).lower() if isinstance(v, bool) else v for k, v in params.items()
+        }
         data = data or {}
         serialized = None
         default_params = self.get_default_params()
@@ -94,7 +98,7 @@ class StreamChat(StreamChatInterface):
 
         url = f"{self.base_url}/{relative_url}"
 
-        if method.__name__ in ["post", "put", "patch"]:
+        if method.__name__ in ["post", "put", "patch", "delete"]:
             serialized = json.dumps(data)
 
         response = method(
@@ -119,8 +123,8 @@ class StreamChat(StreamChatInterface):
     def get(self, relative_url: str, params: Dict = None) -> StreamResponse:
         return self._make_request(self.session.get, relative_url, params, None)
 
-    def delete(self, relative_url: str, params: Dict = None) -> StreamResponse:
-        return self._make_request(self.session.delete, relative_url, params, None)
+    def delete(self, relative_url: str, params: Dict = None, data: Any = None) -> StreamResponse:
+        return self._make_request(self.session.delete, relative_url, params, data)
 
     def patch(
         self, relative_url: str, params: Dict = None, data: Any = None
@@ -352,14 +356,14 @@ class StreamChat(StreamChatInterface):
         if delete_for_me and not deleted_by:
             raise ValueError("deleted_by is required when delete_for_me is True")
 
-        data = options.copy()
+        params = options.copy()
         if delete_for_me:
-            data["delete_for_me"] = True
-            data["deleted_by"] = deleted_by
-        elif deleted_by:
-            data["deleted_by"] = deleted_by
-
-        return self.delete(f"messages/{message_id}", data)
+            # Send acting user in the request body for server-side auth compatibility
+            body = {"delete_for_me": True, "user": {"id": deleted_by}}
+            return self.delete(f"messages/{message_id}", None, body)
+        if deleted_by:
+            params["deleted_by"] = deleted_by
+        return self.delete(f"messages/{message_id}", params)
 
     def undelete_message(self, message_id: str, user_id: str) -> StreamResponse:
         return self.post(

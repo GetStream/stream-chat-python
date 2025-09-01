@@ -109,7 +109,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         headers["Authorization"] = self.auth_token
         headers["stream-auth-type"] = "jwt"
 
-        if method.__name__ in ["post", "put", "patch"]:
+        if method.__name__ in ["post", "put", "patch", "delete"]:
             serialized = json.dumps(data)
 
         async with method(
@@ -134,8 +134,8 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
     async def get(self, relative_url: str, params: Dict = None) -> StreamResponse:
         return await self._make_request(self.session.get, relative_url, params, None)
 
-    async def delete(self, relative_url: str, params: Dict = None) -> StreamResponse:
-        return await self._make_request(self.session.delete, relative_url, params, None)
+    async def delete(self, relative_url: str, params: Dict = None, data: Any = None) -> StreamResponse:
+        return await self._make_request(self.session.delete, relative_url, params, data)
 
     async def patch(
         self, relative_url: str, params: Dict = None, data: Any = None
@@ -365,14 +365,13 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         if delete_for_me and not deleted_by:
             raise ValueError("deleted_by is required when delete_for_me is True")
 
-        data = options.copy()
+        params = options.copy()
         if delete_for_me:
-            data["delete_for_me"] = True
-            data["deleted_by"] = deleted_by
-        elif deleted_by:
-            data["deleted_by"] = deleted_by
-
-        return await self.delete(f"messages/{message_id}", data)
+            body = {"delete_for_me": True, "user": {"id": deleted_by}}
+            return await self.delete(f"messages/{message_id}", None, body)
+        if deleted_by:
+            params["deleted_by"] = deleted_by
+        return await self.delete(f"messages/{message_id}", params)
 
     async def undelete_message(self, message_id: str, user_id: str) -> StreamResponse:
         return await self.post(
