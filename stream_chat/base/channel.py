@@ -292,6 +292,18 @@ class ChannelInterface(abc.ABC):
         :return: The server response
         """
         pass
+    
+    @abc.abstractmethod
+    def mark_delivered(
+        self, data: Dict[str, Any]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse], None]:
+        """
+        Send the mark delivered event for this user, only works if the `delivery_receipts` setting is enabled
+
+        :param data: MarkDeliveredOptions containing channel_delivered_message and other optional fields
+        :return: The server response or None if delivery receipts are disabled
+        """
+        pass
 
     @abc.abstractmethod
     def get_replies(

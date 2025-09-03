@@ -138,6 +138,9 @@ class Channel(ChannelInterface):
     async def mark_unread(self, user_id: str, **data: Any) -> StreamResponse:
         payload = add_user_id(data, user_id)
         return await self.client.post(f"{self.url}/unread", data=payload)
+    
+    async def mark_delivered(self, data: Dict[str, Any]) -> Optional[StreamResponse]:
+        return await self.client.post("channels/delivered", data=data)
 
     async def get_replies(self, parent_id: str, **options: Any) -> StreamResponse:
         return await self.client.get(f"messages/{parent_id}/replies", params=options)
