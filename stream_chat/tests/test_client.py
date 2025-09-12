@@ -1016,3 +1016,58 @@ class TestClient:
 
         assert len(response_next["message_history"]) == 1
         assert response_next["message_history"][0]["text"] == "helloworld-2"
+
+        def test_mark_delivered(self, client: StreamChat, channel: Channel, random_user: Dict):
+        """Test marking messages as delivered"""
+        # Test with basic delivery data using new format
+        delivery_data = {
+            "latest_delivered_messages": [
+                {
+                    "cid": channel.cid,
+                    "id": "test-message-id"
+                }
+            ],
+            "user_id": random_user["id"]
+        }
+        
+        response = client.mark_delivered(delivery_data)
+        assert response is not None
+        
+        # Test with multiple messages
+        delivery_data_multiple = {
+            "latest_delivered_messages": [
+                {
+                    "cid": channel.cid,
+                    "id": "test-message-id-1"
+                },
+                {
+                    "cid": channel.cid,
+                    "id": "test-message-id-2"
+                }
+            ],
+            "user_id": random_user["id"]
+        }
+        
+        response = client.mark_delivered(delivery_data_multiple)
+        assert response is not None
+
+    def test_mark_delivered_simple(self, client: StreamChat, channel: Channel, random_user: Dict):
+        """Test the convenience method for marking messages as delivered"""
+        response = client.mark_delivered_simple(
+            user_id=random_user["id"],
+            message_id="test-message-id",
+            channel_cid=channel.cid
+        )
+        assert response is not None
+
+    def test_mark_delivered_validation(self, client: StreamChat, random_user: Dict):
+        """Test validation of mark_delivered method"""
+        # Test empty latest_delivered_messages
+        with pytest.raises(ValueError, match="latest_delivered_messages must not be empty"):
+            client.mark_delivered({"user_id": random_user["id"]})
+        
+        # Test missing user and user_id
+        with pytest.raises(ValueError, match="either user or user_id must be provided"):
+            client.mark_delivered({
+                "latest_delivered_messages": [{"cid": "test:channel", "id": "test"}]
+            })

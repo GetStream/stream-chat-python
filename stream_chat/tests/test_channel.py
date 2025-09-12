@@ -203,25 +203,6 @@ class TestChannel:
         response = channel.mark_unread(random_user["id"], message_id=msg_id)
         assert "duration" in response
     
-    def test_mark_delivered(self, channel: Channel, random_user: Dict):
-        delivery_data = {
-            "channel_delivered_message": {channel.id: "test-message-id"},
-            "user_id": random_user["id"]
-        }
-        
-        response = channel.mark_delivered(delivery_data)
-        assert response is not None
-        
-        delivery_data_with_options = {
-            "channel_delivered_message": {channel.id: "test-message-id-2"},
-            "user_id": random_user["id"],
-            "client_id": "test-client",
-            "connection_id": "test-connection"
-        }
-        
-        response = channel.mark_delivered(delivery_data_with_options)
-        assert response is not None
-
     def test_get_messages(self, channel: Channel, random_user: Dict):
         msg_id = str(uuid.uuid4())
         channel.send_message({"id": msg_id, "text": "helloworld"}, random_user["id"])

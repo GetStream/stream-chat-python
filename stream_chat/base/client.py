@@ -1537,6 +1537,32 @@ class StreamChatInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def mark_delivered(
+        self, data: Dict[str, Any]
+    ) -> Union[StreamResponse, Awaitable[StreamResponse], None]:
+        """
+        Send the mark delivered event for this user, only works if the `delivery_receipts` setting is enabled
+
+        :param data: MarkDeliveredOptions containing latest_delivered_messages and other optional fields
+        :return: The server response or None if delivery receipts are disabled
+        """
+        pass
+
+    @abc.abstractmethod
+    def mark_delivered_simple(
+        self, user_id: str, message_id: str, channel_cid: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse], None]:
+        """
+        Convenience method to mark a message as delivered for a specific user.
+
+        :param user_id: The user ID
+        :param message_id: The message ID
+        :param channel_cid: The channel CID (channel_type:channel_id)
+        :return: The server response or None if delivery receipts are disabled
+        """
+        pass
+
     #####################
     #  Private methods  #
     #####################
