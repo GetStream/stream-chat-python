@@ -1020,10 +1020,7 @@ class TestClient:
     def test_mark_delivered(self, client: StreamChat, channel: Channel, random_user: Dict):
         delivery_data = {
             "latest_delivered_messages": [
-                {
-                    "cid": channel.cid,
-                    "id": "test-message-id"
-                }
+                {"cid": channel.cid, "id": "test-message-id"}
             ],
             "user_id": random_user["id"]
         }
