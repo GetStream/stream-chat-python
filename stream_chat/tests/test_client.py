@@ -1038,7 +1038,9 @@ class TestClient:
         response = client.mark_delivered(delivery_data_multiple)
         assert response is not None
 
-    def test_mark_delivered_simple(self, client: StreamChat, channel: Channel, random_user: Dict):
+    def test_mark_delivered_simple(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
         response = client.mark_delivered_simple(
             user_id=random_user["id"],
             message_id="test-message-id",
