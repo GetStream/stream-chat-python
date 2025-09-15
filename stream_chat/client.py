@@ -975,7 +975,7 @@ class StreamChat(StreamChatInterface):
         if not channel_cid:
             raise ValueError("channel CID must not be empty")
         data = {
-            "latest_delivered_messages": [{"cid": channel_cid,"id": message_id}],
-            "user_id": user_id
+            "latest_delivered_messages": [{"cid": channel_cid, "id": message_id}],
+            "user_id": user_id,
         }
         return self.mark_delivered(data)
