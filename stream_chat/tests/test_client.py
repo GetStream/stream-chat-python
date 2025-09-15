@@ -1027,7 +1027,6 @@ class TestClient:
         
         response = client.mark_delivered(delivery_data)
         assert response is not None
-        
         delivery_data_multiple = {
             "latest_delivered_messages": [
                 {
