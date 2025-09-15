@@ -1052,7 +1052,9 @@ class TestClient:
         assert response is not None
 
     def test_mark_delivered_validation(self, client: StreamChat, random_user: Dict):
-        with pytest.raises(ValueError, match="latest_delivered_messages must not be empty"):
+        with pytest.raises(
+            ValueError, match="latest_delivered_messages must not be empty"
+        ):
             client.mark_delivered({"user_id": random_user["id"]})
         
         with pytest.raises(ValueError, match="either user or user_id must be provided"):
