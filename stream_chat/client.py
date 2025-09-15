@@ -943,24 +943,26 @@ class StreamChat(StreamChatInterface):
     def mark_delivered(self, data: Dict[str, Any]) -> Optional[StreamResponse]:
         """
         Send the mark delivered event for this user, only works if the `delivery_receipts` setting is enabled
-        
+
         :param data: MarkDeliveredOptions containing latest_delivered_messages and other optional fields
         :return: The server response or None if delivery receipts are disabled
         """
         # Validate required fields
         if not data.get("latest_delivered_messages"):
             raise ValueError("latest_delivered_messages must not be empty")
-        
+
         # Ensure either user or user_id is provided
         if not data.get("user") and not data.get("user_id"):
             raise ValueError("either user or user_id must be provided")
-        
+
         return self.post("channels/delivered", data=data)
 
-    def mark_delivered_simple(self, user_id: str, message_id: str, channel_cid: str) -> Optional[StreamResponse]:
+    def mark_delivered_simple(
+        self, user_id: str, message_id: str, channel_cid: str
+    ) -> Optional[StreamResponse]:
         """
         Convenience method to mark a message as delivered for a specific user.
-        
+
         :param user_id: The user ID
         :param message_id: The message ID
         :param channel_cid: The channel CID (channel_type:channel_id)
@@ -972,15 +974,8 @@ class StreamChat(StreamChatInterface):
             raise ValueError("message ID must not be empty")
         if not channel_cid:
             raise ValueError("channel CID must not be empty")
-        
         data = {
-            "latest_delivered_messages": [
-                {
-                    "cid": channel_cid,
-                    "id": message_id
-                }
-            ],
+            "latest_delivered_messages": [{"cid": channel_cid,"id": message_id}],
             "user_id": user_id
         }
-        
         return self.mark_delivered(data)

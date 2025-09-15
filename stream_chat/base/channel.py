@@ -292,7 +292,7 @@ class ChannelInterface(abc.ABC):
         :return: The server response
         """
         pass
-    
+
     @abc.abstractmethod
     def get_replies(
         self, parent_id: str, **options: Any
