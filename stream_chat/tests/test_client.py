@@ -1024,7 +1024,6 @@ class TestClient:
             ],
             "user_id": random_user["id"],
         }
-        
         response = client.mark_delivered(delivery_data)
         assert response is not None
         delivery_data_multiple = {
