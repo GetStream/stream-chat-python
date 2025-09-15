@@ -1033,7 +1033,7 @@ class TestClient:
                 {"cid": channel.cid, "id": "test-message-id-1"},
                 {"cid": channel.cid, "id": "test-message-id-2"},
             ],
-            "user_id": random_user["id"]
+            "user_id": random_user["id"],
         }
         
         response = client.mark_delivered(delivery_data_multiple)
