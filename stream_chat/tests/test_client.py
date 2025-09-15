@@ -1017,7 +1017,9 @@ class TestClient:
         assert len(response_next["message_history"]) == 1
         assert response_next["message_history"][0]["text"] == "helloworld-2"
 
-    def test_mark_delivered(self, client: StreamChat, channel: Channel, random_user: Dict):
+    def test_mark_delivered(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
         delivery_data = {
             "latest_delivered_messages": [
                 {"cid": channel.cid, "id": "test-message-id"}
