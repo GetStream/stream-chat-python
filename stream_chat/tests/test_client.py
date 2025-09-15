@@ -1030,14 +1030,8 @@ class TestClient:
         assert response is not None
         delivery_data_multiple = {
             "latest_delivered_messages": [
-                {
-                    "cid": channel.cid,
-                    "id": "test-message-id-1"
-                },
-                {
-                    "cid": channel.cid,
-                    "id": "test-message-id-2"
-                }
+                {"cid": channel.cid, "id": "test-message-id-1"},
+                {"cid": channel.cid, "id": "test-message-id-2"},
             ],
             "user_id": random_user["id"]
         }
