@@ -1047,7 +1047,7 @@ class TestClient:
         response = client.mark_delivered_simple(
             user_id=random_user["id"],
             message_id="test-message-id",
-            channel_cid=channel.cid
+            channel_cid=channel.cid,
         )
         assert response is not None
 
