@@ -1054,6 +1054,6 @@ class TestClient:
         ):
             client.mark_delivered({"user_id": random_user["id"]})
         with pytest.raises(ValueError, match="either user or user_id must be provided"):
-            client.mark_delivered({
-                "latest_delivered_messages": [{"cid": "test:channel", "id": "test"}]
-            })
+            client.mark_delivered(
+                {"latest_delivered_messages": [{"cid": "test:channel", "id": "test"}]}
+            )
