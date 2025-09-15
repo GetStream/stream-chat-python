@@ -1022,7 +1022,7 @@ class TestClient:
             "latest_delivered_messages": [
                 {"cid": channel.cid, "id": "test-message-id"}
             ],
-            "user_id": random_user["id"]
+            "user_id": random_user["id"],
         }
         
         response = client.mark_delivered(delivery_data)
