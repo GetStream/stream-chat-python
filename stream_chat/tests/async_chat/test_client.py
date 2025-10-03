@@ -723,8 +723,10 @@ class TestClient:
 
     async def test_create_blocklist(self, client: StreamChatAsync):
         blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        await client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         # Clean up after test
         try:
             await client.delete_blocklist(blocklist_name)
@@ -734,16 +736,20 @@ class TestClient:
     async def test_list_blocklists(self, client: StreamChatAsync):
         # First, clean up any existing test blocklists
         await cleanup_blocklists_async(client)
-        
+
         # Create a test blocklist
         blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        await client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         try:
             response = await client.list_blocklists()
             # Should have at least 1 blocklist (the one we just created)
             assert len(response["blocklists"]) >= 1
-            blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
+            blocklist_names = {
+                blocklist["name"] for blocklist in response["blocklists"]
+            }
             assert blocklist_name in blocklist_names
         finally:
             # Clean up
@@ -754,8 +760,10 @@ class TestClient:
 
     async def test_get_blocklist(self, client: StreamChatAsync):
         blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        await client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         try:
             response = await client.get_blocklist(blocklist_name)
             assert response["blocklist"]["name"] == blocklist_name
@@ -769,8 +777,10 @@ class TestClient:
 
     async def test_update_blocklist(self, client: StreamChatAsync):
         blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        await client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         try:
             await client.update_blocklist(blocklist_name, words=["dang"])
             response = await client.get_blocklist(blocklist_name)
@@ -784,9 +794,11 @@ class TestClient:
 
     async def test_delete_blocklist(self, client: StreamChatAsync):
         blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        await client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
         await client.delete_blocklist(blocklist_name)
-        
+
         # Verify it's deleted
         try:
             await client.get_blocklist(blocklist_name)

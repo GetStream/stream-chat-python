@@ -701,8 +701,10 @@ class TestClient:
     def test_create_blocklist(self, client: StreamChat):
         # Use a unique name to avoid conflicts
         blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
-        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         # Clean up after test
         try:
             client.delete_blocklist(blocklist_name)
@@ -712,16 +714,20 @@ class TestClient:
     def test_list_blocklists(self, client: StreamChat):
         # First, clean up any existing test blocklists
         cleanup_blocklists(client)
-        
+
         # Create a test blocklist
         blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
-        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         try:
             response = client.list_blocklists()
             # Should have at least 1 blocklist (the one we just created)
             assert len(response["blocklists"]) >= 1
-            blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
+            blocklist_names = {
+                blocklist["name"] for blocklist in response["blocklists"]
+            }
             assert blocklist_name in blocklist_names
         finally:
             # Clean up
@@ -732,8 +738,10 @@ class TestClient:
 
     def test_get_blocklist(self, client: StreamChat):
         blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
-        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         try:
             response = client.get_blocklist(blocklist_name)
             assert response["blocklist"]["name"] == blocklist_name
@@ -747,8 +755,10 @@ class TestClient:
 
     def test_update_blocklist(self, client: StreamChat):
         blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
-        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
-        
+        client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
+
         try:
             client.update_blocklist(blocklist_name, words=["dang"])
             response = client.get_blocklist(blocklist_name)
@@ -762,9 +772,11 @@ class TestClient:
 
     def test_delete_blocklist(self, client: StreamChat):
         blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
-        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        client.create_blocklist(
+            name=blocklist_name, words=["fudge", "heck"], type="word"
+        )
         client.delete_blocklist(blocklist_name)
-        
+
         # Verify it's deleted
         try:
             client.get_blocklist(blocklist_name)
