@@ -142,7 +142,7 @@ class TestClient:
                 },
                 {
                     "hook_type": "pending_message",
-                    "webhook_url": "http://test-url.com",
+                    "webhook_url": "http://google.com",
                     "timeout_ms": 500,
                     "callback": {
                         "mode": "CALLBACK_MODE_REST",
