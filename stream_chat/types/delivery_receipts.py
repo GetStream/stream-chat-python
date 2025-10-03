@@ -10,11 +10,12 @@ else:
 class DeliveredMessageConfirmation(TypedDict):
     """
     Confirmation of a delivered message.
-    
+
     Parameters:
         cid: Channel CID (channel_type:channel_id)
         id: Message ID
     """
+
     cid: str
     id: str
 
@@ -22,12 +23,13 @@ class DeliveredMessageConfirmation(TypedDict):
 class MarkDeliveredOptions(TypedDict, total=False):
     """
     Options for marking messages as delivered.
-    
+
     Parameters:
         latest_delivered_messages: List of delivered message confirmations
         user: Optional user object
         user_id: Optional user ID
     """
+
     latest_delivered_messages: List[DeliveredMessageConfirmation]
     user: Optional[Dict]  # UserResponse equivalent
     user_id: Optional[str]
@@ -36,7 +38,7 @@ class MarkDeliveredOptions(TypedDict, total=False):
 class ChannelReadStatus(TypedDict, total=False):
     """
     Channel read status information.
-    
+
     Parameters:
         last_read: Last read timestamp
         unread_messages: Number of unread messages
@@ -46,6 +48,7 @@ class ChannelReadStatus(TypedDict, total=False):
         last_delivered_at: Last delivered timestamp
         last_delivered_message_id: ID of last delivered message
     """
+
     last_read: str  # ISO format string for timestamp
     unread_messages: int
     user: Dict  # UserResponse equivalent

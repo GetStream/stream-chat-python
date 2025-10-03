@@ -1003,7 +1003,9 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
         return await self.post("channels/delivered", data=data)
 
-    async def mark_delivered_simple(self, user_id: str, message_id: str, channel_cid: str) -> Optional[StreamResponse]:
+    async def mark_delivered_simple(
+        self, user_id: str, message_id: str, channel_cid: str
+    ) -> Optional[StreamResponse]:
         """
         Convenience method to mark a message as delivered for a specific user.
 
