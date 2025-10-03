@@ -128,9 +128,6 @@ class TestClient:
         assert "app" in configs
 
     def test_update_app_settings(self, client: StreamChat):
-        response = client.get_app_settings()
-        assert "app" in response
-
         client.update_app_settings(
             event_hooks=[
                 {
