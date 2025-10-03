@@ -718,7 +718,7 @@ class TestClient:
 
     def test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()
-        assert len(response["blocklists"]) == 2
+        assert len(response["blocklists"]) == 3
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
