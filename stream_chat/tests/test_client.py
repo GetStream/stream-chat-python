@@ -128,26 +128,22 @@ class TestClient:
         assert "app" in configs
 
     def test_update_app_settings(self, client: StreamChat):
-        # Get current app settings to verify event hooks support
         response = client.get_app_settings()
         assert "app" in response
 
         client.update_app_settings(
             event_hooks=[
                 {
-                    "enabled": True,
                     "hook_type": "webhook",
                     "webhook_url": "https://example.com/webhook",
                     "event_types": ["message.new", "message.updated"],
                 },
                 {
-                    "enabled": True,
                     "hook_type": "webhook",
-                    "webhook_url": "https://secondary-webhook-url.com",
+                    "webhook_url": "https://google.com",
                     "event_types": [],
                 },
                 {
-                    "enabled": True,
                     "hook_type": "pending_message",
                     "webhook_url": "http://test-url.com",
                     "timeout_ms": 500,
