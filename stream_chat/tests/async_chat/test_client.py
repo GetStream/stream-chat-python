@@ -15,10 +15,7 @@ import pytest
 from stream_chat.async_chat import StreamChatAsync
 from stream_chat.async_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
-from stream_chat.tests.async_chat.conftest import (
-    cleanup_blocklists_async,
-    hard_delete_users,
-)
+from stream_chat.tests.async_chat.conftest import hard_delete_users
 from stream_chat.tests.utils import wait_for_async
 
 
@@ -725,89 +722,26 @@ class TestClient:
         assert len(response["channels"][0]["members"]) == 9
 
     async def test_create_blocklist(self, client: StreamChatAsync):
-        blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(
-            name=blocklist_name, words=["fudge", "heck"], type="word"
-        )
-
-        # Clean up after test
-        try:
-            await client.delete_blocklist(blocklist_name)
-        except Exception:
-            pass
+        await client.create_blocklist(name="Foo", words=["fudge", "heck"], type="word")
 
     async def test_list_blocklists(self, client: StreamChatAsync):
-        # First, clean up any existing test blocklists
-        await cleanup_blocklists_async(client)
-
-        # Create a test blocklist
-        blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(
-            name=blocklist_name, words=["fudge", "heck"], type="word"
-        )
-
-        try:
-            response = await client.list_blocklists()
-            # Should have at least 1 blocklist (the one we just created)
-            assert len(response["blocklists"]) >= 1
-            blocklist_names = {
-                blocklist["name"] for blocklist in response["blocklists"]
-            }
-            assert blocklist_name in blocklist_names
-        finally:
-            # Clean up
-            try:
-                await client.delete_blocklist(blocklist_name)
-            except Exception:
-                pass
+        response = await client.list_blocklists()
+        assert len(response["blocklists"]) == 2
+        blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
+        assert "Foo" in blocklist_names
 
     async def test_get_blocklist(self, client: StreamChatAsync):
-        blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(
-            name=blocklist_name, words=["fudge", "heck"], type="word"
-        )
-
-        try:
-            response = await client.get_blocklist(blocklist_name)
-            assert response["blocklist"]["name"] == blocklist_name
-            assert response["blocklist"]["words"] == ["fudge", "heck"]
-        finally:
-            # Clean up
-            try:
-                await client.delete_blocklist(blocklist_name)
-            except Exception:
-                pass
+        response = await client.get_blocklist("Foo")
+        assert response["blocklist"]["name"] == "Foo"
+        assert response["blocklist"]["words"] == ["fudge", "heck"]
 
     async def test_update_blocklist(self, client: StreamChatAsync):
-        blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(
-            name=blocklist_name, words=["fudge", "heck"], type="word"
-        )
-
-        try:
-            await client.update_blocklist(blocklist_name, words=["dang"])
-            response = await client.get_blocklist(blocklist_name)
-            assert response["blocklist"]["words"] == ["dang"]
-        finally:
-            # Clean up
-            try:
-                await client.delete_blocklist(blocklist_name)
-            except Exception:
-                pass
+        await client.update_blocklist("Foo", words=["dang"])
+        response = await client.get_blocklist("Foo")
+        assert response["blocklist"]["words"] == ["dang"]
 
     async def test_delete_blocklist(self, client: StreamChatAsync):
-        blocklist_name = f"TestBlocklistAsync_{uuid.uuid4().hex[:8]}"
-        await client.create_blocklist(
-            name=blocklist_name, words=["fudge", "heck"], type="word"
-        )
-        await client.delete_blocklist(blocklist_name)
-
-        # Verify it's deleted
-        try:
-            await client.get_blocklist(blocklist_name)
-            pytest.fail("Blocklist should have been deleted")
-        except Exception:
-            pass  # Expected - blocklist should not exist
+        await client.delete_blocklist("Foo")
 
     async def test_check_push(
         self, client: StreamChatAsync, channel: Channel, random_user: Dict

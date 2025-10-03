@@ -131,25 +131,3 @@ def hard_delete_users(client: StreamChat, user_ids: List[str]):
         client.delete_users(user_ids, "hard", conversations="hard", messages="hard")
     except Exception:
         pass
-
-
-def cleanup_blocklists(client: StreamChat):
-    """Clean up test blocklists"""
-    try:
-        # Delete common test blocklist names
-        test_blocklists = ["Foo", "TestBlocklist", "TestBlocklistAsync"]
-        for blocklist_name in test_blocklists:
-            try:
-                client.delete_blocklist(blocklist_name)
-            except Exception:
-                pass  # Blocklist might not exist
-    except Exception:
-        pass
-
-
-@pytest.fixture(autouse=True, scope="session")
-def cleanup_test_data():
-    """Global cleanup for test data"""
-    yield
-    # This runs after all tests complete
-    # Add any global cleanup here if needed
