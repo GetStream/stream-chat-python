@@ -128,15 +128,37 @@ class TestClient:
         assert "app" in configs
 
     def test_update_app_settings(self, client: StreamChat):
+        # Get current app settings to verify event hooks support
+        response = client.get_app_settings()
+        assert "app" in response
+
         client.update_app_settings(
-            async_moderation_config={
-                "callback": {
-                    "mode": "CALLBACK_MODE_REST",
-                    "server_url": "http://example.com/callback",
+            event_hooks=[
+                {
+                    "enabled": True,
+                    "hook_type": "webhook",
+                    "webhook_url": "https://example.com/webhook",
+                    "event_types": ["message.new", "message.updated"],
                 },
-                "timeout_ms": 10000,  # how long messages should stay pending before being deleted
-            }
+                {
+                    "enabled": True,
+                    "hook_type": "webhook",
+                    "webhook_url": "https://secondary-webhook-url.com",
+                    "event_types": [],
+                },
+                {
+                    "enabled": True,
+                    "hook_type": "pending_message",
+                    "webhook_url": "http://test-url.com",
+                    "timeout_ms": 500,
+                    "callback": {
+                        "mode": "CALLBACK_MODE_REST",
+                    },
+                },
+            ]
         )
+
+        client.update_app_settings(event_hooks=[])
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
