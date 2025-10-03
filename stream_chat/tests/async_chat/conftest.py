@@ -141,3 +141,25 @@ async def hard_delete_users(client: StreamChatAsync, user_ids: List[str]):
         )
     except Exception:
         pass
+
+
+async def cleanup_blocklists_async(client: StreamChatAsync):
+    """Clean up test blocklists"""
+    try:
+        # Delete common test blocklist names
+        test_blocklists = ["Foo", "TestBlocklist", "TestBlocklistAsync"]
+        for blocklist_name in test_blocklists:
+            try:
+                await client.delete_blocklist(blocklist_name)
+            except Exception:
+                pass  # Blocklist might not exist
+    except Exception:
+        pass
+
+
+@pytest.fixture(autouse=True, scope="session")
+async def cleanup_test_data():
+    """Global cleanup for test data"""
+    yield
+    # This runs after all tests complete
+    # Add any global cleanup here if needed

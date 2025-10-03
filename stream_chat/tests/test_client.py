@@ -699,26 +699,78 @@ class TestClient:
         assert len(response["channels"][0]["members"]) == 9
 
     def test_create_blocklist(self, client: StreamChat):
-        client.create_blocklist(name="Foo", words=["fudge", "heck"], type="word")
+        # Use a unique name to avoid conflicts
+        blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
+        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        
+        # Clean up after test
+        try:
+            client.delete_blocklist(blocklist_name)
+        except Exception:
+            pass
 
     def test_list_blocklists(self, client: StreamChat):
-        response = client.list_blocklists()
-        assert len(response["blocklists"]) == 2
-        blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
-        assert "Foo" in blocklist_names
+        # First, clean up any existing test blocklists
+        cleanup_blocklists(client)
+        
+        # Create a test blocklist
+        blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
+        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        
+        try:
+            response = client.list_blocklists()
+            # Should have at least 1 blocklist (the one we just created)
+            assert len(response["blocklists"]) >= 1
+            blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
+            assert blocklist_name in blocklist_names
+        finally:
+            # Clean up
+            try:
+                client.delete_blocklist(blocklist_name)
+            except Exception:
+                pass
 
     def test_get_blocklist(self, client: StreamChat):
-        response = client.get_blocklist("Foo")
-        assert response["blocklist"]["name"] == "Foo"
-        assert response["blocklist"]["words"] == ["fudge", "heck"]
+        blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
+        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        
+        try:
+            response = client.get_blocklist(blocklist_name)
+            assert response["blocklist"]["name"] == blocklist_name
+            assert response["blocklist"]["words"] == ["fudge", "heck"]
+        finally:
+            # Clean up
+            try:
+                client.delete_blocklist(blocklist_name)
+            except Exception:
+                pass
 
     def test_update_blocklist(self, client: StreamChat):
-        client.update_blocklist("Foo", words=["dang"])
-        response = client.get_blocklist("Foo")
-        assert response["blocklist"]["words"] == ["dang"]
+        blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
+        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        
+        try:
+            client.update_blocklist(blocklist_name, words=["dang"])
+            response = client.get_blocklist(blocklist_name)
+            assert response["blocklist"]["words"] == ["dang"]
+        finally:
+            # Clean up
+            try:
+                client.delete_blocklist(blocklist_name)
+            except Exception:
+                pass
 
     def test_delete_blocklist(self, client: StreamChat):
-        client.delete_blocklist("Foo")
+        blocklist_name = f"TestBlocklist_{uuid.uuid4().hex[:8]}"
+        client.create_blocklist(name=blocklist_name, words=["fudge", "heck"], type="word")
+        client.delete_blocklist(blocklist_name)
+        
+        # Verify it's deleted
+        try:
+            client.get_blocklist(blocklist_name)
+            pytest.fail("Blocklist should have been deleted")
+        except Exception:
+            pass  # Expected - blocklist should not exist
 
     def test_check_push(self, client: StreamChat, channel: Channel, random_user: Dict):
         msg = {"id": str(uuid.uuid4()), "text": "/giphy wave"}
