@@ -955,7 +955,8 @@ class StreamChat(StreamChatInterface):
         if not data.get("user") and not data.get("user_id"):
             raise ValueError("either user or user_id must be provided")
 
-        return self.post("channels/delivered", data=data)
+        params = {"user_id": user_id}
+        return self.post("channels/delivered", data=data, params=params)
 
     def mark_delivered_simple(
         self, user_id: str, message_id: str, channel_cid: str
@@ -978,4 +979,4 @@ class StreamChat(StreamChatInterface):
             "latest_delivered_messages": [{"cid": channel_cid, "id": message_id}],
             "user_id": user_id,
         }
-        return self.mark_delivered(data)
+        return self.mark_delivered(data=data)
