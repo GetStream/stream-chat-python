@@ -955,6 +955,11 @@ class StreamChat(StreamChatInterface):
         if not data.get("user") and not data.get("user_id"):
             raise ValueError("either user or user_id must be provided")
 
+        # Extract user_id from data
+        user_id = data.get("user_id") or data.get("user", {}).get("id")
+        if not user_id:
+            raise ValueError("user_id must be provided")
+
         params = {"user_id": user_id}
         return self.post("channels/delivered", data=data, params=params)
 

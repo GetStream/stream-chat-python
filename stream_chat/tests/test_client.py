@@ -6,7 +6,7 @@ import uuid
 from contextlib import suppress
 from datetime import datetime
 from operator import itemgetter
-from typing import Dict, List
+from typing import Dict, List, Any, Optional
 
 import jwt
 import pytest
@@ -15,7 +15,7 @@ import requests
 from stream_chat import StreamChat
 from stream_chat.base.exceptions import StreamAPIException
 from stream_chat.channel import Channel
-from stream_chat.tests.conftest import hard_delete_users
+from stream_chat.tests.conftest import hard_delete_users, cleanup_blocklists
 from stream_chat.tests.utils import wait_for
 
 
