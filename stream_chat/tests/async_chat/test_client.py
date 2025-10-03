@@ -15,7 +15,10 @@ import pytest
 from stream_chat.async_chat import StreamChatAsync
 from stream_chat.async_chat.channel import Channel
 from stream_chat.base.exceptions import StreamAPIException
-from stream_chat.tests.async_chat.conftest import hard_delete_users, cleanup_blocklists_async
+from stream_chat.tests.async_chat.conftest import (
+    hard_delete_users,
+    cleanup_blocklists_async,
+)
 from stream_chat.tests.utils import wait_for_async
 
 
