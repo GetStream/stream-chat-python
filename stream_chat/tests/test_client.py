@@ -159,7 +159,7 @@ class TestClient:
 
         response = client.update_app_settings(event_hooks=[])
         assert response.is_ok()
-        
+
         settings = client.get_app_settings()
         assert "app" in settings
         assert "event_hooks" in settings["app"]
