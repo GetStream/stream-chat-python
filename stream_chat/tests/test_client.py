@@ -128,15 +128,42 @@ class TestClient:
         assert "app" in configs
 
     def test_update_app_settings(self, client: StreamChat):
-        client.update_app_settings(
-            async_moderation_config={
-                "callback": {
-                    "mode": "CALLBACK_MODE_REST",
-                    "server_url": "http://example.com/callback",
+        response = client.update_app_settings(
+            event_hooks=[
+                {
+                    "hook_type": "webhook",
+                    "webhook_url": "https://example.com/webhook",
+                    "event_types": ["message.new", "message.updated"],
                 },
-                "timeout_ms": 10000,  # how long messages should stay pending before being deleted
-            }
+                {
+                    "hook_type": "webhook",
+                    "webhook_url": "https://google.com",
+                    "event_types": [],
+                },
+                {
+                    "hook_type": "pending_message",
+                    "webhook_url": "http://google.com",
+                    "timeout_ms": 500,
+                    "callback": {
+                        "mode": "CALLBACK_MODE_REST",
+                    },
+                },
+            ]
         )
+        assert response.is_ok()
+
+        settings = client.get_app_settings()
+        assert "app" in settings
+        assert "event_hooks" in settings["app"]
+        assert len(settings["app"]["event_hooks"]) == 3
+
+        response = client.update_app_settings(event_hooks=[])
+        assert response.is_ok()
+
+        settings = client.get_app_settings()
+        assert "app" in settings
+        assert "event_hooks" in settings["app"]
+        assert len(settings["app"]["event_hooks"]) == 0
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
@@ -703,7 +730,7 @@ class TestClient:
 
     def test_list_blocklists(self, client: StreamChat):
         response = client.list_blocklists()
-        assert len(response["blocklists"]) == 2
+        assert len(response["blocklists"]) == 3
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
