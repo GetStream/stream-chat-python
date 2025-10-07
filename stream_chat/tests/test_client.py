@@ -150,16 +150,20 @@ class TestClient:
                 },
             ]
         )
-        assert "app" in response
         assert response.is_ok()
-        assert "event_hooks" in response["app"]
-        assert len(response["app"]["event_hooks"]) == 3
+
+        settings = client.get_app_settings()
+        assert "app" in settings
+        assert "event_hooks" in settings["app"]
+        assert len(settings["app"]["event_hooks"]) == 3
 
         response = client.update_app_settings(event_hooks=[])
-        assert "app" in response
         assert response.is_ok()
-        assert "event_hooks" in response["app"]
-        assert len(response["app"]["event_hooks"]) == 0
+        
+        settings = client.get_app_settings()
+        assert "app" in settings
+        assert "event_hooks" in settings["app"]
+        assert len(settings["app"]["event_hooks"]) == 0
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
