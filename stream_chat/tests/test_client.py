@@ -128,7 +128,7 @@ class TestClient:
         assert "app" in configs
 
     def test_update_app_settings(self, client: StreamChat):
-        client.update_app_settings(
+        response = client.update_app_settings(
             event_hooks=[
                 {
                     "hook_type": "webhook",
@@ -150,8 +150,16 @@ class TestClient:
                 },
             ]
         )
+        assert "app" in response
+        assert response.is_ok()
+        assert "event_hooks" in response["app"]
+        assert len(response["app"]["event_hooks"]) == 3
 
-        client.update_app_settings(event_hooks=[])
+        response = client.update_app_settings(event_hooks=[])
+        assert "app" in response
+        assert response.is_ok()
+        assert "event_hooks" in response["app"]
+        assert len(response["app"]["event_hooks"]) == 0
 
     def test_update_user(self, client: StreamChat):
         user = {"id": str(uuid.uuid4())}
