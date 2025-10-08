@@ -1043,3 +1043,44 @@ class TestClient:
 
         assert len(response_next["message_history"]) == 1
         assert response_next["message_history"][0]["text"] == "helloworld-2"
+
+    def test_mark_delivered(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
+        delivery_data = {
+            "latest_delivered_messages": [
+                {"cid": channel.cid, "id": "test-message-id"}
+            ],
+            "user_id": random_user["id"],
+        }
+        response = client.mark_delivered(delivery_data)
+        assert response is not None
+        delivery_data_multiple = {
+            "latest_delivered_messages": [
+                {"cid": channel.cid, "id": "test-message-id-1"},
+                {"cid": channel.cid, "id": "test-message-id-2"},
+            ],
+            "user_id": random_user["id"],
+        }
+        response = client.mark_delivered(delivery_data_multiple)
+        assert response is not None
+
+    def test_mark_delivered_simple(
+        self, client: StreamChat, channel: Channel, random_user: Dict
+    ):
+        response = client.mark_delivered_simple(
+            user_id=random_user["id"],
+            message_id="test-message-id",
+            channel_cid=channel.cid,
+        )
+        assert response is not None
+
+    def test_mark_delivered_validation(self, client: StreamChat, random_user: Dict):
+        with pytest.raises(
+            ValueError, match="latest_delivered_messages must not be empty"
+        ):
+            client.mark_delivered({"user_id": random_user["id"]})
+        with pytest.raises(ValueError, match="either user or user_id must be provided"):
+            client.mark_delivered(
+                {"latest_delivered_messages": [{"cid": "test:channel", "id": "test"}]}
+            )
