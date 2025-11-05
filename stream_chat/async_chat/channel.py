@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Any, Dict, Iterable, List, Optional, Union
 
@@ -94,6 +95,10 @@ class Channel(ChannelInterface):
         self, members: Iterable[Dict], message: Dict = None, **options: Any
     ) -> StreamResponse:
         payload = {"add_members": members, "message": message, **options}
+        if "hide_history_before" in payload and isinstance(
+            payload["hide_history_before"], datetime.datetime
+        ):
+            payload["hide_history_before"] = payload["hide_history_before"].isoformat()
         return await self.client.post(self.url, data=payload)
 
     async def assign_roles(
