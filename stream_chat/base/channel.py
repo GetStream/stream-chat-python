@@ -196,7 +196,7 @@ class ChannelInterface(abc.ABC):
 
         :param members: member objects to add
         :param message: An optional to show
-        :param options: additional options such as hide_history
+        :param options: additional options such as hide_history or hide_history_before
         :return:
         """
         pass
