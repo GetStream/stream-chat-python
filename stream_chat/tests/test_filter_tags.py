@@ -1,5 +1,4 @@
 import pytest
-from typing import Dict, List
 
 from stream_chat.channel import Channel
 
