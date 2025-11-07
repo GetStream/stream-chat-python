@@ -276,3 +276,19 @@ class Channel(ChannelInterface):
             params["parent_id"] = parent_id
 
         return self.client.get(f"{self.url}/draft", params=params)
+
+    def add_filter_tags(
+        self,
+        tags: Iterable[str],
+        message: Dict = None,
+    ) -> StreamResponse:
+        payload = {"add_filter_tags": tags, "message": message}
+        return self.client.post(self.url, data=payload)
+
+    def remove_filter_tags(
+        self,
+        tags: Iterable[str],
+        message: Dict = None,
+    ) -> StreamResponse:
+        payload = {"remove_filter_tags": tags, "message": message}
+        return self.client.post(self.url, data=payload)
