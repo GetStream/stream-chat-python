@@ -24,6 +24,21 @@ class MessageTemplate(TypedDict, total=False):
     custom: Optional[Dict]
 
 
+class MemberTemplate(TypedDict, total=False):
+    """
+    Represents the data structure for a member in the members_template.
+
+    Parameters:
+        user_id: The ID of the user.
+        channel_role: The role of the user in the channel.
+        custom: Custom data for the member.
+    """
+
+    user_id: str
+    channel_role: Optional[str]
+    custom: Optional[Dict]
+
+
 class ChannelTemplate(TypedDict, total=False):
     """
     Represents the data structure for a channel template.
@@ -32,12 +47,14 @@ class ChannelTemplate(TypedDict, total=False):
         type: The type of channel.
         id: The ID of the channel.
         members: List of member IDs.
+        members_template: List of member templates with roles and custom data.
         custom: Custom data.
     """
 
     type: str
     id: Optional[str]
     members: Optional[List[str]]
+    members_template: Optional[List[MemberTemplate]]
     custom: Optional[Dict]
 
 
