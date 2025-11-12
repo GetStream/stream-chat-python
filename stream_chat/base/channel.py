@@ -527,6 +527,32 @@ class ChannelInterface(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def add_filter_tags(
+        self, tags: Iterable[str], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Adds filter tags to the channel
+
+        :param tags: list of tags to add
+        :param message: optional system message
+        :return: The server response
+        """
+        pass
+
+    @abc.abstractmethod
+    def remove_filter_tags(
+        self, tags: Iterable[str], message: Dict = None
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Removes filter tags from the channel
+
+        :param tags: list of tags to remove
+        :param message: optional system message
+        :return: The server response
+        """
+        pass
+
 
 def add_user_id(payload: Dict, user_id: str) -> Dict:
     return {**payload, "user": {"id": user_id}}

@@ -272,3 +272,19 @@ class Channel(ChannelInterface):
         if parent_id:
             params["parent_id"] = parent_id
         return await self.client.get(f"{self.url}/draft", params=params)
+
+    async def add_filter_tags(
+        self,
+        tags: Iterable[str],
+        message: Dict = None,
+    ) -> StreamResponse:
+        payload = {"add_filter_tags": tags, "message": message}
+        return await self.client.post(self.url, data=payload)
+
+    async def remove_filter_tags(
+        self,
+        tags: Iterable[str],
+        message: Dict = None,
+    ) -> StreamResponse:
+        payload = {"remove_filter_tags": tags, "message": message}
+        return await self.client.post(self.url, data=payload)
