@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.27.0](https://github.com/GetStream/stream-chat-python/compare/v4.26.0...v4.27.0) (2025-11-12)
+
+
+### Features
+
+* add filter tags to channels ([#210](https://github.com/GetStream/stream-chat-python/issues/210)) ([85d7a38](https://github.com/GetStream/stream-chat-python/commit/85d7a38fb99067259a1944956aa0c5eed285f909))
+* add hide_history_before option for adding members ([#208](https://github.com/GetStream/stream-chat-python/issues/208)) ([0c96e70](https://github.com/GetStream/stream-chat-python/commit/0c96e703c7365b6abad4710a684e0e9aaada8790))
+* Added Delete for me support on behalf of a user ([#204](https://github.com/GetStream/stream-chat-python/issues/204)) ([c911a8b](https://github.com/GetStream/stream-chat-python/commit/c911a8b3126b74ff2104edb4be373a9c8465d179))
+* support members_template property for campaigns ([#209](https://github.com/GetStream/stream-chat-python/issues/209)) ([21997ee](https://github.com/GetStream/stream-chat-python/commit/21997ee97c64f496e71f28de5c9aeb225856254f))
+
+
+### Bug Fixes
+
+* failing webhook and blocklist tests ([#207](https://github.com/GetStream/stream-chat-python/issues/207)) ([bd46569](https://github.com/GetStream/stream-chat-python/commit/bd46569c2d59572b2ca3198a876b5f8b7debd8cb))
+
 ## [4.26.0](https://github.com/GetStream/stream-chat-python/compare/v4.25.0...v4.26.0) (2025-07-08)
 
 ## [4.25.0](https://github.com/GetStream/stream-chat-python/compare/v4.24.0...v4.25.0) (2025-06-18)
