@@ -284,11 +284,11 @@ class ChannelInterface(abc.ABC):
         self, user_id: str, **data: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Marks channel as unread from a specific message or thread, if thread_id is provided in data
+        Marks channel as unread from a specific message, thread, or timestamp, if thread_id is provided in data
         a thread will be searched, otherwise a message.
 
         :param user_id: the user ID for the event
-        :param data: additional data, ie {"message_id": last_message_id} or {"thread_id": thread_id}
+        :param data: additional data, ie {"message_id": last_message_id}, {"thread_id": thread_id}, or {"message_timestamp": timestamp}
         :return: The server response
         """
         pass
