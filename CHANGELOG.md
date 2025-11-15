@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.28.0](https://github.com/GetStream/stream-chat-python/compare/v4.27.0...v4.28.0) (2025-11-13)
+
+
+### Features
+
+* add message_timestamp option to MarkUnread ([#211](https://github.com/GetStream/stream-chat-python/issues/211)) ([1e239cd](https://github.com/GetStream/stream-chat-python/commit/1e239cd0688027442e169c968e63ef21e1a3c018))
+
 ## [4.27.0](https://github.com/GetStream/stream-chat-python/compare/v4.26.0...v4.27.0) (2025-11-12)
 
 
