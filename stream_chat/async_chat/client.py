@@ -965,7 +965,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         :return: API response with reminders
         """
         params = options.copy()
-        params["filter_conditions"] = filter_conditions or {}
+        params["filter"] = filter_conditions or {}
         params["sort"] = sort or [{"field": "remind_at", "direction": 1}]
         params["user_id"] = user_id
         return await self.post("reminders/query", data=params)
