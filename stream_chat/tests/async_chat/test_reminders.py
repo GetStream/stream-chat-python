@@ -158,11 +158,30 @@ class TestReminders:
                 random_user["id"], filter_conditions
             )
             assert response is not None
+            assert "reminders" in response
+            # Verify all returned reminders match the filter
+            for reminder in response["reminders"]:
+                assert reminder["message_id"] in [message_ids[0]]
 
-        # Test case 3: Query reminders by channel CID
+        # Test case 3: Query reminders by single message ID
+        filter_conditions = {"message_id": message_ids[0]}
+        response = await client.query_reminders(random_user["id"], filter_conditions)
+        assert response is not None
+        assert "reminders" in response
+        assert len(response["reminders"]) >= 1
+        # Verify all returned reminders have the exact message_id
+        for reminder in response["reminders"]:
+            assert reminder["message_id"] == message_ids[0]
+
+        # Test case 4: Query reminders by channel CID
         filter_conditions = {"channel_cid": channel_cid}
         response = await client.query_reminders(random_user["id"], filter_conditions)
         assert response is not None
+        assert "reminders" in response
+        assert len(response["reminders"]) >= 3
+        # Verify all returned reminders belong to the channel
+        for reminder in response["reminders"]:
+            assert reminder["channel_cid"] == channel_cid
 
         # Clean up - try to delete the reminders
         for message_id in message_ids:
