@@ -325,7 +325,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         )
 
     async def pin_message(
-        self, message_id: str, user_id: str, expiration: int = None
+        self, message_id: str, user_id: str, expiration: Optional[int] = None
     ) -> StreamResponse:
         updates = {
             "set": {
