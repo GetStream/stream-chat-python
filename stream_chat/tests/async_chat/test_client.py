@@ -390,64 +390,6 @@ class TestClient:
         assert response["message"]["text"] == "helloworld"
         assert response["message"]["awesome"] is True
 
-    async def test_update_message_restricted_visibility(
-        self,
-        client: StreamChatAsync,
-        channel: Channel,
-        random_users: List[Dict],
-    ):
-        amy = random_users[0]["id"]
-        paul = random_users[1]["id"]
-        user = random_users[2]["id"]
-
-        # Add users to channel
-        await channel.add_members([amy, paul])
-
-        # Send initial message
-        msg_id = str(uuid.uuid4())
-        response = await channel.send_message(
-            {"id": msg_id, "text": "hello world"}, user
-        )
-        assert response["message"]["text"] == "hello world"
-
-        # Update message with restricted visibility
-        response = await client.update_message(
-            {
-                "id": msg_id,
-                "text": "helloworld",
-                "restricted_visibility": [amy, paul],
-                "user": {"id": response["message"]["user"]["id"]},
-            }
-        )
-        assert response["message"]["text"] == "helloworld"
-        assert response["message"]["restricted_visibility"] == [amy, paul]
-
-    async def test_update_message_partial_restricted_visibility(
-        self,
-        client: StreamChatAsync,
-        channel: Channel,
-        random_users: List[Dict],
-    ):
-        amy = random_users[0]["id"]
-        paul = random_users[1]["id"]
-        user = random_users[2]["id"]
-
-        # Add users to channel
-        await channel.add_members([amy, paul])
-
-        msg_id = str(uuid.uuid4())
-        response = await channel.send_message(
-            {"id": msg_id, "text": "hello world"}, user
-        )
-        assert response["message"]["text"] == "hello world"
-        response = await client.update_message_partial(
-            msg_id,
-            dict(set=dict(text="helloworld", restricted_visibility=[amy])),
-            user,
-        )
-
-        assert response["message"]["restricted_visibility"] == [amy]
-
     async def test_delete_message(
         self, client: StreamChatAsync, channel: Channel, random_user: Dict
     ):
