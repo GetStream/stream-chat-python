@@ -1028,6 +1028,24 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
         return await self.mark_delivered(data)
 
+    async def update_channels_batch(self, payload: Dict) -> StreamResponse:
+        """
+        Update channels in batch.
+
+        :param payload: Payload containing operation, filter, and optional members/data/filter_tags_update
+        :return: API response
+        """
+        return await self.put("channels/batch", data=payload)
+
+    def channel_batch_updater(self) -> "ChannelBatchUpdater":
+        """
+        Returns a ChannelBatchUpdater instance for batch channel operations.
+
+        :return: A ChannelBatchUpdater instance
+        """
+        from stream_chat.async_chat.channel_batch_updater import ChannelBatchUpdater
+        return ChannelBatchUpdater(self)
+
     async def close(self) -> None:
         await self.session.close()
 
