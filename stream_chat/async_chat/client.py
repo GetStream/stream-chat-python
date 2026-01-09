@@ -18,6 +18,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
+    from stream_chat.async_chat.channel_batch_updater import ChannelBatchUpdater
     from stream_chat.types.channel_batch import ChannelsBatchOptions
 from urllib.parse import urlparse
 
@@ -1033,7 +1034,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         return await self.mark_delivered(data)
 
     async def update_channels_batch(
-        self, options: "ChannelsBatchOptions"
+        self, options: ChannelsBatchOptions
     ) -> StreamResponse:
         """
         Updates channels in batch based on the provided options.
@@ -1046,7 +1047,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
         return await self.put("channels/batch", data=options)
 
-    def channel_batch_updater(self) -> "ChannelBatchUpdater":
+    def channel_batch_updater(self) -> ChannelBatchUpdater:
         """
         Returns a ChannelBatchUpdater instance for batch channel operations.
 

@@ -1,4 +1,5 @@
-from typing import List
+import sys
+from typing import TYPE_CHECKING, List
 
 from stream_chat.types.channel_batch import (
     ChannelBatchMemberRequest,
@@ -8,13 +9,16 @@ from stream_chat.types.channel_batch import (
 )
 from stream_chat.types.stream_response import StreamResponse
 
+if TYPE_CHECKING:
+    from stream_chat.async_chat.client import StreamChatAsync
+
 
 class ChannelBatchUpdater:
     """
     Provides convenience methods for batch channel operations (async).
     """
 
-    def __init__(self, client):
+    def __init__(self, client: "StreamChatAsync") -> None:
         self.client = client
 
     async def add_members(

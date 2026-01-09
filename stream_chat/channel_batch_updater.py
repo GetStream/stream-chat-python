@@ -1,4 +1,5 @@
-from typing import List, Optional
+import sys
+from typing import TYPE_CHECKING, List, Optional
 
 from stream_chat.types.channel_batch import (
     ChannelBatchMemberRequest,
@@ -8,13 +9,16 @@ from stream_chat.types.channel_batch import (
 )
 from stream_chat.types.stream_response import StreamResponse
 
+if TYPE_CHECKING:
+    from stream_chat.client import StreamChat
+
 
 class ChannelBatchUpdater:
     """
     Provides convenience methods for batch channel operations.
     """
 
-    def __init__(self, client):
+    def __init__(self, client: "StreamChat") -> None:
         self.client = client
 
     def add_members(

@@ -90,18 +90,23 @@ class TestChannelBatchUpdater:
                     continue
 
                 if task["status"] == "completed":
-                    # Wait a bit and verify members were added
+                    # Wait a bit and verify members were added to both channels
                     for _ in range(120):
                         time.sleep(1)
                         ch1_members = ch1.query_members({})
                         ch2_members = ch2.query_members({})
 
                         ch1_member_ids = [m["user_id"] for m in ch1_members]
-                        all_found = all(
+                        ch2_member_ids = [m["user_id"] for m in ch2_members]
+                        all_found_ch1 = all(
                             user_id in ch1_member_ids
                             for user_id in [u["id"] for u in users_to_add]
                         )
-                        if all_found:
+                        all_found_ch2 = all(
+                            user_id in ch2_member_ids
+                            for user_id in [u["id"] for u in users_to_add]
+                        )
+                        if all_found_ch1 and all_found_ch2:
                             return
 
                     pytest.fail("changes not visible after 2 minutes")

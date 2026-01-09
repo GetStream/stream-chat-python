@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 if TYPE_CHECKING:
+    from stream_chat.channel_batch_updater import ChannelBatchUpdater
     from stream_chat.types.channel_batch import ChannelsBatchOptions
 
 from stream_chat.campaign import Campaign
@@ -999,7 +1000,7 @@ class StreamChat(StreamChatInterface):
         }
         return self.mark_delivered(data=data)
 
-    def update_channels_batch(self, options: "ChannelsBatchOptions") -> StreamResponse:
+    def update_channels_batch(self, options: ChannelsBatchOptions) -> StreamResponse:
         """
         Updates channels in batch based on the provided options.
 
@@ -1011,7 +1012,7 @@ class StreamChat(StreamChatInterface):
 
         return self.put("channels/batch", data=options)
 
-    def channel_batch_updater(self) -> "ChannelBatchUpdater":
+    def channel_batch_updater(self) -> ChannelBatchUpdater:
         """
         Returns a ChannelBatchUpdater instance for batch channel operations.
 

@@ -74,13 +74,13 @@ class ChannelsBatchFilters(TypedDict, total=False):
     filter_tags: Optional[Any]
 
 
-class ChannelsBatchOptions(TypedDict):
+class ChannelsBatchOptions(TypedDict, total=False):
     """
     Represents options for batch channel updates.
 
     Parameters:
-        operation: The batch operation to perform.
-        filter: The filter to match channels.
+        operation: The batch operation to perform (required).
+        filter: The filter to match channels (required).
         members: List of members for member-related operations (optional).
         data: Channel data updates for updateData operation (optional).
         filter_tags_update: List of filter tags for filter tag operations (optional).
