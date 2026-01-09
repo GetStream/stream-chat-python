@@ -2,9 +2,12 @@ import datetime
 import json
 import sys
 import warnings
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Union, cast
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+
+if TYPE_CHECKING:
+    from stream_chat.types.channel_batch import ChannelsBatchOptions
 
 from stream_chat.campaign import Campaign
 from stream_chat.segment import Segment
@@ -985,3 +988,27 @@ class StreamChat(StreamChatInterface):
             "user_id": user_id,
         }
         return self.mark_delivered(data=data)
+
+    def update_channels_batch(
+        self, options: "ChannelsBatchOptions"
+    ) -> StreamResponse:
+        """
+        Updates channels in batch based on the provided options.
+
+        :param options: ChannelsBatchOptions containing operation, filter, and operation-specific data.
+        :return: StreamResponse containing task_id.
+        """
+        if options is None:
+            raise ValueError("options must not be None")
+
+        return self.put("channels/batch", data=options)
+
+    def channel_batch_updater(self) -> "ChannelBatchUpdater":
+        """
+        Returns a ChannelBatchUpdater instance for batch channel operations.
+
+        :return: ChannelBatchUpdater instance.
+        """
+        from stream_chat.channel_batch_updater import ChannelBatchUpdater
+
+        return ChannelBatchUpdater(self)

@@ -1303,6 +1303,27 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def update_channels_batch(
+        self, options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Updates channels in batch based on the provided options.
+
+        :param options: ChannelsBatchOptions containing operation, filter, and operation-specific data.
+        :return: StreamResponse containing task_id.
+        """
+        pass
+
+    @abc.abstractmethod
+    def channel_batch_updater(self) -> Any:
+        """
+        Returns a ChannelBatchUpdater instance for batch channel operations.
+
+        :return: ChannelBatchUpdater instance.
+        """
+        pass
+
+    @abc.abstractmethod
     def send_user_custom_event(
         self, user_id: str, event: Dict
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
