@@ -19,12 +19,14 @@ from typing import (
 
 if TYPE_CHECKING:
     from stream_chat.async_chat.channel_batch_updater import ChannelBatchUpdater
+
 from urllib.parse import urlparse
 
 from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.channel_batch import ChannelsBatchOptions
 from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
@@ -33,7 +35,6 @@ from stream_chat.types.segment import (
     SegmentType,
     SegmentUpdatableFields,
 )
-from stream_chat.types.channel_batch import ChannelsBatchOptions
 from stream_chat.types.shared_locations import SharedLocationsOptions
 
 if sys.version_info >= (3, 8):
