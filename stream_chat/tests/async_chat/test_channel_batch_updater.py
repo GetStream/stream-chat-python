@@ -39,9 +39,7 @@ class TestChannelBatchUpdater:
             # Perform batch update
             options: ChannelsBatchOptions = {
                 "operation": "addMembers",
-                "filter": {
-                    "cids": {"$in": [ch1.cid, ch2.cid]}
-                },
+                "filter": {"cids": {"$in": [ch1.cid, ch2.cid]}},
                 "members": [{"user_id": user_to_add["id"]}],
             }
 
@@ -76,10 +74,7 @@ class TestChannelBatchUpdater:
 
             updater = client.channel_batch_updater()
 
-            members = [
-                {"user_id": user["id"]}
-                for user in users_to_add
-            ]
+            members = [{"user_id": user["id"]} for user in users_to_add]
 
             response = await updater.add_members(
                 {"cids": {"$in": [ch1.cid, ch2.cid]}}, members

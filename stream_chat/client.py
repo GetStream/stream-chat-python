@@ -2,7 +2,17 @@ import datetime
 import json
 import sys
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Union,
+    cast,
+)
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
@@ -989,9 +999,7 @@ class StreamChat(StreamChatInterface):
         }
         return self.mark_delivered(data=data)
 
-    def update_channels_batch(
-        self, options: "ChannelsBatchOptions"
-    ) -> StreamResponse:
+    def update_channels_batch(self, options: "ChannelsBatchOptions") -> StreamResponse:
         """
         Updates channels in batch based on the provided options.
 

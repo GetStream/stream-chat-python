@@ -37,9 +37,7 @@ class TestChannelBatchUpdater:
             # Perform batch update
             options: ChannelsBatchOptions = {
                 "operation": "addMembers",
-                "filter": {
-                    "cids": {"$in": [ch1.cid, ch2.cid]}
-                },
+                "filter": {"cids": {"$in": [ch1.cid, ch2.cid]}},
                 "members": [{"user_id": user_to_add["id"]}],
             }
 
@@ -73,10 +71,7 @@ class TestChannelBatchUpdater:
 
             updater = client.channel_batch_updater()
 
-            members = [
-                {"user_id": user["id"]}
-                for user in users_to_add
-            ]
+            members = [{"user_id": user["id"]} for user in users_to_add]
 
             response = updater.add_members(
                 {"cids": {"$in": [ch1.cid, ch2.cid]}}, members
@@ -103,7 +98,8 @@ class TestChannelBatchUpdater:
 
                         ch1_member_ids = [m["user_id"] for m in ch1_members]
                         all_found = all(
-                            user_id in ch1_member_ids for user_id in [u["id"] for u in users_to_add]
+                            user_id in ch1_member_ids
+                            for user_id in [u["id"] for u in users_to_add]
                         )
                         if all_found:
                             return
@@ -219,9 +215,7 @@ class TestChannelBatchUpdater:
             except Exception:
                 pass
 
-    def test_channel_batch_updater_archive(
-        self, client: StreamChat, random_user: Dict
-    ):
+    def test_channel_batch_updater_archive(self, client: StreamChat, random_user: Dict):
         """Test ChannelBatchUpdater.archive"""
         # Create users
         members_id = [str(uuid.uuid4()), str(uuid.uuid4())]
