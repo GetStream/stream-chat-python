@@ -1,13 +1,10 @@
 import asyncio
-import time
 import uuid
 from typing import Dict
 
 import pytest
 
 from stream_chat.async_chat import StreamChatAsync
-from stream_chat.async_chat.channel import Channel
-from stream_chat.base.exceptions import StreamAPIException
 from stream_chat.tests.async_chat.conftest import hard_delete_users
 from stream_chat.types.channel_batch import ChannelsBatchOptions
 

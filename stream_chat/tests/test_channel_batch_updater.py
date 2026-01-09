@@ -5,10 +5,7 @@ from typing import Dict
 import pytest
 
 from stream_chat import StreamChat
-from stream_chat.base.exceptions import StreamAPIException
-from stream_chat.channel import Channel
 from stream_chat.tests.conftest import hard_delete_users
-from stream_chat.tests.utils import wait_for
 from stream_chat.types.channel_batch import ChannelsBatchOptions
 
 

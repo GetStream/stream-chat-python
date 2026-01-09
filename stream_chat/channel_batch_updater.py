@@ -1,5 +1,4 @@
-import sys
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 
 from stream_chat.types.channel_batch import (
     ChannelBatchMemberRequest,
