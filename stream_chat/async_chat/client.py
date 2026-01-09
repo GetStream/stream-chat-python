@@ -19,7 +19,6 @@ from typing import (
 
 if TYPE_CHECKING:
     from stream_chat.async_chat.channel_batch_updater import ChannelBatchUpdater
-    from stream_chat.types.channel_batch import ChannelsBatchOptions
 from urllib.parse import urlparse
 
 from stream_chat.async_chat.campaign import Campaign
@@ -34,6 +33,7 @@ from stream_chat.types.segment import (
     SegmentType,
     SegmentUpdatableFields,
 )
+from stream_chat.types.channel_batch import ChannelsBatchOptions
 from stream_chat.types.shared_locations import SharedLocationsOptions
 
 if sys.version_info >= (3, 8):
@@ -1047,7 +1047,7 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
         return await self.put("channels/batch", data=options)
 
-    def channel_batch_updater(self) -> ChannelBatchUpdater:
+    def channel_batch_updater(self) -> "ChannelBatchUpdater":
         """
         Returns a ChannelBatchUpdater instance for batch channel operations.
 

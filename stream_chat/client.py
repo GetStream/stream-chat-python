@@ -18,7 +18,6 @@ from urllib.request import Request, urlopen
 
 if TYPE_CHECKING:
     from stream_chat.channel_batch_updater import ChannelBatchUpdater
-    from stream_chat.types.channel_batch import ChannelsBatchOptions
 
 from stream_chat.campaign import Campaign
 from stream_chat.segment import Segment
@@ -32,6 +31,7 @@ from stream_chat.types.segment import (
     SegmentType,
     SegmentUpdatableFields,
 )
+from stream_chat.types.channel_batch import ChannelsBatchOptions
 from stream_chat.types.shared_locations import SharedLocationsOptions
 
 if sys.version_info >= (3, 8):
@@ -1012,7 +1012,7 @@ class StreamChat(StreamChatInterface):
 
         return self.put("channels/batch", data=options)
 
-    def channel_batch_updater(self) -> ChannelBatchUpdater:
+    def channel_batch_updater(self) -> "ChannelBatchUpdater":
         """
         Returns a ChannelBatchUpdater instance for batch channel operations.
 
