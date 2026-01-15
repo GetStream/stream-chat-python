@@ -4,6 +4,7 @@ import sys
 import warnings
 from types import TracebackType
 from typing import (
+    TYPE_CHECKING,
     Any,
     AsyncContextManager,
     Callable,
@@ -15,12 +16,17 @@ from typing import (
     Union,
     cast,
 )
+
+if TYPE_CHECKING:
+    from stream_chat.async_chat.channel_batch_updater import ChannelBatchUpdater
+
 from urllib.parse import urlparse
 
 from stream_chat.async_chat.campaign import Campaign
 from stream_chat.async_chat.segment import Segment
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
+from stream_chat.types.channel_batch import ChannelsBatchOptions
 from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
@@ -1027,6 +1033,30 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         }
 
         return await self.mark_delivered(data)
+
+    async def update_channels_batch(
+        self, options: ChannelsBatchOptions
+    ) -> StreamResponse:
+        """
+        Updates channels in batch based on the provided options.
+
+        :param options: ChannelsBatchOptions containing operation, filter, and operation-specific data.
+        :return: StreamResponse containing task_id.
+        """
+        if options is None:
+            raise ValueError("options must not be None")
+
+        return await self.put("channels/batch", data=options)
+
+    def channel_batch_updater(self) -> "ChannelBatchUpdater":
+        """
+        Returns a ChannelBatchUpdater instance for batch channel operations.
+
+        :return: ChannelBatchUpdater instance.
+        """
+        from stream_chat.async_chat.channel_batch_updater import ChannelBatchUpdater
+
+        return ChannelBatchUpdater(self)
 
     async def close(self) -> None:
         await self.session.close()
