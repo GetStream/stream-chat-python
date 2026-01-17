@@ -232,6 +232,22 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
             "query_banned_users", params={"payload": json.dumps(query_conditions)}
         )
 
+    async def query_future_channel_bans(self, **options: Any) -> StreamResponse:
+        """
+        Query future channel bans created by a user.
+
+        :param options: Optional parameters including:
+            - user_id: The ID of the user who created the bans
+            - exclude_expired_bans: Whether to exclude expired bans
+            - limit: Maximum number of results to return
+            - offset: Number of results to skip
+
+        :return: A StreamResponse containing the list of future channel bans
+        """
+        return await self.get(
+            "query_future_channel_bans", params={"payload": json.dumps(options)}
+        )
+
     async def block_user(
         self, blocked_user_id: str, user_id: str, **options: Any
     ) -> StreamResponse:
