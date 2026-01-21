@@ -548,23 +548,36 @@ class StreamChat(StreamChatInterface):
         return self._parse_response(response)
 
     def create_blocklist(
-        self, name: str, words: Iterable[str], type: str = "word"
+        self,
+        name: str,
+        words: Iterable[str],
+        type: str = "word",
+        team: Optional[str] = None,
     ) -> StreamResponse:
+        params = {"team": team} if team is not None else {}
         return self.post(
-            "blocklists", data={"name": name, "words": words, "type": type}
+            "blocklists",
+            data={"name": name, "words": words, "type": type},
+            params=params,
         )
 
-    def list_blocklists(self) -> StreamResponse:
-        return self.get("blocklists")
+    def list_blocklists(self, team: Optional[str] = None) -> StreamResponse:
+        params = {"team": team} if team is not None else {}
+        return self.get("blocklists", params)
 
-    def get_blocklist(self, name: str) -> StreamResponse:
-        return self.get(f"blocklists/{name}")
+    def get_blocklist(self, name: str, team: Optional[str] = None) -> StreamResponse:
+        params = {"team": team} if team is not None else {}
+        return self.get(f"blocklists/{name}", params)
 
-    def update_blocklist(self, name: str, words: Iterable[str]) -> StreamResponse:
-        return self.put(f"blocklists/{name}", data={"words": words})
+    def update_blocklist(
+        self, name: str, words: Iterable[str], team: Optional[str] = None
+    ) -> StreamResponse:
+        params = {"team": team} if team is not None else {}
+        return self.put(f"blocklists/{name}", data={"words": words}, params=params)
 
-    def delete_blocklist(self, name: str) -> StreamResponse:
-        return self.delete(f"blocklists/{name}")
+    def delete_blocklist(self, name: str, team: Optional[str] = None) -> StreamResponse:
+        params = {"team": team} if team is not None else {}
+        return self.delete(f"blocklists/{name}", params)
 
     def check_push(self, push_data: Dict) -> StreamResponse:
         return self.post("check_push", data=push_data)
