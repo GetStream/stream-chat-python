@@ -357,6 +357,23 @@ class StreamChatInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def query_future_channel_bans(
+        self, **options: Any
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Query future channel bans created by a user.
+
+        :param options: Optional parameters including:
+            - user_id: The ID of the user who created the bans
+            - exclude_expired_bans: Whether to exclude expired bans
+            - limit: Maximum number of results to return
+            - offset: Number of results to skip
+
+        :return: A StreamResponse containing the list of future channel bans
+        """
+        pass
+
+    @abc.abstractmethod
     def block_user(
         self, blocked_user_id: str, user_id: str, **options: Any
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
