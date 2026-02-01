@@ -1,6 +1,6 @@
 import sys
 from enum import IntEnum
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -43,3 +43,20 @@ class Pager(TypedDict, total=False):
     limit: Optional[int]
     next: Optional[str]
     prev: Optional[str]
+
+
+class ParsedPredefinedFilterResponse(TypedDict, total=False):
+    """
+    Represents the parsed/interpolated predefined filter returned in QueryChannels response.
+
+    This is only present when a predefined filter is used in the query.
+
+    Parameters:
+        name: The name of the predefined filter that was used.
+        filter: The interpolated filter with placeholders replaced by actual values.
+        sort: The interpolated sort parameters (optional).
+    """
+
+    name: str
+    filter: Dict[str, Any]
+    sort: Optional[List[SortParam]]
