@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.30.0](https://github.com/GetStream/stream-chat-python/compare/v4.29.0...v4.30.0) (2026-02-04)
+
+
+### Features
+
+* [CHA-1699] add Future Channel Bans support ([#217](https://github.com/GetStream/stream-chat-python/issues/217)) ([2ee3f97](https://github.com/GetStream/stream-chat-python/commit/2ee3f97abc35139225b171e0352c60e7d903e8f6))
+
 ## [4.29.0](https://github.com/GetStream/stream-chat-python/compare/v4.27.0...v4.29.0) (2026-01-19)
 
 
