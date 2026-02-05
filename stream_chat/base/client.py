@@ -530,7 +530,7 @@ class StreamChatInterface(abc.ABC):
 
     @abc.abstractmethod
     def pin_message(
-        self, message_id: str, user_id: str, expiration: int = None
+        self, message_id: str, user_id: str, expiration: Optional[int] = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Pins a message.

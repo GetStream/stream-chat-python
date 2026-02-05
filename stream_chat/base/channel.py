@@ -420,7 +420,7 @@ class ChannelInterface(abc.ABC):
 
     @abc.abstractmethod
     def mute(
-        self, user_id: str, expiration: int = None
+        self, user_id: str, expiration: Optional[int] = None
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Mutes a channel.

@@ -201,7 +201,7 @@ class Channel(ChannelInterface):
     def show(self, user_id: str) -> StreamResponse:
         return self.client.post(f"{self.url}/show", data={"user_id": user_id})
 
-    def mute(self, user_id: str, expiration: int = None) -> StreamResponse:
+    def mute(self, user_id: str, expiration: Optional[int] = None) -> StreamResponse:
         params: Dict[str, Union[str, int]] = {
             "user_id": user_id,
             "channel_cid": self.cid,
