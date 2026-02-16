@@ -1074,6 +1074,27 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
 
         return ChannelBatchUpdater(self)
 
+    async def query_team_usage_stats(self, **options: Any) -> StreamResponse:
+        """
+        Queries team-level usage statistics from the warehouse database.
+
+        Returns all 16 metrics grouped by team with cursor-based pagination.
+        This endpoint is server-side only.
+
+        Date Range Options (mutually exclusive):
+        - Use 'month' parameter (YYYY-MM format) for monthly aggregated values
+        - Use 'start_date'/'end_date' parameters (YYYY-MM-DD format) for daily breakdown
+        - If neither provided, defaults to current month (monthly mode)
+
+        :param month: Month in YYYY-MM format (e.g., '2026-01')
+        :param start_date: Start date in YYYY-MM-DD format
+        :param end_date: End date in YYYY-MM-DD format
+        :param limit: Maximum number of teams to return per page (default: 30, max: 30)
+        :param next: Cursor for pagination to fetch next page of teams
+        :return: StreamResponse with teams array and optional next cursor
+        """
+        return await self.post("stats/team_usage", data=options)
+
     async def close(self) -> None:
         await self.session.close()
 
