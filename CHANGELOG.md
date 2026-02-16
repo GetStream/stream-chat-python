@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.30.1](https://github.com/GetStream/stream-chat-python/compare/v4.30.0...v4.30.1) (2026-02-16)
+
+
+### Features
+
+* add query_team_usage_stats API for multi-tenant metrics ([#221](https://github.com/GetStream/stream-chat-python/issues/221)) ([edd67a0](https://github.com/GetStream/stream-chat-python/commit/edd67a0396bd5f546e5d3d0c368398103a039066))
+
 ## [4.30.0](https://github.com/GetStream/stream-chat-python/compare/v4.29.0...v4.30.0) (2026-02-04)
 
 
