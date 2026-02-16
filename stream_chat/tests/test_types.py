@@ -1,10 +1,6 @@
 """Tests for type definitions."""
 
-from stream_chat.types.base import (
-    ParsedPredefinedFilterResponse,
-    SortOrder,
-    SortParam,
-)
+from stream_chat.types.base import ParsedPredefinedFilterResponse, SortOrder, SortParam
 
 
 class TestParsedPredefinedFilterResponse:
