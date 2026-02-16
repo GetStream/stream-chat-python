@@ -1,7 +1,5 @@
 from datetime import date, timedelta
 
-import pytest
-
 from stream_chat import StreamChat
 
 
