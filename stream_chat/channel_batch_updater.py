@@ -206,4 +206,3 @@ class ChannelBatchUpdater:
             "data": data,
         }
         return self.client.update_channels_batch(options)
-
