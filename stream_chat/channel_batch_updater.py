@@ -207,36 +207,3 @@ class ChannelBatchUpdater:
         }
         return self.client.update_channels_batch(options)
 
-    def add_filter_tags(
-        self, filter: ChannelsBatchFilters, tags: List[str]
-    ) -> StreamResponse:
-        """
-        Adds filter tags to channels matching the filter.
-
-        :param filter: The filter to match channels.
-        :param tags: List of filter tags to add.
-        :return: StreamResponse containing task_id.
-        """
-        options: ChannelsBatchOptions = {
-            "operation": "addFilterTags",
-            "filter": filter,
-            "filter_tags_update": tags,
-        }
-        return self.client.update_channels_batch(options)
-
-    def remove_filter_tags(
-        self, filter: ChannelsBatchFilters, tags: List[str]
-    ) -> StreamResponse:
-        """
-        Removes filter tags from channels matching the filter.
-
-        :param filter: The filter to match channels.
-        :param tags: List of filter tags to remove.
-        :return: StreamResponse containing task_id.
-        """
-        options: ChannelsBatchOptions = {
-            "operation": "removeFilterTags",
-            "filter": filter,
-            "filter_tags_update": tags,
-        }
-        return self.client.update_channels_batch(options)
