@@ -84,13 +84,27 @@ def channel(client: StreamChat, random_user: Dict):
 
 @pytest.fixture(scope="function")
 def command(client: StreamChat):
+    try:
+        commands = client.list_commands()
+        for cmd in commands.get("commands", []):
+            if cmd.get("name") not in ("giphy", "imgur", "flag", "ban", "unban", "mute", "unmute"):
+                try:
+                    client.delete_command(cmd["name"])
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
     response = client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
     )
 
     yield response["command"]
 
-    client.delete_command(response["command"]["name"])
+    try:
+        client.delete_command(response["command"]["name"])
+    except Exception:
+        pass
 
 
 @pytest.fixture(scope="module")
@@ -111,6 +125,10 @@ def fellowship_of_the_ring(client: StreamChat):
         },
         {"id": "peregrin-took", "name": "Peregrin Took", "race": "Hobbit", "age": 28},
     ]
+    try:
+        client.restore_users([m["id"] for m in members])
+    except Exception:
+        pass
     client.upsert_users(members)
     channel = client.channel(
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
