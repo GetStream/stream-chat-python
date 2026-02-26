@@ -96,7 +96,15 @@ async def command(client: StreamChatAsync):
     try:
         commands = await client.list_commands()
         for cmd in commands.get("commands", []):
-            if cmd.get("name") not in ("giphy", "imgur", "flag", "ban", "unban", "mute", "unmute"):
+            if cmd.get("name") not in (
+                "giphy",
+                "imgur",
+                "flag",
+                "ban",
+                "unban",
+                "mute",
+                "unmute",
+            ):
                 try:
                     await client.delete_command(cmd["name"])
                 except Exception:

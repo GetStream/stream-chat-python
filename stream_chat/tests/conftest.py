@@ -87,7 +87,15 @@ def command(client: StreamChat):
     try:
         commands = client.list_commands()
         for cmd in commands.get("commands", []):
-            if cmd.get("name") not in ("giphy", "imgur", "flag", "ban", "unban", "mute", "unmute"):
+            if cmd.get("name") not in (
+                "giphy",
+                "imgur",
+                "flag",
+                "ban",
+                "unban",
+                "mute",
+                "unmute",
+            ):
                 try:
                     client.delete_command(cmd["name"])
                 except Exception:
