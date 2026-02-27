@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0](https://github.com/GetStream/stream-chat-python/compare/v4.30.1...v4.31.0) (2026-02-27)
+
+
+### Features
+
+* remove filterTags from channel batch update API ([#224](https://github.com/GetStream/stream-chat-python/issues/224)) ([e2c5c23](https://github.com/GetStream/stream-chat-python/commit/e2c5c2359471ba85d365eb6b2cb8cdc6dce94467))
+
 ### [4.30.1](https://github.com/GetStream/stream-chat-python/compare/v4.30.0...v4.30.1) (2026-02-16)
 
 
