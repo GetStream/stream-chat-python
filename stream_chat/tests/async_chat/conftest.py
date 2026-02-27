@@ -93,13 +93,35 @@ async def channel(client: StreamChatAsync, random_user: Dict):
 
 @pytest.fixture(scope="function")
 async def command(client: StreamChatAsync):
+    try:
+        commands = await client.list_commands()
+        for cmd in commands.get("commands", []):
+            if cmd.get("name") not in (
+                "giphy",
+                "imgur",
+                "flag",
+                "ban",
+                "unban",
+                "mute",
+                "unmute",
+            ):
+                try:
+                    await client.delete_command(cmd["name"])
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
     response = await client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
     )
 
     yield response["command"]
 
-    await client.delete_command(response["command"]["name"])
+    try:
+        await client.delete_command(response["command"]["name"])
+    except Exception:
+        pass
 
 
 @pytest.fixture(scope="function")
@@ -121,6 +143,10 @@ async def fellowship_of_the_ring(client: StreamChatAsync):
         },
         {"id": "peregrin-took", "name": "Peregrin Took", "race": "Hobbit", "age": 28},
     ]
+    try:
+        await client.restore_users([m["id"] for m in members])
+    except Exception:
+        pass
     await client.upsert_users(members)
     channel = client.channel(
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
