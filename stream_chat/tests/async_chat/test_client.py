@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import sys
@@ -173,14 +174,14 @@ class TestClient:
         )
         assert "task_id" in response
 
-        for _ in range(20):
+        for _ in range(60):
             response = await client.get_task(response["task_id"])
             if response["status"] == "completed" and response["result"][
                 random_user["id"]
             ] == {"status": "ok"}:
                 return
 
-            time.sleep(1)
+            await asyncio.sleep(1)
 
         pytest.fail("task did not succeed")
 
@@ -810,14 +811,14 @@ class TestClient:
         response = await client.delete_channels([channel.cid])
         assert "task_id" in response
 
-        for _ in range(20):
+        for _ in range(60):
             response = await client.get_task(response["task_id"])
             if response["status"] == "completed" and response["result"][
                 channel.cid
             ] == {"status": "ok"}:
                 return
 
-            time.sleep(1)
+            await asyncio.sleep(1)
 
         pytest.fail("task did not succeed")
 

@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.31.0](https://github.com/GetStream/stream-chat-python/compare/v4.30.1...v4.31.0) (2026-02-27)
+
+
+### Features
+
+* remove filterTags from channel batch update API ([#224](https://github.com/GetStream/stream-chat-python/issues/224)) ([e2c5c23](https://github.com/GetStream/stream-chat-python/commit/e2c5c2359471ba85d365eb6b2cb8cdc6dce94467))
+
+### [4.30.1](https://github.com/GetStream/stream-chat-python/compare/v4.30.0...v4.30.1) (2026-02-16)
+
+
+### Features
+
+* add query_team_usage_stats API for multi-tenant metrics ([#221](https://github.com/GetStream/stream-chat-python/issues/221)) ([edd67a0](https://github.com/GetStream/stream-chat-python/commit/edd67a0396bd5f546e5d3d0c368398103a039066))
+
+## [4.30.0](https://github.com/GetStream/stream-chat-python/compare/v4.29.0...v4.30.0) (2026-02-04)
+
+
+### Features
+
+* [CHA-1699] add Future Channel Bans support ([#217](https://github.com/GetStream/stream-chat-python/issues/217)) ([2ee3f97](https://github.com/GetStream/stream-chat-python/commit/2ee3f97abc35139225b171e0352c60e7d903e8f6))
+
 ## [4.29.0](https://github.com/GetStream/stream-chat-python/compare/v4.27.0...v4.29.0) (2026-01-19)
 
 
