@@ -2,7 +2,7 @@
 >
 > **`stream-chat` is now in maintenance mode.** It will continue to receive critical fixes and requested features, so it is safe to keep using. However, we encourage existing users to migrate when convenient and strongly recommend that new projects start with `getstream`.
 >
-> Check out the [Migration Guide](https://github.com/GetStream/stream-py/tree/main/docs/migration-from-stream-chat-python) for side-by-side examples covering common use cases.
+> Check out the [Migration Guide](https://github.com/GetStream/stream-py/blob/221d9f15bd5f93ce2a83bb54ecd5a62e6c563da6/docs/migration-from-stream-chat-python/README.md) for side-by-side examples covering common use cases.
 
 # Official Python SDK for [Stream Chat](https://getstream.io/chat/)
 
