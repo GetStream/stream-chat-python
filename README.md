@@ -1,3 +1,9 @@
+> **Note:** [`getstream`](https://github.com/GetStream/stream-py) is the new full-product SDK for Stream, covering Chat, Video, Moderation, and Feeds with long-term support.
+>
+> **`stream-chat` is now in maintenance mode.** It will continue to receive critical fixes and requested features, so it is safe to keep using. However, we encourage existing users to migrate when convenient and strongly recommend that new projects start with `getstream`.
+>
+> Check out the [Migration Guide](https://github.com/GetStream/stream-py/blob/221d9f15bd5f93ce2a83bb54ecd5a62e6c563da6/docs/migration-from-stream-chat-python/README.md) for side-by-side examples covering common use cases.
+
 # Official Python SDK for [Stream Chat](https://getstream.io/chat/)
 
 [![build](https://github.com/GetStream/stream-chat-python/workflows/build/badge.svg)](https://github.com/GetStream/stream-chat-python/actions) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stream-chat.svg) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
