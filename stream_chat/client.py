@@ -82,9 +82,13 @@ class StreamChat(StreamChatInterface):
         try:
             parsed_result = json.loads(response.text) if response.text else {}
         except ValueError:
-            raise StreamAPIException(response.text, response.status_code)
+            raise StreamAPIException(
+                response.text, response.status_code, dict(response.headers)
+            )
         if response.status_code >= 399:
-            raise StreamAPIException(response.text, response.status_code)
+            raise StreamAPIException(
+                response.text, response.status_code, dict(response.headers)
+            )
 
         return StreamResponse(
             parsed_result, dict(response.headers), response.status_code
