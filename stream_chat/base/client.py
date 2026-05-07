@@ -133,6 +133,85 @@ class StreamChatInterface(abc.ABC):
         ).hexdigest()
         return signature == x_signature
 
+    def decompress_webhook_body(
+        self,
+        body: Union[bytes, str],
+        content_encoding: Optional[str] = None,
+        payload_encoding: Optional[str] = None,
+    ) -> bytes:
+        """Decode a (possibly compressed and/or wrapped) webhook payload.
+
+        Stream Chat can compress outbound webhook payloads with gzip and, for
+        SQS / SNS firehose delivery, also wrap the compressed bytes in base64
+        so they remain valid UTF-8 over the queue. This helper applies the
+        encodings in order:
+
+        1. ``payload_encoding`` (``"base64"`` / ``"b64"``) is unwrapped first.
+        2. ``content_encoding`` (``"gzip"``) is decompressed next.
+        3. The raw JSON bytes are returned. The caller can ``.decode("utf-8")``
+           or pass the value straight to :func:`json.loads`, which accepts
+           bytes.
+
+        ``None`` or an empty string for either encoding is a no-op, so the
+        regular HTTP webhook path stays bytewise identical to today.
+
+        This method does **not** check the ``X-Signature`` header. Use
+        :meth:`verify_and_decode_webhook` for the combined decode + verify
+        flow.
+
+        :param body: raw bytes (or str) received from Stream
+        :param content_encoding: value of the ``Content-Encoding`` header
+            (only ``"gzip"`` is supported)
+        :param payload_encoding: wrapper around the compressed bytes
+            (``"base64"`` / ``"b64"``); used by the SQS / SNS firehose
+        :returns: the uncompressed JSON body as bytes
+        """
+        from stream_chat.webhook import decompress_webhook_body
+
+        return decompress_webhook_body(
+            body,
+            content_encoding=content_encoding,
+            payload_encoding=payload_encoding,
+        )
+
+    def verify_and_decode_webhook(
+        self,
+        body: Union[bytes, str],
+        x_signature: Union[str, bytes],
+        content_encoding: Optional[str] = None,
+        payload_encoding: Optional[str] = None,
+    ) -> bytes:
+        """Decode a webhook payload and verify its HMAC-SHA256 signature.
+
+        The signature is always computed over the **uncompressed** JSON
+        payload, so this method first decodes the body via
+        :meth:`decompress_webhook_body` and then compares the digest with
+        ``x_signature`` using :func:`hmac.compare_digest`.
+
+        Works for plain HTTP webhooks (pass the ``Content-Encoding`` header
+        value) and for SQS / SNS firehose envelopes (additionally pass
+        ``payload_encoding="base64"``).
+
+        :param body: raw bytes (or str) received from Stream
+        :param x_signature: the ``X-Signature`` header value sent by Stream
+        :param content_encoding: value of the ``Content-Encoding`` header
+            (only ``"gzip"`` is supported)
+        :param payload_encoding: wrapper around the compressed bytes
+            (``"base64"`` / ``"b64"``); used by the SQS / SNS firehose
+        :returns: the verified, uncompressed JSON body as bytes
+        :raises stream_chat.base.exceptions.WebhookSignatureError: on
+            signature mismatch or any decode error
+        """
+        from stream_chat.webhook import verify_and_decode_webhook
+
+        return verify_and_decode_webhook(
+            body,
+            x_signature,
+            api_secret=self.api_secret,
+            content_encoding=content_encoding,
+            payload_encoding=payload_encoding,
+        )
+
     @abc.abstractmethod
     def update_app_settings(
         self, **settings: Any

@@ -90,6 +90,79 @@ valid = client.verify_webhook(request.body, request.META['HTTP_X_SIGNATURE'])
 valid = client.verify_webhook(request.data, request.headers['X-SIGNATURE'])
 ```
 
+### Compressed webhook bodies
+
+GZIP compression can be enabled for hooks payloads from the Dashboard. Enabling compression reduces the payload size significantly (often 70–90% smaller) reducing your bandwidth usage on Stream. The computation overhead introduced by the decompression step is usually negligible and offset by the much smaller payload.
+
+When payload compression is enabled, webhook HTTP requests will include the `Content-Encoding: gzip` header and the request body will be compressed with GZIP. Some HTTP servers and middleware (Rails, Django, Laravel, Spring Boot, ASP.NET) handle this transparently and strip the header before your handler runs — in that case the body you see is already raw JSON.
+
+Before enabling compression, make sure that:
+
+* Your backend integration is using a recent version of our official SDKs with compression support
+* If you don't use an official SDK, make sure that your code supports receiving compressed payloads
+* The payload signature check is done on the **uncompressed** payload
+
+The Python SDK ships with `client.verify_and_decode_webhook(...)` which transparently handles plain, gzip-compressed, and base64-wrapped (SQS / SNS firehose) payloads. It returns the raw JSON body as `bytes`, ready to pass to `json.loads`.
+
+```python
+import json
+from stream_chat import StreamChat
+
+client = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+
+# Django view
+def stream_webhook(request):
+    body = client.verify_and_decode_webhook(
+        request.body,
+        request.headers["X-Signature"],
+        request.headers.get("Content-Encoding"),
+    )
+    event = json.loads(body)
+    # ... handle event ...
+```
+
+```python
+import json
+from flask import request
+from stream_chat import StreamChat
+
+client = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+
+@app.route("/webhooks/stream", methods=["POST"])
+def stream_webhook():
+    body = client.verify_and_decode_webhook(
+        request.get_data(),
+        request.headers["X-Signature"],
+        request.headers.get("Content-Encoding"),
+    )
+    event = json.loads(body)
+    # ... handle event ...
+```
+
+If your HTTP framework or a middleware already decompressed the body before it reached your handler, the `Content-Encoding` header will be missing (or set to `identity`) and `verify_and_decode_webhook` will be a no-op for the decompression step — the same call works in both cases.
+
+`verify_and_decode_webhook` raises `stream_chat.base.exceptions.WebhookSignatureError` when the signature does not match or the body cannot be decoded.
+
+The original `client.verify_webhook(request.body, request.headers["X-Signature"])` is unchanged and still available for handlers that prefer to verify and parse the body separately.
+
+#### SQS / SNS firehose
+
+When delivering events through SQS or SNS, Stream base64-wraps the (possibly gzip-compressed) body so the payload stays valid UTF-8 over the queue. Pass `payload_encoding="base64"` so `verify_and_decode_webhook` unwraps the envelope before verifying the HMAC signature, which is always computed over the uncompressed JSON.
+
+```python
+body = client.verify_and_decode_webhook(
+    sqs_message["Body"],
+    sqs_message["MessageAttributes"]["X-Signature"]["StringValue"],
+    content_encoding=sqs_message["MessageAttributes"]
+        .get("Content-Encoding", {})
+        .get("StringValue"),
+    payload_encoding="base64",
+)
+event = json.loads(body)
+```
+
+If you only need to decode the body without checking the signature (for example because you have already verified it elsewhere), use `client.decompress_webhook_body(body, content_encoding, payload_encoding)`.
+
 All webhook requests contain these headers:
 
 | Name              | Description                                                                                                          | Example                                                          |
