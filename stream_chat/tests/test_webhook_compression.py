@@ -7,10 +7,7 @@ import pytest
 
 from stream_chat import StreamChat, StreamChatAsync
 from stream_chat.base.exceptions import WebhookSignatureError
-from stream_chat.webhook import (
-    decompress_webhook_body,
-    verify_and_decode_webhook,
-)
+from stream_chat.webhook import decompress_webhook_body, verify_and_decode_webhook
 
 API_KEY = "tkey"
 API_SECRET = "tsec2"
