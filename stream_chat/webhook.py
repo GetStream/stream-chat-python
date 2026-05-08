@@ -1,30 +1,35 @@
-"""Helpers for verifying and decoding outbound Stream webhook payloads.
+"""Webhook verification and parsing helpers.
 
-Stream Chat can compress outbound webhook payloads with gzip and, for SQS / SNS
-firehose delivery, also wrap the compressed bytes in base64 so they remain
-valid UTF-8 over the queue. The helpers in this module mirror the cross-SDK
-contract: callers can either decode the body without checking the signature
-(:func:`decompress_webhook_body`) or do decode + HMAC verification in one call
-(:func:`verify_and_decode_webhook`).
+Stream Chat can deliver outbound events as plain JSON, gzipped JSON over
+HTTP, or as base64 + gzip wrapped messages over SQS / SNS. The helpers in
+this module implement the cross-SDK contract documented at
+https://getstream.io/chat/docs/node/webhooks_overview/.
 
-The functions live outside the client classes so they can be exercised in
-isolation, without instantiating an HTTP client. The client methods just
-delegate here, passing ``self.api_secret``.
+The composite functions (:func:`verify_and_parse_webhook`,
+:func:`verify_and_parse_sqs`, :func:`verify_and_parse_sns`) are the
+recommended entry points. The primitives they compose are exposed so
+callers can build custom flows or run individual steps in isolation.
+
+The Python SDK currently returns the parsed JSON as a ``dict``; typed
+event classes will land in a future release.
 """
 
 import base64
+import binascii
 import gzip
 import hashlib
 import hmac
-from typing import Optional, Union
+import json
+from typing import Any, Dict, Union
 
 from stream_chat.base.exceptions import WebhookSignatureError
 
-_BASE64_ALIASES = frozenset({"base64", "b64"})
-_GZIP_ALIASES = frozenset({"gzip"})
+GZIP_MAGIC = b"\x1f\x8b\x08"
+
+_BytesLike = Union[bytes, bytearray, memoryview, str]
 
 
-def _to_bytes(body: Union[bytes, str]) -> bytes:
+def _to_bytes(body: _BytesLike) -> bytes:
     if isinstance(body, str):
         return body.encode("utf-8")
     if isinstance(body, (bytes, bytearray, memoryview)):
@@ -32,106 +37,129 @@ def _to_bytes(body: Union[bytes, str]) -> bytes:
     raise TypeError(f"webhook body must be bytes or str, got {type(body).__name__}")
 
 
-def _normalize(value: Optional[str]) -> str:
-    if value is None:
-        return ""
-    return value.strip().lower()
+def ungzip_payload(body: _BytesLike) -> bytes:
+    """Return ``body`` unchanged unless it starts with the gzip magic
+    (``1f 8b 08``), in which case the gzip stream is decompressed.
 
-
-def decompress_webhook_body(
-    body: Union[bytes, str],
-    content_encoding: Optional[str] = None,
-    payload_encoding: Optional[str] = None,
-) -> bytes:
-    """Decode a (possibly wrapped + compressed) webhook payload.
-
-    Application order:
-
-    1. ``payload_encoding`` (``"base64"`` / ``"b64"``) is unwrapped first.
-       This corresponds to the SQS / SNS envelope, which base64-wraps the
-       compressed bytes so they stay valid UTF-8 over the queue.
-    2. ``content_encoding`` (``"gzip"``) is decompressed.
-    3. The resulting raw JSON bytes are returned. The caller can decode them
-       as UTF-8 or pass them straight to :func:`json.loads` (which accepts
-       bytes).
-
-    ``None`` or an empty string for either encoding is a no-op, so the regular
-    HTTP webhook path (no compression, no wrapping) is just an identity
-    function and stays bytewise identical to today.
-
-    :param body: raw bytes or str received from Stream
-    :param content_encoding: value of the ``Content-Encoding`` header (``"gzip"``)
-    :param payload_encoding: wrapper around the compressed bytes
-        (``"base64"`` / ``"b64"``)
-    :returns: the uncompressed JSON body as bytes
-    :raises WebhookSignatureError: when the body cannot be decoded with the
-        requested encodings
-    :raises ValueError: when an encoding value is not supported by this SDK
+    Magic-byte detection (rather than relying on a header) means the same
+    handler stays correct when middleware - Rails, Django, Laravel, Phoenix -
+    auto-decompresses the request before your code sees it.
     """
-    data = _to_bytes(body)
-
-    payload_enc = _normalize(payload_encoding)
-    if payload_enc:
-        if payload_enc in _BASE64_ALIASES:
-            try:
-                data = base64.b64decode(data, validate=True)
-            except ValueError as exc:
-                raise WebhookSignatureError(
-                    f"failed to decode webhook body with payload_encoding={payload_enc!r}: {exc}"
-                )
-        else:
-            raise ValueError(
-                f"unsupported webhook payload_encoding: {payload_encoding}. "
-                "This SDK only supports base64."
-            )
-
-    content_enc = _normalize(content_encoding)
-    if content_enc:
-        if content_enc in _GZIP_ALIASES:
-            try:
-                data = gzip.decompress(data)
-            except (gzip.BadGzipFile, OSError, EOFError) as exc:
-                raise WebhookSignatureError(
-                    f"failed to decompress webhook body with Content-Encoding={content_enc!r}: {exc}"
-                )
-        else:
-            raise ValueError(
-                f"unsupported webhook Content-Encoding: {content_encoding}. "
-                "This SDK only supports gzip; set webhook_compression_algorithm "
-                'to "gzip" on the app config.'
-            )
-
-    return data
+    raw = _to_bytes(body)
+    if raw[:3] != GZIP_MAGIC:
+        return raw
+    try:
+        return gzip.decompress(raw)
+    except (gzip.BadGzipFile, OSError, EOFError) as exc:
+        raise WebhookSignatureError(f"failed to decompress gzip payload: {exc}")
 
 
-def verify_and_decode_webhook(
-    body: Union[bytes, str],
-    x_signature: Union[str, bytes],
-    api_secret: str,
-    content_encoding: Optional[str] = None,
-    payload_encoding: Optional[str] = None,
-) -> bytes:
-    """Decode a webhook payload and verify its HMAC-SHA256 signature.
+def decode_sqs_payload(body: _BytesLike) -> bytes:
+    """Reverse the SQS firehose envelope.
 
-    The signature is always computed over the **uncompressed** JSON bytes,
-    so this helper first applies :func:`decompress_webhook_body` and then
-    compares the digest with ``x_signature`` using :func:`hmac.compare_digest`.
-
-    :returns: the verified, uncompressed JSON body as bytes
-    :raises WebhookSignatureError: on signature mismatch or any decode error
+    SQS message bodies are always base64-encoded so they remain valid
+    UTF-8 over the queue. The base64-decoded bytes are gzip-decompressed
+    when they begin with the gzip magic, otherwise they are returned
+    as-is, which means the same call works whether or not Stream is
+    compressing payloads for this app.
     """
-    decoded = decompress_webhook_body(
-        body, content_encoding=content_encoding, payload_encoding=payload_encoding
-    )
+    raw = _to_bytes(body)
+    try:
+        decoded = base64.b64decode(raw, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise WebhookSignatureError(f"failed to base64-decode payload: {exc}")
+    return ungzip_payload(decoded)
 
-    if isinstance(x_signature, bytes):
-        x_signature = x_signature.decode()
 
+def decode_sns_payload(message: _BytesLike) -> bytes:
+    """Reverse the SNS firehose envelope. Byte-for-byte identical to
+    :func:`decode_sqs_payload`; exposed under both names so call sites
+    read intent."""
+    return decode_sqs_payload(message)
+
+
+def verify_signature(
+    body: _BytesLike,
+    signature: Union[str, bytes],
+    secret: str,
+) -> bool:
+    """Constant-time HMAC-SHA256 verification of ``signature`` against
+    the digest of ``body`` keyed by ``secret``.
+
+    The signature is always computed over the **uncompressed** JSON
+    bytes, so callers that decoded a gzipped or base64-wrapped payload
+    must pass the inflated bytes here.
+    """
+    raw = _to_bytes(body)
+    if isinstance(signature, bytes):
+        signature = signature.decode("ascii")
     expected = hmac.new(
-        key=api_secret.encode(), msg=decoded, digestmod=hashlib.sha256
+        key=secret.encode("utf-8"), msg=raw, digestmod=hashlib.sha256
     ).hexdigest()
+    return hmac.compare_digest(expected, signature)
 
-    if not hmac.compare_digest(expected, x_signature):
+
+def parse_event(payload: _BytesLike) -> Dict[str, Any]:
+    """Parse a JSON-encoded webhook event.
+
+    Returns a ``dict`` today; typed event classes are planned for a
+    future release of the Python SDK. The function name matches the
+    documented primitive so callers can swap in a typed parser later
+    without changing call sites.
+    """
+    if isinstance(payload, (bytes, bytearray, memoryview)):
+        return json.loads(bytes(payload))
+    return json.loads(payload)
+
+
+def _verify_and_parse(
+    payload_bytes: bytes,
+    signature: Union[str, bytes],
+    secret: str,
+) -> Dict[str, Any]:
+    if not verify_signature(payload_bytes, signature, secret):
         raise WebhookSignatureError("invalid webhook signature")
+    return parse_event(payload_bytes)
 
-    return decoded
+
+def verify_and_parse_webhook(
+    body: _BytesLike,
+    signature: Union[str, bytes],
+    secret: str,
+) -> Dict[str, Any]:
+    """Decompress (when gzipped), verify the HMAC ``signature``, and
+    return the parsed event.
+
+    :param body: raw HTTP request body bytes Stream signed
+    :param signature: ``X-Signature`` header value
+    :param secret: the app's API secret
+    :raises WebhookSignatureError: on signature mismatch or decode error
+    """
+    inflated = ungzip_payload(body)
+    return _verify_and_parse(inflated, signature, secret)
+
+
+def verify_and_parse_sqs(
+    message_body: _BytesLike,
+    signature: Union[str, bytes],
+    secret: str,
+) -> Dict[str, Any]:
+    """Decode the SQS ``Body`` (base64, then gzip-if-magic), verify the
+    HMAC ``signature`` from the ``X-Signature`` message attribute, and
+    return the parsed event.
+    """
+    inflated = decode_sqs_payload(message_body)
+    return _verify_and_parse(inflated, signature, secret)
+
+
+def verify_and_parse_sns(
+    message: _BytesLike,
+    signature: Union[str, bytes],
+    secret: str,
+) -> Dict[str, Any]:
+    """Decode the SNS ``Message`` (identical to SQS handling), verify
+    the HMAC ``signature`` from the ``X-Signature`` message attribute,
+    and return the parsed event.
+    """
+    inflated = decode_sns_payload(message)
+    return _verify_and_parse(inflated, signature, secret)
