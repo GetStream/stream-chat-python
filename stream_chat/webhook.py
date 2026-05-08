@@ -23,7 +23,7 @@ from typing import Any, Dict, Union
 
 from stream_chat.base.exceptions import WebhookSignatureError
 
-GZIP_MAGIC = b"\x1f\x8b\x08"
+GZIP_MAGIC = b"\x1f\x8b"
 
 _BytesLike = Union[bytes, bytearray, memoryview, str]
 
@@ -38,14 +38,14 @@ def _to_bytes(body: _BytesLike) -> bytes:
 
 def ungzip_payload(body: _BytesLike) -> bytes:
     """Return ``body`` unchanged unless it starts with the gzip magic
-    (``1f 8b 08``), in which case the gzip stream is decompressed.
+    (``1f 8b``, per RFC 1952), in which case the gzip stream is decompressed.
 
     Magic-byte detection (rather than relying on a header) means the same
     handler stays correct when middleware - Rails, Django, Laravel, Phoenix -
     auto-decompresses the request before your code sees it.
     """
     raw = _to_bytes(body)
-    if raw[:3] != GZIP_MAGIC:
+    if raw[:2] != GZIP_MAGIC:
         return raw
     try:
         return gzip.decompress(raw)
