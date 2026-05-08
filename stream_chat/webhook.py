@@ -15,7 +15,6 @@ event classes will land in a future release.
 """
 
 import base64
-import binascii
 import gzip
 import hashlib
 import hmac
@@ -66,7 +65,7 @@ def decode_sqs_payload(body: _BytesLike) -> bytes:
     raw = _to_bytes(body)
     try:
         decoded = base64.b64decode(raw, validate=True)
-    except (binascii.Error, ValueError) as exc:
+    except ValueError as exc:
         raise WebhookSignatureError(f"failed to base64-decode payload: {exc}")
     return ungzip_payload(decoded)
 
