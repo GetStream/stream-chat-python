@@ -88,14 +88,26 @@ def verify_signature(
     The signature is always computed over the **uncompressed** JSON
     bytes, so callers that decoded a gzipped or base64-wrapped payload
     must pass the inflated bytes here.
+
+    A malformed ``signature`` (non-ASCII bytes, non-string types, etc.)
+    is treated as a mismatch and returns ``False`` rather than raising,
+    so callers can rely on the boolean contract.
     """
     raw = _to_bytes(body)
     if isinstance(signature, bytes):
-        signature = signature.decode("ascii")
+        try:
+            signature = signature.decode("ascii")
+        except UnicodeDecodeError:
+            return False
+    elif not isinstance(signature, str):
+        return False
     expected = hmac.new(
         key=secret.encode("utf-8"), msg=raw, digestmod=hashlib.sha256
     ).hexdigest()
-    return hmac.compare_digest(expected, signature)
+    try:
+        return hmac.compare_digest(expected, signature)
+    except TypeError:
+        return False
 
 
 def parse_event(payload: _BytesLike) -> Dict[str, Any]:

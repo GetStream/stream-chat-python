@@ -148,6 +148,15 @@ class TestVerifySignature:
         sig_over_compressed = _sign(compressed)
         assert verify_signature(JSON_BODY, sig_over_compressed, API_SECRET) is False
 
+    def test_non_ascii_bytes_signature_returns_false(self):
+        assert verify_signature(JSON_BODY, b"\xff" * 32, API_SECRET) is False
+
+    def test_non_ascii_str_signature_returns_false(self):
+        assert verify_signature(JSON_BODY, "\u2603" * 64, API_SECRET) is False
+
+    def test_non_string_signature_returns_false(self):
+        assert verify_signature(JSON_BODY, 12345, API_SECRET) is False  # type: ignore[arg-type]
+
 
 class TestParseEvent:
     def test_parses_bytes(self):
@@ -198,6 +207,12 @@ class TestVerifyAndParseWebhook:
     def test_signature_can_be_bytes(self):
         sig = _sign(JSON_BODY).encode()
         assert verify_and_parse_webhook(JSON_BODY, sig, API_SECRET) == EVENT_DICT
+
+    def test_malformed_signature_surfaces_as_webhook_error(self):
+        with pytest.raises(WebhookSignatureError):
+            verify_and_parse_webhook(JSON_BODY, b"\xff" * 32, API_SECRET)
+        with pytest.raises(WebhookSignatureError):
+            verify_and_parse_webhook(JSON_BODY, "\u2603" * 64, API_SECRET)
 
 
 class TestVerifyAndParseSqs:
