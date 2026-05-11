@@ -115,13 +115,39 @@ class TestDecodeSqsPayload:
         assert "base64" in str(exc_info.value).lower()
 
 
+def _sns_envelope(inner_message: str) -> str:
+    return json.dumps(
+        {
+            "Type": "Notification",
+            "MessageId": "22b80b92-fdea-4c2c-8f9d-bdfb0c7bf324",
+            "TopicArn": "arn:aws:sns:us-east-1:123456789012:stream-webhooks",
+            "Message": inner_message,
+            "Timestamp": "2026-05-11T10:00:00.000Z",
+            "SignatureVersion": "1",
+            "MessageAttributes": {
+                "X-Signature": {"Type": "String", "Value": "<signature placeholder>"},
+            },
+        }
+    )
+
+
 class TestDecodeSnsPayload:
-    def test_aliases_decode_sqs_payload(self):
+    def test_pre_extracted_message_matches_decode_sqs_payload(self):
         wrapped = _b64(_gzip(JSON_BODY))
         assert decode_sns_payload(wrapped) == decode_sqs_payload(wrapped)
 
-    def test_round_trip(self):
+    def test_pre_extracted_message_round_trip(self):
         assert decode_sns_payload(_b64(_gzip(JSON_BODY))) == JSON_BODY
+
+    def test_unwraps_full_sns_envelope(self):
+        wrapped = _b64(_gzip(JSON_BODY))
+        envelope = _sns_envelope(wrapped)
+        assert decode_sns_payload(envelope) == JSON_BODY
+
+    def test_handles_envelope_with_leading_whitespace(self):
+        wrapped = _b64(_gzip(JSON_BODY))
+        envelope = "\n  " + _sns_envelope(wrapped)
+        assert decode_sns_payload(envelope) == JSON_BODY
 
 
 class TestVerifySignature:
@@ -181,7 +207,9 @@ class TestVerifyAndParseWebhook:
 
     def test_gzip_body(self):
         sig = _sign(JSON_BODY)
-        assert verify_and_parse_webhook(_gzip(JSON_BODY), sig, API_SECRET) == EVENT_DICT
+        assert (
+            verify_and_parse_webhook(_gzip(JSON_BODY), sig, API_SECRET) == EVENT_DICT
+        )
 
     def test_returns_dict(self):
         sig = _sign(JSON_BODY)
@@ -239,23 +267,38 @@ class TestVerifyAndParseSqs:
 
 
 class TestVerifyAndParseSns:
-    def test_round_trip(self):
+    def test_pre_extracted_message_round_trip(self):
         wrapped = _b64(_gzip(JSON_BODY))
         sig = _sign(JSON_BODY)
         assert verify_and_parse_sns(wrapped, sig, API_SECRET) == EVENT_DICT
 
-    def test_matches_sqs_behaviour(self):
+    def test_matches_sqs_behaviour_for_pre_extracted_message(self):
         wrapped = _b64(_gzip(JSON_BODY))
         sig = _sign(JSON_BODY)
         assert verify_and_parse_sns(wrapped, sig, API_SECRET) == verify_and_parse_sqs(
             wrapped, sig, API_SECRET
         )
 
+    def test_full_sns_envelope(self):
+        wrapped = _b64(_gzip(JSON_BODY))
+        envelope = _sns_envelope(wrapped)
+        sig = _sign(JSON_BODY)
+        assert verify_and_parse_sns(envelope, sig, API_SECRET) == EVENT_DICT
+
+    def test_rejects_signature_over_envelope(self):
+        wrapped = _b64(_gzip(JSON_BODY))
+        envelope = _sns_envelope(wrapped)
+        sig_over_envelope = _sign(envelope.encode("utf-8"))
+        with pytest.raises(WebhookSignatureError):
+            verify_and_parse_sns(envelope, sig_over_envelope, API_SECRET)
+
 
 class TestSyncClientMethods:
     def test_verify_and_parse_webhook(self, sync_client: StreamChat):
         sig = _sign(JSON_BODY)
-        assert sync_client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
+        assert (
+            sync_client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
+        )
 
     def test_verify_and_parse_sqs(self, sync_client: StreamChat):
         wrapped = _b64(_gzip(JSON_BODY))
@@ -286,7 +329,9 @@ class TestAsyncClientMethods:
     async def test_verify_and_parse_webhook(self):
         sig = _sign(JSON_BODY)
         async with StreamChatAsync(api_key=API_KEY, api_secret=API_SECRET) as client:
-            assert client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
+            assert (
+                client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
+            )
 
     async def test_verify_and_parse_sqs(self):
         wrapped = _b64(_gzip(JSON_BODY))

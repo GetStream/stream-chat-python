@@ -19,7 +19,7 @@ import gzip
 import hashlib
 import hmac
 import json
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from stream_chat.base.exceptions import WebhookSignatureError
 
@@ -70,11 +70,33 @@ def decode_sqs_payload(body: _BytesLike) -> bytes:
     return ungzip_payload(decoded)
 
 
-def decode_sns_payload(message: _BytesLike) -> bytes:
-    """Reverse the SNS firehose envelope. Byte-for-byte identical to
-    :func:`decode_sqs_payload`; exposed under both names so call sites
-    read intent."""
-    return decode_sqs_payload(message)
+def decode_sns_payload(notification_body: _BytesLike) -> bytes:
+    """Reverse an SNS HTTP notification envelope.
+
+    When ``notification_body`` is a JSON envelope
+    (``{"Type":"Notification","Message":"..."}``), the inner
+    ``Message`` field is extracted and run through
+    :func:`decode_sqs_payload` (base64-decode, then gzip-if-magic). When
+    the input is not a JSON envelope it is treated as the already-extracted
+    ``Message`` string, so call sites that pre-unwrap continue to work.
+    """
+    raw = _to_bytes(notification_body)
+    inner = _extract_sns_message(raw)
+    return decode_sqs_payload(inner if inner is not None else raw)
+
+
+def _extract_sns_message(notification_body: bytes) -> Optional[str]:
+    trimmed = notification_body.lstrip()
+    if not trimmed or trimmed[:1] != b"{":
+        return None
+    try:
+        envelope = json.loads(trimmed)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(envelope, dict):
+        return None
+    message = envelope.get("Message")
+    return message if isinstance(message, str) else None
 
 
 def verify_signature(

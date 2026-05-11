@@ -141,17 +141,27 @@ The original `client.verify_webhook(request.body, request.headers["X-Signature"]
 
 #### SQS / SNS firehose
 
-For events delivered through SQS or SNS, call the matching helper on the message body. It base64-decodes the envelope, gzip-decompresses when the magic bytes are present, verifies the HMAC, and returns the parsed event.
+For events delivered through SQS or SNS, call the matching helper. It base64-decodes the envelope, gzip-decompresses when the magic bytes are present, verifies the HMAC, and returns the parsed event.
+
+For SQS, pass the message `Body` (already the payload):
 
 ```python
 event = client.verify_and_parse_sqs(
     sqs_message["Body"],
     sqs_message["MessageAttributes"]["X-Signature"]["StringValue"],
 )
+```
 
+For SNS, pass the **raw notification body** (the full `{"Type":"Notification", ...}` JSON envelope Amazon delivers). The SDK extracts the inner `Message` field for you, so the call site mirrors what HTTP frameworks already hand you in `request.body`:
+
+```python
+import json
+
+# Django SNS HTTP delivery
+attrs = json.loads(request.body)["MessageAttributes"]
 event = client.verify_and_parse_sns(
-    sns_notification["Message"],
-    sns_notification["MessageAttributes"]["X-Signature"]["Value"],
+    request.body,                                # raw envelope (bytes/str)
+    attrs["X-Signature"]["Value"],
 )
 ```
 
@@ -164,7 +174,7 @@ from stream_chat import webhook
 
 event = webhook.verify_and_parse_webhook(body, signature, secret)
 event = webhook.verify_and_parse_sqs(message_body, signature, secret)
-event = webhook.verify_and_parse_sns(message, signature, secret)
+event = webhook.verify_and_parse_sns(notification_body, signature, secret)
 ```
 
 The module also exposes the primitives the composites are built from — `ungzip_payload`, `decode_sqs_payload`, `decode_sns_payload`, `verify_signature` (constant-time HMAC-SHA256), and `parse_event` — for callers that need to run the steps individually.
