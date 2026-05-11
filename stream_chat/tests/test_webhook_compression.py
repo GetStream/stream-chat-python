@@ -207,9 +207,7 @@ class TestVerifyAndParseWebhook:
 
     def test_gzip_body(self):
         sig = _sign(JSON_BODY)
-        assert (
-            verify_and_parse_webhook(_gzip(JSON_BODY), sig, API_SECRET) == EVENT_DICT
-        )
+        assert verify_and_parse_webhook(_gzip(JSON_BODY), sig, API_SECRET) == EVENT_DICT
 
     def test_returns_dict(self):
         sig = _sign(JSON_BODY)
@@ -296,9 +294,7 @@ class TestVerifyAndParseSns:
 class TestSyncClientMethods:
     def test_verify_and_parse_webhook(self, sync_client: StreamChat):
         sig = _sign(JSON_BODY)
-        assert (
-            sync_client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
-        )
+        assert sync_client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
 
     def test_verify_and_parse_sqs(self, sync_client: StreamChat):
         wrapped = _b64(_gzip(JSON_BODY))
@@ -329,9 +325,7 @@ class TestAsyncClientMethods:
     async def test_verify_and_parse_webhook(self):
         sig = _sign(JSON_BODY)
         async with StreamChatAsync(api_key=API_KEY, api_secret=API_SECRET) as client:
-            assert (
-                client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
-            )
+            assert client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
 
     async def test_verify_and_parse_sqs(self):
         wrapped = _b64(_gzip(JSON_BODY))
