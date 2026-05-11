@@ -36,7 +36,7 @@ def _to_bytes(body: _BytesLike) -> bytes:
     raise TypeError(f"webhook body must be bytes or str, got {type(body).__name__}")
 
 
-def ungzip_payload(body: _BytesLike) -> bytes:
+def gunzip_payload(body: _BytesLike) -> bytes:
     """Return ``body`` unchanged unless it starts with the gzip magic
     (``1f 8b``, per RFC 1952), in which case the gzip stream is decompressed.
 
@@ -67,7 +67,7 @@ def decode_sqs_payload(body: _BytesLike) -> bytes:
         decoded = base64.b64decode(raw, validate=True)
     except ValueError as exc:
         raise WebhookSignatureError(f"failed to base64-decode payload: {exc}")
-    return ungzip_payload(decoded)
+    return gunzip_payload(decoded)
 
 
 def decode_sns_payload(notification_body: _BytesLike) -> bytes:
@@ -168,7 +168,7 @@ def verify_and_parse_webhook(
     :param secret: the app's API secret
     :raises WebhookSignatureError: on signature mismatch or decode error
     """
-    inflated = ungzip_payload(body)
+    inflated = gunzip_payload(body)
     return _verify_and_parse(inflated, signature, secret)
 
 

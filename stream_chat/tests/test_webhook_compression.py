@@ -4,7 +4,7 @@ The Python SDK exposes the cross-SDK webhook contract in two layers:
 
 * Module-level functions in :mod:`stream_chat.webhook`:
 
-  * primitives - ``ungzip_payload``, ``decode_sqs_payload``,
+  * primitives - ``gunzip_payload``, ``decode_sqs_payload``,
     ``decode_sns_payload``, ``verify_signature``, ``parse_event``
   * composite helpers - ``verify_and_parse_webhook``,
     ``verify_and_parse_sqs``, ``verify_and_parse_sns``
@@ -32,8 +32,8 @@ from stream_chat.webhook import (
     GZIP_MAGIC,
     decode_sns_payload,
     decode_sqs_payload,
+    gunzip_payload,
     parse_event,
-    ungzip_payload,
     verify_and_parse_sns,
     verify_and_parse_sqs,
     verify_and_parse_webhook,
@@ -66,31 +66,35 @@ def sync_client() -> StreamChat:
     return StreamChat(api_key=API_KEY, api_secret=API_SECRET)
 
 
-class TestUngzipPayload:
+class TestGunzipPayload:
     def test_passthrough_plain_bytes(self):
-        assert ungzip_payload(JSON_BODY) == JSON_BODY
+        assert gunzip_payload(JSON_BODY) == JSON_BODY
 
     def test_passthrough_str_input(self):
-        assert ungzip_payload(JSON_BODY.decode("utf-8")) == JSON_BODY
+        assert gunzip_payload(JSON_BODY.decode("utf-8")) == JSON_BODY
 
     def test_inflates_gzip_bytes(self):
-        assert ungzip_payload(_gzip(JSON_BODY)) == JSON_BODY
+        assert gunzip_payload(_gzip(JSON_BODY)) == JSON_BODY
 
     def test_returns_bytes(self):
-        assert isinstance(ungzip_payload(JSON_BODY), bytes)
-        assert isinstance(ungzip_payload(_gzip(JSON_BODY)), bytes)
+        assert isinstance(gunzip_payload(JSON_BODY), bytes)
+        assert isinstance(gunzip_payload(_gzip(JSON_BODY)), bytes)
 
     def test_empty_input(self):
-        assert ungzip_payload(b"") == b""
+        assert gunzip_payload(b"") == b""
 
     def test_short_input_below_magic_length(self):
-        assert ungzip_payload(b"ab") == b"ab"
+        assert gunzip_payload(b"ab") == b"ab"
 
     def test_truncated_gzip_with_magic_raises(self):
         bad = GZIP_MAGIC + b"\x00\x00\x00"
         with pytest.raises(WebhookSignatureError) as exc_info:
-            ungzip_payload(bad)
+            gunzip_payload(bad)
         assert "decompress" in str(exc_info.value).lower()
+
+    def test_decompresses_helloworld_fixture(self):
+        gz_bytes = base64.b64decode("H4sIAGrYAWoAA8tIzcnJL88vykkBAK0g6/kKAAAA")
+        assert gunzip_payload(gz_bytes) == b"helloworld"
 
 
 class TestDecodeSqsPayload:
@@ -113,6 +117,15 @@ class TestDecodeSqsPayload:
         with pytest.raises(WebhookSignatureError) as exc_info:
             decode_sqs_payload("!!!not-valid-base64!!!")
         assert "base64" in str(exc_info.value).lower()
+
+    def test_decodes_helloworld_base64_fixture(self):
+        assert decode_sqs_payload("aGVsbG93b3JsZA==") == b"helloworld"
+
+    def test_decodes_helloworld_base64_gzip_fixture(self):
+        assert (
+            decode_sqs_payload("H4sIAGrYAWoAA8tIzcnJL88vykkBAK0g6/kKAAAA")
+            == b"helloworld"
+        )
 
 
 def _sns_envelope(inner_message: str) -> str:

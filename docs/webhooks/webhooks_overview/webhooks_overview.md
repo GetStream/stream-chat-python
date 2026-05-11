@@ -177,7 +177,7 @@ event = webhook.verify_and_parse_sqs(message_body, signature, secret)
 event = webhook.verify_and_parse_sns(notification_body, signature, secret)
 ```
 
-The module also exposes the primitives the composites are built from — `ungzip_payload`, `decode_sqs_payload`, `decode_sns_payload`, `verify_signature` (constant-time HMAC-SHA256), and `parse_event` — for callers that need to run the steps individually.
+The module also exposes the primitives the composites are built from — `gunzip_payload`, `decode_sqs_payload`, `decode_sns_payload`, `verify_signature` (constant-time HMAC-SHA256), and `parse_event` — for callers that need to run the steps individually.
 
 All webhook requests contain these headers:
 
