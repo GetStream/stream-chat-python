@@ -6,6 +6,10 @@ class StreamChannelException(Exception):
     pass
 
 
+class WebhookSignatureError(Exception):
+    """Invalid webhook signature or malformed gzip/base64 envelope."""
+
+
 class StreamAPIException(Exception):
     def __init__(self, text: str, status_code: int) -> None:
         self.response_text = text
