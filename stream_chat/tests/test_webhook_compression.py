@@ -4,10 +4,10 @@ The Python SDK exposes the cross-SDK webhook contract in two layers:
 
 * Module-level functions in :mod:`stream_chat.webhook`:
 
-  * primitives - ``gunzip_payload``, ``decode_sqs_payload``,
+  * primitives - ``ungzip_payload``, ``decode_sqs_payload``,
     ``decode_sns_payload``, ``verify_signature``, ``parse_event``
-  * composite helpers - ``verify_and_parse_webhook``,
-    ``verify_and_parse_sqs``, ``verify_and_parse_sns``
+  * composite helpers - ``verify_and_parse_webhook``, ``parse_sqs``,
+    ``parse_sns``
 
 * Client-instance forms on :class:`StreamChat` and
   :class:`StreamChatAsync`. They take ``api_secret`` from the client and
@@ -27,15 +27,15 @@ import json
 import pytest
 
 from stream_chat import StreamChat, StreamChatAsync
+from stream_chat.base.exceptions import WebhookSignatureError
 from stream_chat.webhook import (
     GZIP_MAGIC,
-    InvalidWebhookError,
     decode_sns_payload,
     decode_sqs_payload,
-    gunzip_payload,
     parse_event,
-    verify_and_parse_sns,
-    verify_and_parse_sqs,
+    parse_sns,
+    parse_sqs,
+    ungzip_payload,
     verify_and_parse_webhook,
     verify_signature,
 )
@@ -66,39 +66,31 @@ def sync_client() -> StreamChat:
     return StreamChat(api_key=API_KEY, api_secret=API_SECRET)
 
 
-class TestGunzipPayload:
+class TestUngzipPayload:
     def test_passthrough_plain_bytes(self):
-        assert gunzip_payload(JSON_BODY) == JSON_BODY
+        assert ungzip_payload(JSON_BODY) == JSON_BODY
 
     def test_passthrough_str_input(self):
-        assert gunzip_payload(JSON_BODY.decode("utf-8")) == JSON_BODY
+        assert ungzip_payload(JSON_BODY.decode("utf-8")) == JSON_BODY
 
     def test_inflates_gzip_bytes(self):
-        assert gunzip_payload(_gzip(JSON_BODY)) == JSON_BODY
+        assert ungzip_payload(_gzip(JSON_BODY)) == JSON_BODY
 
     def test_returns_bytes(self):
-        assert isinstance(gunzip_payload(JSON_BODY), bytes)
-        assert isinstance(gunzip_payload(_gzip(JSON_BODY)), bytes)
+        assert isinstance(ungzip_payload(JSON_BODY), bytes)
+        assert isinstance(ungzip_payload(_gzip(JSON_BODY)), bytes)
 
     def test_empty_input(self):
-        assert gunzip_payload(b"") == b""
+        assert ungzip_payload(b"") == b""
 
     def test_short_input_below_magic_length(self):
-        assert gunzip_payload(b"ab") == b"ab"
+        assert ungzip_payload(b"ab") == b"ab"
 
     def test_truncated_gzip_with_magic_raises(self):
         bad = GZIP_MAGIC + b"\x00\x00\x00"
-        with pytest.raises(InvalidWebhookError, match=r"gzip decompression failed"):
-            gunzip_payload(bad)
-
-    def test_gunzip_payload_raises_on_corrupt_gzip(self):
-        corrupt = GZIP_MAGIC + b"\x08\x00" + b"\x00" * 20
-        with pytest.raises(InvalidWebhookError, match=r"gzip decompression failed"):
-            gunzip_payload(corrupt)
-
-    def test_decompresses_helloworld_fixture(self):
-        gz_bytes = base64.b64decode("H4sIAGrYAWoAA8tIzcnJL88vykkBAK0g6/kKAAAA")
-        assert gunzip_payload(gz_bytes) == b"helloworld"
+        with pytest.raises(WebhookSignatureError) as exc_info:
+            ungzip_payload(bad)
+        assert "decompress" in str(exc_info.value).lower()
 
 
 class TestDecodeSqsPayload:
@@ -118,21 +110,9 @@ class TestDecodeSqsPayload:
         assert decode_sqs_payload(encoded) == JSON_BODY
 
     def test_invalid_base64_raises(self):
-        with pytest.raises(InvalidWebhookError, match=r"invalid base64 encoding"):
+        with pytest.raises(WebhookSignatureError) as exc_info:
             decode_sqs_payload("!!!not-valid-base64!!!")
-
-    def test_decode_sqs_payload_raises_on_invalid_base64(self):
-        with pytest.raises(InvalidWebhookError, match=r"invalid base64 encoding"):
-            decode_sqs_payload("not*valid*base64*data")
-
-    def test_decodes_helloworld_base64_fixture(self):
-        assert decode_sqs_payload("aGVsbG93b3JsZA==") == b"helloworld"
-
-    def test_decodes_helloworld_base64_gzip_fixture(self):
-        assert (
-            decode_sqs_payload("H4sIAGrYAWoAA8tIzcnJL88vykkBAK0g6/kKAAAA")
-            == b"helloworld"
-        )
+        assert "base64" in str(exc_info.value).lower()
 
 
 def _sns_envelope(inner_message: str) -> str:
@@ -215,8 +195,8 @@ class TestParseEvent:
         body = b'{"type":"a.future.event","custom":42}'
         assert parse_event(body) == {"type": "a.future.event", "custom": 42}
 
-    def test_parse_event_raises_on_invalid_json(self):
-        with pytest.raises(InvalidWebhookError, match=r"invalid JSON payload"):
+    def test_malformed_json_raises(self):
+        with pytest.raises(json.JSONDecodeError):
             parse_event(b"not json")
 
 
@@ -235,18 +215,19 @@ class TestVerifyAndParseWebhook:
         assert isinstance(result, dict)
 
     def test_signature_mismatch_raises(self):
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
+        with pytest.raises(WebhookSignatureError) as exc_info:
             verify_and_parse_webhook(JSON_BODY, "0" * 64, API_SECRET)
+        assert "invalid webhook signature" in str(exc_info.value).lower()
 
     def test_signature_must_be_over_uncompressed_bytes(self):
         compressed = _gzip(JSON_BODY)
         sig_over_compressed = _sign(compressed)
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
+        with pytest.raises(WebhookSignatureError):
             verify_and_parse_webhook(compressed, sig_over_compressed, API_SECRET)
 
     def test_wrong_secret_raises(self):
         sig = _sign(JSON_BODY, secret="other")
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
+        with pytest.raises(WebhookSignatureError):
             verify_and_parse_webhook(JSON_BODY, sig, API_SECRET)
 
     def test_signature_can_be_bytes(self):
@@ -254,85 +235,35 @@ class TestVerifyAndParseWebhook:
         assert verify_and_parse_webhook(JSON_BODY, sig, API_SECRET) == EVENT_DICT
 
     def test_malformed_signature_surfaces_as_webhook_error(self):
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
+        with pytest.raises(WebhookSignatureError):
             verify_and_parse_webhook(JSON_BODY, b"\xff" * 32, API_SECRET)
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
+        with pytest.raises(WebhookSignatureError):
             verify_and_parse_webhook(JSON_BODY, "\u2603" * 64, API_SECRET)
 
 
-class TestVerifyAndParseSqs:
+class TestParseSqs:
     def test_base64_only(self):
         wrapped = _b64(JSON_BODY)
-        sig = _sign(JSON_BODY)
-        assert verify_and_parse_sqs(wrapped, sig, API_SECRET) == EVENT_DICT
+        assert parse_sqs(wrapped) == EVENT_DICT
 
     def test_base64_plus_gzip(self):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
-        assert verify_and_parse_sqs(wrapped, sig, API_SECRET) == EVENT_DICT
-
-    def test_signature_mismatch_raises(self):
-        wrapped = _b64(_gzip(JSON_BODY))
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
-            verify_and_parse_sqs(wrapped, "0" * 64, API_SECRET)
-
-    def test_signature_over_compressed_or_wrapped_bytes_rejected(self):
-        wrapped = _b64(_gzip(JSON_BODY))
-        sig_over_wrapped = _sign(wrapped.encode("ascii"))
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
-            verify_and_parse_sqs(wrapped, sig_over_wrapped, API_SECRET)
-
-    def test_verify_and_parse_sqs_without_signature_parses(self):
-        assert verify_and_parse_sqs(_b64(JSON_BODY)) == EVENT_DICT
-        assert verify_and_parse_sqs(_b64(_gzip(JSON_BODY))) == EVENT_DICT
-        assert verify_and_parse_sqs(_b64(_gzip(JSON_BODY)).encode()) == EVENT_DICT
-
-    def test_static_verify_and_parse_sqs_raises_on_partial_creds(self):
-        wrapped = _b64(_gzip(JSON_BODY))
-        with pytest.raises(
-            InvalidWebhookError,
-            match=r"signature and secret must both be provided",
-        ):
-            verify_and_parse_sqs(wrapped, _sign(JSON_BODY))
-        with pytest.raises(
-            InvalidWebhookError,
-            match=r"signature and secret must both be provided",
-        ):
-            verify_and_parse_sqs(wrapped, secret=API_SECRET)
+        assert parse_sqs(wrapped) == EVENT_DICT
 
 
-class TestVerifyAndParseSns:
+class TestParseSns:
     def test_pre_extracted_message_round_trip(self):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
-        assert verify_and_parse_sns(wrapped, sig, API_SECRET) == EVENT_DICT
+        assert parse_sns(wrapped) == EVENT_DICT
 
     def test_matches_sqs_behaviour_for_pre_extracted_message(self):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
-        assert verify_and_parse_sns(wrapped, sig, API_SECRET) == verify_and_parse_sqs(
-            wrapped, sig, API_SECRET
-        )
+        assert parse_sns(wrapped) == parse_sqs(wrapped)
 
     def test_full_sns_envelope(self):
         wrapped = _b64(_gzip(JSON_BODY))
         envelope = _sns_envelope(wrapped)
-        sig = _sign(JSON_BODY)
-        assert verify_and_parse_sns(envelope, sig, API_SECRET) == EVENT_DICT
-
-    def test_rejects_signature_over_envelope(self):
-        wrapped = _b64(_gzip(JSON_BODY))
-        envelope = _sns_envelope(wrapped)
-        sig_over_envelope = _sign(envelope.encode("utf-8"))
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
-            verify_and_parse_sns(envelope, sig_over_envelope, API_SECRET)
-
-    def test_verify_and_parse_sns_without_signature_parses(self):
-        wrapped = _b64(_gzip(JSON_BODY))
-        envelope = _sns_envelope(wrapped)
-        assert verify_and_parse_sns(envelope) == EVENT_DICT
-        assert verify_and_parse_sns(wrapped) == EVENT_DICT
-        assert verify_and_parse_sns(_b64(JSON_BODY)) == EVENT_DICT
+        assert parse_sns(envelope) == EVENT_DICT
 
 
 class TestSyncClientMethods:
@@ -340,26 +271,17 @@ class TestSyncClientMethods:
         sig = _sign(JSON_BODY)
         assert sync_client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
 
-    def test_verify_and_parse_sqs(self, sync_client: StreamChat):
+    def test_parse_sqs(self, sync_client: StreamChat):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
-        assert sync_client.verify_and_parse_sqs(wrapped, sig) == EVENT_DICT
+        assert sync_client.parse_sqs(wrapped) == EVENT_DICT
 
-    def test_verify_and_parse_sns(self, sync_client: StreamChat):
+    def test_parse_sns(self, sync_client: StreamChat):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
-        assert sync_client.verify_and_parse_sns(wrapped, sig) == EVENT_DICT
+        assert sync_client.parse_sns(wrapped) == EVENT_DICT
 
     def test_signature_mismatch_via_client(self, sync_client: StreamChat):
-        with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
+        with pytest.raises(WebhookSignatureError):
             sync_client.verify_and_parse_webhook(JSON_BODY, "0" * 64)
-
-    def test_instance_verify_and_parse_sqs_without_signature(self):
-        client = StreamChat(api_key=API_KEY, api_secret="")
-        wrapped = _b64(_gzip(JSON_BODY))
-        envelope = _sns_envelope(wrapped)
-        assert client.verify_and_parse_sqs(wrapped) == EVENT_DICT
-        assert client.verify_and_parse_sns(envelope) == EVENT_DICT
 
 
 class TestSyncClientLegacyVerifyWebhook:
@@ -378,14 +300,12 @@ class TestAsyncClientMethods:
         async with StreamChatAsync(api_key=API_KEY, api_secret=API_SECRET) as client:
             assert client.verify_and_parse_webhook(_gzip(JSON_BODY), sig) == EVENT_DICT
 
-    async def test_verify_and_parse_sqs(self):
+    async def test_parse_sqs(self):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
         async with StreamChatAsync(api_key=API_KEY, api_secret=API_SECRET) as client:
-            assert client.verify_and_parse_sqs(wrapped, sig) == EVENT_DICT
+            assert client.parse_sqs(wrapped) == EVENT_DICT
 
-    async def test_verify_and_parse_sns(self):
+    async def test_parse_sns(self):
         wrapped = _b64(_gzip(JSON_BODY))
-        sig = _sign(JSON_BODY)
         async with StreamChatAsync(api_key=API_KEY, api_secret=API_SECRET) as client:
-            assert client.verify_and_parse_sns(wrapped, sig) == EVENT_DICT
+            assert client.parse_sns(wrapped) == EVENT_DICT

@@ -147,68 +147,26 @@ class StreamChatInterface(abc.ABC):
 
         :param body: raw HTTP request body bytes Stream signed
         :param signature: ``X-Signature`` header value
-        :raises stream_chat.webhook.InvalidWebhookError: on
+        :raises stream_chat.base.exceptions.WebhookSignatureError: on
             signature mismatch or any decode error
         """
         from stream_chat.webhook import verify_and_parse_webhook
 
         return verify_and_parse_webhook(body, signature, self.api_secret)
 
-    def verify_and_parse_sqs(
-        self,
-        message_body: Union[bytes, str],
-        signature: Optional[Union[str, bytes]] = None,
-    ) -> Dict[str, Any]:
-        """Parse an SQS firehose webhook event.
+    def parse_sqs(self, message_body: Union[bytes, str]) -> Dict[str, Any]:
+        """Parse an SQS firehose body (base64 + optional gzip). No HMAC."""
 
-        Reverses the base64 (+ optional gzip) wrapping on the SQS
-        ``Body`` and returns the parsed event. Stream does not attach
-        an ``X-Signature`` to SQS deliveries -- the transport is an
-        IAM-authenticated AWS queue, so HMAC verification on top is
-        redundant and signature verification is therefore optional.
-        When ``signature`` is supplied the app's API secret is used to
-        run the legacy verification pipeline.
+        from stream_chat.webhook import parse_sqs
 
-        :param message_body: SQS message ``Body`` (string)
-        :param signature: optional ``X-Signature`` message attribute
-            value; when supplied, signature verification runs
-        :raises stream_chat.webhook.InvalidWebhookError: on
-            signature mismatch or any decode error
-        """
-        from stream_chat.webhook import verify_and_parse_sqs
+        return parse_sqs(message_body)
 
-        if signature is None:
-            return verify_and_parse_sqs(message_body)
-        return verify_and_parse_sqs(message_body, signature, self.api_secret)
+    def parse_sns(self, message: Union[bytes, str]) -> Dict[str, Any]:
+        """Parse an SNS body (unwraps SNS envelope when present). No HMAC."""
 
-    def verify_and_parse_sns(
-        self,
-        notification_body: Union[bytes, str],
-        signature: Optional[Union[str, bytes]] = None,
-    ) -> Dict[str, Any]:
-        """Parse an SNS firehose webhook event.
+        from stream_chat.webhook import parse_sns
 
-        Reverses the base64 (+ optional gzip) wrapping on the SNS
-        ``Message`` and returns the parsed event. Stream does not
-        attach an ``X-Signature`` to SNS deliveries -- AWS already
-        signs the SNS notification envelope, so HMAC verification on
-        top is redundant and signature verification is therefore
-        optional. When ``signature`` is supplied the app's API secret
-        is used to run the legacy verification pipeline.
-
-        :param notification_body: raw SNS notification body (the full
-            ``{"Type":"Notification", ...}`` JSON envelope, or a
-            pre-extracted ``Message`` string)
-        :param signature: optional ``X-Signature`` message attribute
-            value; when supplied, signature verification runs
-        :raises stream_chat.webhook.InvalidWebhookError: on
-            signature mismatch or any decode error
-        """
-        from stream_chat.webhook import verify_and_parse_sns
-
-        if signature is None:
-            return verify_and_parse_sns(notification_body)
-        return verify_and_parse_sns(notification_body, signature, self.api_secret)
+        return parse_sns(message)
 
     @abc.abstractmethod
     def update_app_settings(
