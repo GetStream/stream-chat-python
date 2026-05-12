@@ -44,6 +44,32 @@ async def client():
         timeout=10,
         **options,
     ) as stream_client:
+        # Reset the shared CI test app to a permissive upload + command
+        # config so tests aren't held hostage to whatever a prior PR left
+        # behind. Empty allow/block lists on every gate (extensions AND MIME
+        # types) means 'no restrictions' per backend FileUploadConfig.Validate
+        # in controllers/types.go. Re-registering the default messaging
+        # channel-type commands keeps /giphy parseable for run_message_action.
+        permissive = {
+            "allowed_file_extensions": [],
+            "blocked_file_extensions": [],
+            "allowed_mime_types": [],
+            "blocked_mime_types": [],
+        }
+        try:
+            await stream_client.update_app_settings(
+                file_upload_config=permissive,
+                image_upload_config=permissive,
+            )
+        except Exception:
+            pass
+        try:
+            await stream_client.update_channel_type(
+                "messaging",
+                commands=["giphy", "imgur", "flag", "ban", "mute", "unban", "unmute"],
+            )
+        except Exception:
+            pass
         yield stream_client
 
 

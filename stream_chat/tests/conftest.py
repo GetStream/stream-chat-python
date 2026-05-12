@@ -25,16 +25,53 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "incremental: mark test incremental")
 
 
+def _baseline_app_config(stream_client: StreamChat) -> None:
+    """Reset the shared CI test app to a permissive upload + command config.
+
+    Pinning state here is safer than skip-on-error guards inside individual
+    tests — those silently mask drift. Empty allow/block lists on every gate
+    (extensions AND MIME types) means 'no restrictions' per backend
+    ``FileUploadConfig.Validate`` in ``controllers/types.go``. Re-registering
+    the default ``messaging`` channel-type commands keeps ``/giphy``
+    parseable for ``run_message_action``.
+
+    Best-effort: a test app that doesn't expose either endpoint falls
+    through and the individual tests surface the real failure.
+    """
+    permissive = {
+        "allowed_file_extensions": [],
+        "blocked_file_extensions": [],
+        "allowed_mime_types": [],
+        "blocked_mime_types": [],
+    }
+    try:
+        stream_client.update_app_settings(
+            file_upload_config=permissive,
+            image_upload_config=permissive,
+        )
+    except Exception:
+        pass
+    try:
+        stream_client.update_channel_type(
+            "messaging",
+            commands=["giphy", "imgur", "flag", "ban", "mute", "unban", "unmute"],
+        )
+    except Exception:
+        pass
+
+
 @pytest.fixture(scope="module")
 def client():
     base_url = os.environ.get("STREAM_HOST")
     options = {"base_url": base_url} if base_url else {}
-    return StreamChat(
+    stream_client = StreamChat(
         api_key=os.environ["STREAM_KEY"],
         api_secret=os.environ["STREAM_SECRET"],
         timeout=10,
         **options,
     )
+    _baseline_app_config(stream_client)
+    return stream_client
 
 
 @pytest.fixture(scope="function")
