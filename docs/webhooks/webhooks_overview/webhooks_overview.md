@@ -141,41 +141,48 @@ The original `client.verify_webhook(request.body, request.headers["X-Signature"]
 
 #### SQS / SNS firehose
 
-For events delivered through SQS or SNS, call the matching helper. It base64-decodes the envelope, gzip-decompresses when the magic bytes are present, verifies the HMAC, and returns the parsed event.
+For events delivered through SQS or SNS, call the matching helper. It base64-decodes the envelope, gzip-decompresses when the magic bytes are present, and returns the parsed event.
+
+Stream does **not** ship an `X-Signature` on SQS or SNS deliveries: those transports run on AWS-internal infrastructure that is already authenticated end-to-end. SQS queues are reached via IAM-authenticated polling, and SNS notifications carry an AWS signature on the notification envelope itself, so verifying that the message really came from your topic happens at the AWS layer. Layering an HMAC check on top is redundant, so `signature` and `secret` are optional for the SQS/SNS helpers. If you want the legacy verification pipeline you can still pass both — but you do not need to.
 
 For SQS, pass the message `Body` (already the payload):
 
 ```python
-event = client.verify_and_parse_sqs(
-    sqs_message["Body"],
-    sqs_message["MessageAttributes"]["X-Signature"]["StringValue"],
-)
+event = client.verify_and_parse_sqs(sqs_message["Body"])
 ```
 
 For SNS, pass the **raw notification body** (the full `{"Type":"Notification", ...}` JSON envelope Amazon delivers). The SDK extracts the inner `Message` field for you, so the call site mirrors what HTTP frameworks already hand you in `request.body`:
 
 ```python
-import json
-
 # Django SNS HTTP delivery
-attrs = json.loads(request.body)["MessageAttributes"]
-event = client.verify_and_parse_sns(
-    request.body,                                # raw envelope (bytes/str)
-    attrs["X-Signature"]["Value"],
-)
+event = client.verify_and_parse_sns(request.body)        # raw envelope (bytes/str)
 ```
 
 #### Stateless / module-level form
 
-If you do not want to construct a `StreamChat` client (for example in a lightweight Lambda that only handles webhooks), call the module-level helpers directly. They take the API secret as a third argument and are otherwise identical:
+If you do not want to construct a `StreamChat` client (for example in a lightweight Lambda that only handles webhooks), call the module-level helpers directly. The HTTP helper still requires the signature and secret; the SQS/SNS helpers take them as optional positional arguments:
 
 ```python
 from stream_chat import webhook
 
 event = webhook.verify_and_parse_webhook(body, signature, secret)
+event = webhook.verify_and_parse_sqs(message_body)
+event = webhook.verify_and_parse_sns(notification_body)
+
+# Opt-in HMAC verification for SQS / SNS (defence in depth)
 event = webhook.verify_and_parse_sqs(message_body, signature, secret)
 event = webhook.verify_and_parse_sns(notification_body, signature, secret)
 ```
+
+Passing only one of `signature` / `secret` to the SQS or SNS helper is a programmer error and raises `InvalidWebhookError("signature and secret must both be provided to verify the SQS/SNS payload")`.
+
+##### Arguments
+
+| Argument            | `verify_and_parse_webhook` | `verify_and_parse_sqs` | `verify_and_parse_sns` |
+| ------------------- | -------------------------- | ---------------------- | ---------------------- |
+| body / message_body / notification_body | required | required | required |
+| signature           | required                   | optional               | optional               |
+| secret              | required                   | optional               | optional               |
 
 The module also exposes the primitives the composites are built from — `gunzip_payload`, `decode_sqs_payload`, `decode_sns_payload`, `verify_signature` (constant-time HMAC-SHA256), and `parse_event` — for callers that need to run the steps individually.
 

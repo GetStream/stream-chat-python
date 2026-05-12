@@ -282,6 +282,24 @@ class TestVerifyAndParseSqs:
         with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
             verify_and_parse_sqs(wrapped, sig_over_wrapped, API_SECRET)
 
+    def test_verify_and_parse_sqs_without_signature_parses(self):
+        assert verify_and_parse_sqs(_b64(JSON_BODY)) == EVENT_DICT
+        assert verify_and_parse_sqs(_b64(_gzip(JSON_BODY))) == EVENT_DICT
+        assert verify_and_parse_sqs(_b64(_gzip(JSON_BODY)).encode()) == EVENT_DICT
+
+    def test_static_verify_and_parse_sqs_raises_on_partial_creds(self):
+        wrapped = _b64(_gzip(JSON_BODY))
+        with pytest.raises(
+            InvalidWebhookError,
+            match=r"signature and secret must both be provided",
+        ):
+            verify_and_parse_sqs(wrapped, _sign(JSON_BODY))
+        with pytest.raises(
+            InvalidWebhookError,
+            match=r"signature and secret must both be provided",
+        ):
+            verify_and_parse_sqs(wrapped, secret=API_SECRET)
+
 
 class TestVerifyAndParseSns:
     def test_pre_extracted_message_round_trip(self):
@@ -309,6 +327,13 @@ class TestVerifyAndParseSns:
         with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
             verify_and_parse_sns(envelope, sig_over_envelope, API_SECRET)
 
+    def test_verify_and_parse_sns_without_signature_parses(self):
+        wrapped = _b64(_gzip(JSON_BODY))
+        envelope = _sns_envelope(wrapped)
+        assert verify_and_parse_sns(envelope) == EVENT_DICT
+        assert verify_and_parse_sns(wrapped) == EVENT_DICT
+        assert verify_and_parse_sns(_b64(JSON_BODY)) == EVENT_DICT
+
 
 class TestSyncClientMethods:
     def test_verify_and_parse_webhook(self, sync_client: StreamChat):
@@ -328,6 +353,13 @@ class TestSyncClientMethods:
     def test_signature_mismatch_via_client(self, sync_client: StreamChat):
         with pytest.raises(InvalidWebhookError, match=r"signature mismatch"):
             sync_client.verify_and_parse_webhook(JSON_BODY, "0" * 64)
+
+    def test_instance_verify_and_parse_sqs_without_signature(self):
+        client = StreamChat(api_key=API_KEY, api_secret="")
+        wrapped = _b64(_gzip(JSON_BODY))
+        envelope = _sns_envelope(wrapped)
+        assert client.verify_and_parse_sqs(wrapped) == EVENT_DICT
+        assert client.verify_and_parse_sns(envelope) == EVENT_DICT
 
 
 class TestSyncClientLegacyVerifyWebhook:

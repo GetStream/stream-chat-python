@@ -28,6 +28,9 @@ INVALID_WEBHOOK_SIGNATURE_MISMATCH = "signature mismatch"
 INVALID_WEBHOOK_INVALID_BASE64 = "invalid base64 encoding"
 INVALID_WEBHOOK_GZIP_FAILED = "gzip decompression failed"
 INVALID_WEBHOOK_INVALID_JSON = "invalid JSON payload"
+INVALID_WEBHOOK_PARTIAL_AWS_CREDS = (
+    "signature and secret must both be provided to verify the SQS/SNS payload"
+)
 
 
 class InvalidWebhookError(Exception):
@@ -179,6 +182,18 @@ def _verify_and_parse(
     return parse_event(payload_bytes)
 
 
+def _maybe_verify_and_parse(
+    payload_bytes: bytes,
+    signature: Optional[Union[str, bytes]],
+    secret: Optional[str],
+) -> Dict[str, Any]:
+    if not signature and not secret:
+        return parse_event(payload_bytes)
+    if not signature or not secret:
+        raise InvalidWebhookError(INVALID_WEBHOOK_PARTIAL_AWS_CREDS)
+    return _verify_and_parse(payload_bytes, signature, secret)
+
+
 def verify_and_parse_webhook(
     body: _BytesLike,
     signature: Union[str, bytes],
@@ -198,25 +213,51 @@ def verify_and_parse_webhook(
 
 def verify_and_parse_sqs(
     message_body: _BytesLike,
-    signature: Union[str, bytes],
-    secret: str,
+    signature: Optional[Union[str, bytes]] = None,
+    secret: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Decode the SQS ``Body`` (base64, then gzip-if-magic), verify the
-    HMAC ``signature`` from the ``X-Signature`` message attribute, and
-    return the parsed event.
+    """Decode the SQS ``Body`` (base64, then gzip-if-magic) and return
+    the parsed event.
+
+    Stream does not attach an ``X-Signature`` to SQS deliveries: the
+    transport is an IAM-authenticated AWS queue, so the queue ARN
+    already proves origin. HMAC verification on top is redundant and
+    is therefore optional. When ``signature`` and ``secret`` are both
+    supplied the legacy verification pipeline still runs, so existing
+    callers keep working unchanged.
+
+    :param message_body: SQS message ``Body`` (string)
+    :param signature: optional ``X-Signature`` message attribute value
+    :param secret: optional API secret matching ``signature``
+    :raises InvalidWebhookError: on signature mismatch, any decode
+        error, or when only one of ``signature`` / ``secret`` is given
     """
     inflated = decode_sqs_payload(message_body)
-    return _verify_and_parse(inflated, signature, secret)
+    return _maybe_verify_and_parse(inflated, signature, secret)
 
 
 def verify_and_parse_sns(
-    message: _BytesLike,
-    signature: Union[str, bytes],
-    secret: str,
+    notification_body: _BytesLike,
+    signature: Optional[Union[str, bytes]] = None,
+    secret: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Decode the SNS ``Message`` (identical to SQS handling), verify
-    the HMAC ``signature`` from the ``X-Signature`` message attribute,
-    and return the parsed event.
+    """Decode the SNS ``Message`` (identical to SQS handling) and return
+    the parsed event.
+
+    Stream does not attach an ``X-Signature`` to SNS deliveries: AWS
+    already signs the SNS notification envelope, so verifying that the
+    request really came from your topic happens at the SNS layer.
+    HMAC verification on top is optional. When ``signature`` and
+    ``secret`` are both supplied the legacy verification pipeline still
+    runs, so existing callers keep working unchanged.
+
+    :param notification_body: raw SNS notification body (the full
+        ``{"Type":"Notification", ...}`` JSON envelope, or a
+        pre-extracted ``Message`` string)
+    :param signature: optional ``X-Signature`` message attribute value
+    :param secret: optional API secret matching ``signature``
+    :raises InvalidWebhookError: on signature mismatch, any decode
+        error, or when only one of ``signature`` / ``secret`` is given
     """
-    inflated = decode_sns_payload(message)
-    return _verify_and_parse(inflated, signature, secret)
+    inflated = decode_sns_payload(notification_body)
+    return _maybe_verify_and_parse(inflated, signature, secret)
