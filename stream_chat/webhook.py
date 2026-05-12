@@ -19,11 +19,32 @@ import gzip
 import hashlib
 import hmac
 import json
+import zlib
 from typing import Any, Dict, Optional, Union
 
-from stream_chat.base.exceptions import WebhookSignatureError
-
 GZIP_MAGIC = b"\x1f\x8b"
+
+INVALID_WEBHOOK_SIGNATURE_MISMATCH = "signature mismatch"
+INVALID_WEBHOOK_INVALID_BASE64 = "invalid base64 encoding"
+INVALID_WEBHOOK_GZIP_FAILED = "gzip decompression failed"
+INVALID_WEBHOOK_INVALID_JSON = "invalid JSON payload"
+
+
+class InvalidWebhookError(Exception):
+    """Raised by every webhook primitive when verification or decoding
+    fails. The cross-SDK contract is "one exception, message says why" -
+    callers branch on the message text when they need mode-specific
+    behaviour (signature mismatch vs invalid base64 vs corrupt gzip vs
+    malformed JSON).
+    """
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.message = message
+
+    def __str__(self) -> str:
+        return f"InvalidWebhookError: {self.message}"
+
 
 _BytesLike = Union[bytes, bytearray, memoryview, str]
 
@@ -49,8 +70,8 @@ def gunzip_payload(body: _BytesLike) -> bytes:
         return raw
     try:
         return gzip.decompress(raw)
-    except (gzip.BadGzipFile, OSError, EOFError) as exc:
-        raise WebhookSignatureError(f"failed to decompress gzip payload: {exc}")
+    except (gzip.BadGzipFile, OSError, EOFError, zlib.error) as err:
+        raise InvalidWebhookError(INVALID_WEBHOOK_GZIP_FAILED) from err
 
 
 def decode_sqs_payload(body: _BytesLike) -> bytes:
@@ -65,8 +86,8 @@ def decode_sqs_payload(body: _BytesLike) -> bytes:
     raw = _to_bytes(body)
     try:
         decoded = base64.b64decode(raw, validate=True)
-    except ValueError as exc:
-        raise WebhookSignatureError(f"failed to base64-decode payload: {exc}")
+    except ValueError as err:
+        raise InvalidWebhookError(INVALID_WEBHOOK_INVALID_BASE64) from err
     return gunzip_payload(decoded)
 
 
@@ -141,8 +162,11 @@ def parse_event(payload: _BytesLike) -> Dict[str, Any]:
     without changing call sites.
     """
     if isinstance(payload, (bytes, bytearray, memoryview)):
-        return json.loads(bytes(payload))
-    return json.loads(payload)
+        payload = bytes(payload)
+    try:
+        return json.loads(payload)
+    except json.JSONDecodeError as err:
+        raise InvalidWebhookError(INVALID_WEBHOOK_INVALID_JSON) from err
 
 
 def _verify_and_parse(
@@ -151,7 +175,7 @@ def _verify_and_parse(
     secret: str,
 ) -> Dict[str, Any]:
     if not verify_signature(payload_bytes, signature, secret):
-        raise WebhookSignatureError("invalid webhook signature")
+        raise InvalidWebhookError(INVALID_WEBHOOK_SIGNATURE_MISMATCH)
     return parse_event(payload_bytes)
 
 
@@ -166,7 +190,7 @@ def verify_and_parse_webhook(
     :param body: raw HTTP request body bytes Stream signed
     :param signature: ``X-Signature`` header value
     :param secret: the app's API secret
-    :raises WebhookSignatureError: on signature mismatch or decode error
+    :raises InvalidWebhookError: on signature mismatch or any decode error
     """
     inflated = gunzip_payload(body)
     return _verify_and_parse(inflated, signature, secret)

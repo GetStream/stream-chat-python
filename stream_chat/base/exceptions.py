@@ -25,17 +25,3 @@ class StreamAPIException(Exception):
             return f'StreamChat error code {self.error_code}: {self.error_message}"'
         else:
             return f"StreamChat error HTTP code: {self.status_code}"
-
-
-class WebhookSignatureError(StreamAPIException):
-    """Raised when an outbound webhook signature does not match, the
-    webhook payload cannot be decompressed, or the wrapping (e.g. base64)
-    cannot be decoded.
-    """
-
-    def __init__(self, message: str) -> None:
-        super().__init__(message, status_code=0)
-        self.message = message
-
-    def __str__(self) -> str:
-        return f"WebhookSignatureError: {self.message}"

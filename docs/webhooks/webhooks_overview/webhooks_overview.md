@@ -135,7 +135,7 @@ def stream_webhook():
 
 The same call works whether or not Stream is compressing for this app, and whether or not your framework auto-decompressed the request — the helper inspects the body bytes rather than the `Content-Encoding` header.
 
-All helpers raise `stream_chat.base.exceptions.WebhookSignatureError` when the signature does not match, when the gzip stream is corrupt, or when the SQS/SNS base64 envelope cannot be decoded.
+All helpers raise `stream_chat.webhook.InvalidWebhookError` when the signature does not match, when the gzip stream is corrupt, or when the SQS/SNS base64 envelope cannot be decoded.
 
 The original `client.verify_webhook(request.body, request.headers["X-Signature"])` — which returns a `bool` and does not decompress — stays unchanged for backward compatibility. Switch to `verify_and_parse_webhook` to support compressed payloads.
 

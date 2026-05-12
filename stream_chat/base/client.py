@@ -147,7 +147,7 @@ class StreamChatInterface(abc.ABC):
 
         :param body: raw HTTP request body bytes Stream signed
         :param signature: ``X-Signature`` header value
-        :raises stream_chat.base.exceptions.WebhookSignatureError: on
+        :raises stream_chat.webhook.InvalidWebhookError: on
             signature mismatch or any decode error
         """
         from stream_chat.webhook import verify_and_parse_webhook
@@ -167,7 +167,7 @@ class StreamChatInterface(abc.ABC):
 
         :param message_body: SQS message ``Body`` (string)
         :param signature: ``X-Signature`` message attribute value
-        :raises stream_chat.base.exceptions.WebhookSignatureError: on
+        :raises stream_chat.webhook.InvalidWebhookError: on
             signature mismatch or any decode error
         """
         from stream_chat.webhook import verify_and_parse_sqs
@@ -187,7 +187,7 @@ class StreamChatInterface(abc.ABC):
 
         :param message: SNS notification ``Message`` field (string)
         :param signature: ``X-Signature`` message attribute value
-        :raises stream_chat.base.exceptions.WebhookSignatureError: on
+        :raises stream_chat.webhook.InvalidWebhookError: on
             signature mismatch or any decode error
         """
         from stream_chat.webhook import verify_and_parse_sns
