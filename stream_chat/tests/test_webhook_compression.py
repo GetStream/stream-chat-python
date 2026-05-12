@@ -4,7 +4,7 @@ The Python SDK exposes the cross-SDK webhook contract in two layers:
 
 * Module-level functions in :mod:`stream_chat.webhook`:
 
-  * primitives - ``ungzip_payload``, ``decode_sqs_payload``,
+  * primitives - ``gunzip_payload``, ``decode_sqs_payload``,
     ``decode_sns_payload``, ``verify_signature``, ``parse_event``
   * composite helpers - ``verify_and_parse_webhook``, ``parse_sqs``,
     ``parse_sns``
@@ -27,15 +27,21 @@ import json
 import pytest
 
 from stream_chat import StreamChat, StreamChatAsync
-from stream_chat.base.exceptions import WebhookSignatureError
+from stream_chat.base.exceptions import (
+    INVALID_WEBHOOK_GZIP_FAILED,
+    INVALID_WEBHOOK_INVALID_BASE64,
+    INVALID_WEBHOOK_INVALID_JSON,
+    INVALID_WEBHOOK_SIGNATURE_MISMATCH,
+    InvalidWebhookError,
+)
 from stream_chat.webhook import (
     GZIP_MAGIC,
     decode_sns_payload,
     decode_sqs_payload,
+    gunzip_payload,
     parse_event,
     parse_sns,
     parse_sqs,
-    ungzip_payload,
     verify_and_parse_webhook,
     verify_signature,
 )
@@ -66,31 +72,31 @@ def sync_client() -> StreamChat:
     return StreamChat(api_key=API_KEY, api_secret=API_SECRET)
 
 
-class TestUngzipPayload:
+class TestGunzipPayload:
     def test_passthrough_plain_bytes(self):
-        assert ungzip_payload(JSON_BODY) == JSON_BODY
+        assert gunzip_payload(JSON_BODY) == JSON_BODY
 
     def test_passthrough_str_input(self):
-        assert ungzip_payload(JSON_BODY.decode("utf-8")) == JSON_BODY
+        assert gunzip_payload(JSON_BODY.decode("utf-8")) == JSON_BODY
 
     def test_inflates_gzip_bytes(self):
-        assert ungzip_payload(_gzip(JSON_BODY)) == JSON_BODY
+        assert gunzip_payload(_gzip(JSON_BODY)) == JSON_BODY
 
     def test_returns_bytes(self):
-        assert isinstance(ungzip_payload(JSON_BODY), bytes)
-        assert isinstance(ungzip_payload(_gzip(JSON_BODY)), bytes)
+        assert isinstance(gunzip_payload(JSON_BODY), bytes)
+        assert isinstance(gunzip_payload(_gzip(JSON_BODY)), bytes)
 
     def test_empty_input(self):
-        assert ungzip_payload(b"") == b""
+        assert gunzip_payload(b"") == b""
 
     def test_short_input_below_magic_length(self):
-        assert ungzip_payload(b"ab") == b"ab"
+        assert gunzip_payload(b"ab") == b"ab"
 
     def test_truncated_gzip_with_magic_raises(self):
         bad = GZIP_MAGIC + b"\x00\x00\x00"
-        with pytest.raises(WebhookSignatureError) as exc_info:
-            ungzip_payload(bad)
-        assert "decompress" in str(exc_info.value).lower()
+        with pytest.raises(InvalidWebhookError) as exc_info:
+            gunzip_payload(bad)
+        assert str(exc_info.value) == INVALID_WEBHOOK_GZIP_FAILED
 
 
 class TestDecodeSqsPayload:
@@ -110,9 +116,9 @@ class TestDecodeSqsPayload:
         assert decode_sqs_payload(encoded) == JSON_BODY
 
     def test_invalid_base64_raises(self):
-        with pytest.raises(WebhookSignatureError) as exc_info:
+        with pytest.raises(InvalidWebhookError) as exc_info:
             decode_sqs_payload("!!!not-valid-base64!!!")
-        assert "base64" in str(exc_info.value).lower()
+        assert str(exc_info.value) == INVALID_WEBHOOK_INVALID_BASE64
 
 
 def _sns_envelope(inner_message: str) -> str:
@@ -178,7 +184,7 @@ class TestVerifySignature:
         assert verify_signature(JSON_BODY, b"\xff" * 32, API_SECRET) is False
 
     def test_non_ascii_str_signature_returns_false(self):
-        assert verify_signature(JSON_BODY, "\u2603" * 64, API_SECRET) is False
+        assert verify_signature(JSON_BODY, "☃" * 64, API_SECRET) is False
 
     def test_non_string_signature_returns_false(self):
         assert verify_signature(JSON_BODY, 12345, API_SECRET) is False  # type: ignore[arg-type]
@@ -196,8 +202,9 @@ class TestParseEvent:
         assert parse_event(body) == {"type": "a.future.event", "custom": 42}
 
     def test_malformed_json_raises(self):
-        with pytest.raises(json.JSONDecodeError):
+        with pytest.raises(InvalidWebhookError) as exc_info:
             parse_event(b"not json")
+        assert str(exc_info.value) == INVALID_WEBHOOK_INVALID_JSON
 
 
 class TestVerifyAndParseWebhook:
@@ -215,19 +222,19 @@ class TestVerifyAndParseWebhook:
         assert isinstance(result, dict)
 
     def test_signature_mismatch_raises(self):
-        with pytest.raises(WebhookSignatureError) as exc_info:
+        with pytest.raises(InvalidWebhookError) as exc_info:
             verify_and_parse_webhook(JSON_BODY, "0" * 64, API_SECRET)
-        assert "invalid webhook signature" in str(exc_info.value).lower()
+        assert str(exc_info.value) == INVALID_WEBHOOK_SIGNATURE_MISMATCH
 
     def test_signature_must_be_over_uncompressed_bytes(self):
         compressed = _gzip(JSON_BODY)
         sig_over_compressed = _sign(compressed)
-        with pytest.raises(WebhookSignatureError):
+        with pytest.raises(InvalidWebhookError):
             verify_and_parse_webhook(compressed, sig_over_compressed, API_SECRET)
 
     def test_wrong_secret_raises(self):
         sig = _sign(JSON_BODY, secret="other")
-        with pytest.raises(WebhookSignatureError):
+        with pytest.raises(InvalidWebhookError):
             verify_and_parse_webhook(JSON_BODY, sig, API_SECRET)
 
     def test_signature_can_be_bytes(self):
@@ -235,10 +242,10 @@ class TestVerifyAndParseWebhook:
         assert verify_and_parse_webhook(JSON_BODY, sig, API_SECRET) == EVENT_DICT
 
     def test_malformed_signature_surfaces_as_webhook_error(self):
-        with pytest.raises(WebhookSignatureError):
+        with pytest.raises(InvalidWebhookError):
             verify_and_parse_webhook(JSON_BODY, b"\xff" * 32, API_SECRET)
-        with pytest.raises(WebhookSignatureError):
-            verify_and_parse_webhook(JSON_BODY, "\u2603" * 64, API_SECRET)
+        with pytest.raises(InvalidWebhookError):
+            verify_and_parse_webhook(JSON_BODY, "☃" * 64, API_SECRET)
 
 
 class TestParseSqs:
@@ -280,7 +287,7 @@ class TestSyncClientMethods:
         assert sync_client.parse_sns(wrapped) == EVENT_DICT
 
     def test_signature_mismatch_via_client(self, sync_client: StreamChat):
-        with pytest.raises(WebhookSignatureError):
+        with pytest.raises(InvalidWebhookError):
             sync_client.verify_and_parse_webhook(JSON_BODY, "0" * 64)
 
 

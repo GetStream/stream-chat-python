@@ -147,7 +147,7 @@ class StreamChatInterface(abc.ABC):
 
         :param body: raw HTTP request body bytes Stream signed
         :param signature: ``X-Signature`` header value
-        :raises stream_chat.base.exceptions.WebhookSignatureError: on
+        :raises stream_chat.base.exceptions.InvalidWebhookError: on
             signature mismatch or any decode error
         """
         from stream_chat.webhook import verify_and_parse_webhook
