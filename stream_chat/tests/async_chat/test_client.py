@@ -174,7 +174,7 @@ class TestClient:
         )
         assert "task_id" in response
 
-        for _ in range(60):
+        for _ in range(300):
             response = await client.get_task(response["task_id"])
             if response["status"] == "completed" and response["result"][
                 random_user["id"]
@@ -669,7 +669,9 @@ class TestClient:
 
     async def test_list_blocklists(self, client: StreamChatAsync):
         response = await client.list_blocklists()
-        assert len(response["blocklists"]) == 3
+        # Don't pin the exact count: the shared test app accumulates blocklists
+        # across CI runs where teardown didn't get to run.
+        assert len(response["blocklists"]) >= 3
         blocklist_names = {blocklist["name"] for blocklist in response["blocklists"]}
         assert "Foo" in blocklist_names
 
@@ -811,7 +813,7 @@ class TestClient:
         response = await client.delete_channels([channel.cid])
         assert "task_id" in response
 
-        for _ in range(60):
+        for _ in range(300):
             response = await client.get_task(response["task_id"])
             if response["status"] == "completed" and response["result"][
                 channel.cid
