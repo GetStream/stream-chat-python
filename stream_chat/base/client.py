@@ -133,6 +133,41 @@ class StreamChatInterface(abc.ABC):
         ).hexdigest()
         return signature == x_signature
 
+    def verify_and_parse_webhook(
+        self,
+        body: Union[bytes, str],
+        signature: Union[str, bytes],
+    ) -> Dict[str, Any]:
+        """Verify and parse an HTTP webhook event.
+
+        Decompresses ``body`` when gzipped (detected from the body bytes),
+        verifies the ``X-Signature`` header against the app's API secret,
+        and returns the parsed event. The Python SDK currently returns a
+        ``dict``; typed event classes are planned for a future release.
+
+        :param body: raw HTTP request body bytes Stream signed
+        :param signature: ``X-Signature`` header value
+        :raises stream_chat.base.exceptions.InvalidWebhookError: on
+            signature mismatch or any decode error
+        """
+        from stream_chat.webhook import verify_and_parse_webhook
+
+        return verify_and_parse_webhook(body, signature, self.api_secret)
+
+    def parse_sqs(self, message_body: Union[bytes, str]) -> Dict[str, Any]:
+        """Parse an SQS firehose body (base64 + optional gzip). No HMAC."""
+
+        from stream_chat.webhook import parse_sqs
+
+        return parse_sqs(message_body)
+
+    def parse_sns(self, message: Union[bytes, str]) -> Dict[str, Any]:
+        """Parse an SNS body (unwraps SNS envelope when present). No HMAC."""
+
+        from stream_chat.webhook import parse_sns
+
+        return parse_sns(message)
+
     @abc.abstractmethod
     def update_app_settings(
         self, **settings: Any

@@ -90,6 +90,96 @@ valid = client.verify_webhook(request.body, request.META['HTTP_X_SIGNATURE'])
 valid = client.verify_webhook(request.data, request.headers['X-SIGNATURE'])
 ```
 
+### Compressed webhook bodies
+
+GZIP compression can be enabled for hook payloads from the Dashboard. Enabling compression reduces the payload size significantly (often 70–90% smaller) reducing your bandwidth usage on Stream. The decompression cost on your side is usually negligible and offset by the much smaller payload.
+
+When payload compression is enabled, webhook HTTP requests include the `Content-Encoding: gzip` header and the body is gzipped. SQS and SNS messages are gzipped and then base64-wrapped (both transports are UTF-8 only). Some HTTP servers and middleware (Rails, Django, Laravel, Spring Boot, ASP.NET) auto-decompress the body before your handler runs — in that case the body you see is already raw JSON.
+
+Before enabling compression, make sure that:
+
+* Your backend integration is using a recent version of our official SDKs with compression support
+* If you don't use an official SDK, make sure that your code supports receiving compressed payloads
+* The payload signature check is done on the **uncompressed** payload
+
+The Python SDK exposes a one-liner per transport. Each helper detects the encoding from the body bytes (the gzip magic `1f 8b`, per [RFC 1952](https://datatracker.ietf.org/doc/html/rfc1952)), verifies the HMAC `X-Signature` over the uncompressed JSON, and returns the parsed event as a `dict`. Typed event classes are planned for a future release; until then handlers can key off the `type` field.
+
+```python
+from stream_chat import StreamChat
+
+client = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+
+# Django view
+def stream_webhook(request):
+    event = client.verify_and_parse_webhook(
+        request.body,
+        request.headers["X-Signature"],
+    )
+    # ... handle event["type"], event["message"], ...
+```
+
+```python
+from flask import request
+from stream_chat import StreamChat
+
+client = StreamChat(api_key="STREAM_KEY", api_secret="STREAM_SECRET")
+
+@app.route("/webhooks/stream", methods=["POST"])
+def stream_webhook():
+    event = client.verify_and_parse_webhook(
+        request.get_data(),
+        request.headers["X-Signature"],
+    )
+    # ... handle event["type"], event["message"], ...
+```
+
+The same call works whether or not Stream is compressing for this app, and whether or not your framework auto-decompressed the request — the helper inspects the body bytes rather than the `Content-Encoding` header.
+
+All helpers raise `stream_chat.webhook.InvalidWebhookError` when the signature does not match, when the gzip stream is corrupt, or when the SQS/SNS base64 envelope cannot be decoded.
+
+The original `client.verify_webhook(request.body, request.headers["X-Signature"])` — which returns a `bool` and does not decompress — stays unchanged for backward compatibility. Switch to `verify_and_parse_webhook` to support compressed payloads.
+
+#### SQS / SNS firehose
+
+For events delivered through SQS or SNS, call the matching helper. It base64-decodes the envelope, gzip-decompresses when the magic bytes are present, and returns the parsed event.
+
+Stream does **not** ship an `X-Signature` on SQS or SNS deliveries: those transports run on AWS-internal infrastructure that is already authenticated end-to-end. SQS queues are reached via IAM-authenticated polling, and SNS notifications carry an AWS signature on the notification envelope itself, so verifying that the message really came from your topic happens at the AWS layer. Layering an HMAC check on top is redundant, so the SQS/SNS helpers only decode and parse — they take a single argument and never verify a signature.
+
+For SQS, pass the message `Body` (already the payload):
+
+```python
+event = client.parse_sqs(sqs_message["Body"])
+```
+
+For SNS, pass the **raw notification body** (the full `{"Type":"Notification", ...}` JSON envelope Amazon delivers). The SDK extracts the inner `Message` field for you, so the call site mirrors what HTTP frameworks already hand you in `request.body`:
+
+```python
+# Django SNS HTTP delivery
+event = client.parse_sns(request.body)        # raw envelope (bytes/str)
+```
+
+#### Stateless / module-level form
+
+If you do not want to construct a `StreamChat` client (for example in a lightweight Lambda that only handles webhooks), call the module-level helpers directly. The HTTP helper still requires the signature and secret; the SQS/SNS helpers take a single argument:
+
+```python
+from stream_chat import webhook
+
+event = webhook.verify_and_parse_webhook(body, signature, secret)
+event = webhook.parse_sqs(message_body)
+event = webhook.parse_sns(notification_body)
+```
+
+##### Arguments
+
+| Argument            | `verify_and_parse_webhook` | `parse_sqs`     | `parse_sns`          |
+| ------------------- | -------------------------- | --------------- | -------------------- |
+| body / message_body / notification_body | required | required | required |
+| signature           | required                   | —               | —                    |
+| secret              | required                   | —               | —                    |
+
+The module also exposes the primitives the composites are built from — `gunzip_payload`, `decode_sqs_payload`, `decode_sns_payload`, `verify_signature` (constant-time HMAC-SHA256), and `parse_event` — for callers that need to run the steps individually.
+
 All webhook requests contain these headers:
 
 | Name              | Description                                                                                                          | Example                                                          |

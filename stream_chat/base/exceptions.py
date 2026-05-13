@@ -6,6 +6,23 @@ class StreamChannelException(Exception):
     pass
 
 
+class InvalidWebhookError(Exception):
+    """Invalid webhook signature or malformed gzip/base64/JSON envelope.
+
+    Raised by :mod:`stream_chat.webhook` on any failure path: signature
+    mismatch, malformed base64, gzip decompression failure, or invalid
+    JSON payload. The message text identifies the failure mode so
+    callers that want to differentiate (security logging, retry policy)
+    can filter on substring or on the module-level constants.
+    """
+
+
+INVALID_WEBHOOK_SIGNATURE_MISMATCH = "signature mismatch"
+INVALID_WEBHOOK_INVALID_BASE64 = "invalid base64 encoding"
+INVALID_WEBHOOK_GZIP_FAILED = "gzip decompression failed"
+INVALID_WEBHOOK_INVALID_JSON = "invalid JSON payload"
+
+
 class StreamAPIException(Exception):
     def __init__(self, text: str, status_code: int) -> None:
         self.response_text = text
