@@ -1,4 +1,5 @@
 import os
+import sys
 import uuid
 from typing import Dict, List
 
@@ -23,6 +24,72 @@ def pytest_runtest_setup(item):
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "incremental: mark test incremental")
+
+
+def _warn_cleanup_failure(label: str, identifier: str, exc: BaseException) -> None:
+    """Surface cleanup failures in CI logs.
+
+    Fixtures used to swallow every teardown exception with ``except Exception: pass``,
+    which silently leaked test channels / users / commands into the shared CI
+    app and eventually broke unrelated tests with stale-state assertions. We
+    can't fail the test on cleanup error (the test itself already passed) but
+    we can at least make the leak visible so the on-call dev knows where to
+    look.
+    """
+    print(
+        f"[cleanup] {label} {identifier} failed: {exc.__class__.__name__}: {exc}",
+        file=sys.stderr,
+    )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _purge_stale_test_channels():
+    """Best-effort sweep of leaked test channels at session start AND end.
+
+    Per-test fixtures tear down with synchronous ``channel.delete(hard=True)``,
+    but historical runs that aborted mid-test left orphans in the shared CI
+    app. This sweep targets channels tagged ``{"test": True, "language":
+    "python"}`` by the ``channel`` fixture below — anything that isn't
+    actively in use by another concurrent run gets hard-deleted.
+
+    Session-scoped so it runs once per ``pytest`` invocation. autouse=True so
+    even tests that don't request a channel still benefit (and the next run's
+    quotas are healthy).
+    """
+
+    def sweep(client: StreamChat) -> None:
+        try:
+            response = client.query_channels(
+                {"test": True, "language": "python"},
+                sort=[{"field": "created_at", "direction": -1}],
+                limit=30,
+            )
+        except Exception as exc:
+            print(
+                f"[cleanup] sweep query_channels failed: {exc.__class__.__name__}: {exc}",
+                file=sys.stderr,
+            )
+            return
+        cids = [c["channel"]["cid"] for c in response.get("channels", [])]
+        if not cids:
+            return
+        try:
+            client.delete_channels(cids, hard_delete=True)
+            print(f"[cleanup] swept {len(cids)} leaked test channels", file=sys.stderr)
+        except Exception as exc:
+            _warn_cleanup_failure("sweep delete_channels", str(len(cids)), exc)
+
+    base_url = os.environ.get("STREAM_HOST")
+    options = {"base_url": base_url} if base_url else {}
+    client = StreamChat(
+        api_key=os.environ["STREAM_KEY"],
+        api_secret=os.environ["STREAM_SECRET"],
+        timeout=10,
+        **options,
+    )
+    sweep(client)
+    yield
+    sweep(client)
 
 
 @pytest.fixture(scope="module")
@@ -76,10 +143,13 @@ def channel(client: StreamChat, random_user: Dict):
 
     yield channel
 
+    # Use the synchronous channel.delete (HTTP DELETE) instead of
+    # client.delete_channels (returns task_id, races with subsequent tests
+    # querying the same app). Tag failures so CI logs show the leak source.
     try:
-        client.delete_channels([channel.cid], hard_delete=True)
-    except Exception:
-        pass
+        channel.delete(hard=True)
+    except Exception as exc:
+        _warn_cleanup_failure("channel", channel.cid, exc)
 
 
 @pytest.fixture(scope="function")
@@ -98,10 +168,10 @@ def command(client: StreamChat):
             ):
                 try:
                     client.delete_command(cmd["name"])
-                except Exception:
-                    pass
-    except Exception:
-        pass
+                except Exception as exc:
+                    _warn_cleanup_failure("stale command", cmd["name"], exc)
+    except Exception as exc:
+        _warn_cleanup_failure("list_commands", "<sweep>", exc)
 
     response = client.create_command(
         dict(name=str(uuid.uuid4()), description="My command")
@@ -111,8 +181,8 @@ def command(client: StreamChat):
 
     try:
         client.delete_command(response["command"]["name"])
-    except Exception:
-        pass
+    except Exception as exc:
+        _warn_cleanup_failure("command", response["command"]["name"], exc)
 
 
 @pytest.fixture(scope="module")
@@ -135,8 +205,8 @@ def fellowship_of_the_ring(client: StreamChat):
     ]
     try:
         client.restore_users([m["id"] for m in members])
-    except Exception:
-        pass
+    except Exception as exc:
+        _warn_cleanup_failure("restore_users", "fellowship", exc)
     client.upsert_users(members)
     channel = client.channel(
         "team", "fellowship-of-the-ring", {"members": [m["id"] for m in members]}
@@ -147,13 +217,13 @@ def fellowship_of_the_ring(client: StreamChat):
 
     try:
         channel.delete(hard=True)
-        hard_delete_users(client, [m["id"] for m in members])
-    except Exception:
-        pass
+    except Exception as exc:
+        _warn_cleanup_failure("channel", channel.cid, exc)
+    hard_delete_users(client, [m["id"] for m in members])
 
 
 def hard_delete_users(client: StreamChat, user_ids: List[str]):
     try:
         client.delete_users(user_ids, "hard", conversations="hard", messages="hard")
-    except Exception:
-        pass
+    except Exception as exc:
+        _warn_cleanup_failure("delete_users", ",".join(user_ids), exc)

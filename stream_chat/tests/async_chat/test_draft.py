@@ -84,65 +84,80 @@ class TestDraft:
         draft1 = {"text": "Draft in channel 1"}
         await channel.create_draft(draft1, random_user["id"])
 
-        # Create another channel with a draft
-        channel2 = client.channel("messaging", str(uuid.uuid4()))
+        # Create another channel with a draft. Tag with {"test": True,
+        # "language": "python"} so the session-level GC sweep in conftest
+        # catches it if cleanup at the end of this test doesn't run.
+        channel2 = client.channel(
+            "messaging",
+            str(uuid.uuid4()),
+            {"test": True, "language": "python"},
+        )
         await channel2.create(random_user["id"])
 
-        draft2 = {"text": "Draft in channel 2"}
-        await channel2.create_draft(draft2, random_user["id"])
-
-        # Query all drafts for the user
-        response = await client.query_drafts(random_user["id"])
-
-        assert "drafts" in response
-        assert len(response["drafts"]) == 2
-
-        # Query drafts for a specific channel
-        response = await client.query_drafts(
-            random_user["id"], filter={"channel_cid": channel2.cid}
-        )
-
-        assert "drafts" in response
-        assert len(response["drafts"]) == 1
-        draft = response["drafts"][0]
-        assert draft["channel_cid"] == channel2.cid
-        assert draft["message"]["text"] == "Draft in channel 2"
-
-        # Query drafts with sort
-        response = await client.query_drafts(
-            random_user["id"],
-            sort=[{"field": "created_at", "direction": SortOrder.ASC}],
-        )
-
-        assert "drafts" in response
-        assert len(response["drafts"]) == 2
-        assert response["drafts"][0]["channel_cid"] == channel.cid
-        assert response["drafts"][1]["channel_cid"] == channel2.cid
-
-        # Query drafts with pagination
-        response = await client.query_drafts(
-            random_user["id"],
-            options={"limit": 1},
-        )
-
-        assert "drafts" in response
-        assert len(response["drafts"]) == 1
-        assert response["drafts"][0]["channel_cid"] == channel2.cid
-
-        assert response["next"] is not None
-
-        # Query drafts with pagination
-        response = await client.query_drafts(
-            random_user["id"],
-            options={"limit": 1, "next": response["next"]},
-        )
-
-        assert "drafts" in response
-        assert len(response["drafts"]) == 1
-        assert response["drafts"][0]["channel_cid"] == channel.cid
-
-        # Cleanup
         try:
-            await channel2.delete()
-        except Exception:
-            pass
+            draft2 = {"text": "Draft in channel 2"}
+            await channel2.create_draft(draft2, random_user["id"])
+
+            # Query all drafts for the user
+            response = await client.query_drafts(random_user["id"])
+
+            assert "drafts" in response
+            assert len(response["drafts"]) == 2
+
+            # Query drafts for a specific channel
+            response = await client.query_drafts(
+                random_user["id"], filter={"channel_cid": channel2.cid}
+            )
+
+            assert "drafts" in response
+            assert len(response["drafts"]) == 1
+            draft = response["drafts"][0]
+            assert draft["channel_cid"] == channel2.cid
+            assert draft["message"]["text"] == "Draft in channel 2"
+
+            # Query drafts with sort
+            response = await client.query_drafts(
+                random_user["id"],
+                sort=[{"field": "created_at", "direction": SortOrder.ASC}],
+            )
+
+            assert "drafts" in response
+            assert len(response["drafts"]) == 2
+            assert response["drafts"][0]["channel_cid"] == channel.cid
+            assert response["drafts"][1]["channel_cid"] == channel2.cid
+
+            # Query drafts with pagination
+            response = await client.query_drafts(
+                random_user["id"],
+                options={"limit": 1},
+            )
+
+            assert "drafts" in response
+            assert len(response["drafts"]) == 1
+            assert response["drafts"][0]["channel_cid"] == channel2.cid
+
+            assert response["next"] is not None
+
+            # Query drafts with pagination
+            response = await client.query_drafts(
+                random_user["id"],
+                options={"limit": 1, "next": response["next"]},
+            )
+
+            assert "drafts" in response
+            assert len(response["drafts"]) == 1
+            assert response["drafts"][0]["channel_cid"] == channel.cid
+        finally:
+            # Hard-delete via the synchronous channel.delete (HTTP DELETE)
+            # rather than the async-task delete_channels helper. Failures
+            # surface in CI logs instead of being swallowed silently.
+            try:
+                await channel2.delete(hard=True)
+            except Exception as exc:
+                import sys
+
+                print(
+                    f"[cleanup] channel {channel2.cid} delete failed: "
+                    f"{exc.__class__.__name__}: {exc}",
+                    file=sys.stderr,
+                )
