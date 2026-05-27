@@ -9,7 +9,15 @@ To enable the Before Message Send webhook, configure the `before_message_send_ho
 ```python
 client.update_app_settings(
     before_message_send_hook_url="https://example.com/webhooks/stream/before-message-send",
-)
+);
+```
+
+## Per-attempt HTTP timeout
+
+You can optionally set `before_message_send_hook_attempt_timeout_ms` (milliseconds). **Omitted or `0`** keeps the Stream default (**1500 ms** per HTTP attempt on this hook and **2000 ms** overall). Values **1–5000** set the per-attempt timeout; the overall envelope is the configured value **plus 500 ms**. The API rejects values outside **0–5000**.
+
+```python
+client.update_app_settings(before_message_send_hook_attempt_timeout_ms=2000)
 ```
 
 ## Use-cases
@@ -155,7 +163,9 @@ Not all message fields can be rewritten by your hook handler, fields such as cre
 
 ## Performance considerations
 
-Your webhook endpoint will be part of the send message transaction, so you should avoid performing any remote calls or potentially slow operations while processing the request. Stream Chat will give your endpoint 1 second of time to reply. If your endpoint is not available (ie. returns a response with status codes 4xx or 5xx) or takes too long, Stream Chat will continue with the execution and save the message as usual.
+Your webhook endpoint will be part of the send message transaction, so you should avoid performing any remote calls or potentially slow operations while processing the request.
+
+**Timeouts:** By default, Stream allows **1500 ms** for your HTTP handler to start returning a response (per-attempt timeout), with **2000 ms** for the overall before-message-send request including internal overhead. You can raise the per-attempt budget up to **5000 ms** using `before_message_send_hook_attempt_timeout_ms` (see [Per-attempt HTTP timeout](/chat/docs/python/before_message_send_webhook/#per-attempt-http-timeout)); the overall envelope is always **500 ms** above that per-attempt value. If your endpoint is unavailable (for example HTTP **4xx** or **5xx**) or too slow, Stream **fails open** for this hook: processing continues and the message is stored as usual unless your handler returns a structured rejection.
 
 To make sure that an outage on the hook does not impact your application, Stream will pause your webhook once it is considered unreachable and it will automatically resume once the webhook is found to be healthy again.
 
