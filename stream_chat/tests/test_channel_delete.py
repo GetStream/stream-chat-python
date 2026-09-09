@@ -23,6 +23,16 @@ def test_delete_sends_skip_truncate() -> None:
 
 
 @pytest.mark.asyncio
+async def test_async_delete_omits_skip_truncate_by_default() -> None:
+    client = MagicMock()
+    client.delete = AsyncMock()
+    await AsyncChannel(client, "messaging", "chan").delete()
+    client.delete.assert_called_once_with(
+        "channels/messaging/chan", {"hard_delete": False}
+    )
+
+
+@pytest.mark.asyncio
 async def test_async_delete_sends_skip_truncate() -> None:
     client = MagicMock()
     client.delete = AsyncMock()
