@@ -166,11 +166,14 @@ class ChannelInterface(abc.ABC):
 
     @abc.abstractmethod
     def delete(
-        self, hard: bool = False
+        self, hard: bool = False, skip_truncate: bool = False
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
         Delete the channel. Messages are permanently removed.
 
+        :param hard: hard delete the channel and its messages
+        :param skip_truncate: keep the messages of a soft deleted channel, so
+            recreating it with the same id restores the history
         :return: The server response
         """
         pass
