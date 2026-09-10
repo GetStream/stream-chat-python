@@ -83,8 +83,11 @@ class Channel(ChannelInterface):
         payload = {"set": to_set or {}, "unset": to_unset or []}
         return self.client.patch(self.url, data=payload)
 
-    def delete(self, hard: bool = False) -> StreamResponse:
-        return self.client.delete(self.url, params={"hard_delete": hard})
+    def delete(self, hard: bool = False, skip_truncate: bool = False) -> StreamResponse:
+        params = {"hard_delete": hard}
+        if skip_truncate:
+            params["skip_truncate"] = True
+        return self.client.delete(self.url, params=params)
 
     def truncate(self, **options: Any) -> StreamResponse:
         return self.client.post(f"{self.url}/truncate", data=options)
