@@ -169,7 +169,7 @@ class ChannelInterface(abc.ABC):
         self, hard: bool = False, skip_truncate: bool = False
     ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
         """
-        Delete the channel. Messages are permanently removed.
+        Delete the channel.
 
         :param hard: hard delete the channel and its messages
         :param skip_truncate: keep the messages of a soft deleted channel, so
