@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.33.0](https://github.com/GetStream/stream-chat-python/compare/v4.32.0...v4.33.0) (2026-09-10)
+
+
+### Features
+
+* add skip_truncate to channel delete ([#236](https://github.com/GetStream/stream-chat-python/issues/236)) ([610523b](https://github.com/GetStream/stream-chat-python/commit/610523bf78a09c94b2fd3fc045d667ff58eefff3))
+
+
+### Bug Fixes
+
+* **ci:** grant contents write to the release job ([#237](https://github.com/GetStream/stream-chat-python/issues/237)) ([4c7834d](https://github.com/GetStream/stream-chat-python/commit/4c7834d2e22dc7f5302ca9b2af5326c9175a07c7))
+
 ## [4.32.0](https://github.com/GetStream/stream-chat-python/compare/v4.31.0...v4.32.0) (2026-05-15)
 
 
