@@ -18,6 +18,7 @@ import gzip
 import hashlib
 import hmac
 import json
+import zlib
 from typing import Any, Dict, Optional, Union
 
 from stream_chat.base.exceptions import (
@@ -54,7 +55,7 @@ def gunzip_payload(body: _BytesLike) -> bytes:
         return raw
     try:
         return gzip.decompress(raw)
-    except (gzip.BadGzipFile, OSError, EOFError) as exc:
+    except (gzip.BadGzipFile, OSError, EOFError, zlib.error) as exc:
         raise InvalidWebhookError(INVALID_WEBHOOK_GZIP_FAILED) from exc
 
 
