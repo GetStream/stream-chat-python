@@ -28,6 +28,11 @@ from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
 from stream_chat.types.channel_batch import ChannelsBatchOptions
 from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
+from stream_chat.types.scheduled_messages import (
+    QueryScheduledMessagesFilter,
+    QueryScheduledMessagesOptions,
+    format_scheduled_at,
+)
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -991,6 +996,47 @@ class StreamChatAsync(StreamChatInterface, AsyncContextManager):
         params["sort"] = sort or [{"field": "remind_at", "direction": 1}]
         params["user_id"] = user_id
         return await self.post("reminders/query", data=params)
+
+    async def update_scheduled_message(
+        self,
+        scheduled_message_id: str,
+        message: Optional[Dict] = None,
+        scheduled_at: Optional[Union[str, datetime.datetime]] = None,
+    ) -> StreamResponse:
+        if message is None and scheduled_at is None:
+            raise ValueError("message or scheduled_at is required")
+        data: Dict[str, Any] = {}
+        if message is not None:
+            data["message"] = message
+        if scheduled_at is not None:
+            data["scheduled_at"] = format_scheduled_at(scheduled_at)
+        return await self.patch(f"scheduled_messages/{scheduled_message_id}", data=data)
+
+    async def delete_scheduled_message(
+        self, scheduled_message_id: str
+    ) -> StreamResponse:
+        return await self.delete(f"scheduled_messages/{scheduled_message_id}")
+
+    async def send_scheduled_message_now(
+        self, scheduled_message_id: str
+    ) -> StreamResponse:
+        return await self.post(f"scheduled_messages/{scheduled_message_id}/send_now")
+
+    async def query_scheduled_messages(
+        self,
+        user_id: str,
+        filter: Optional[QueryScheduledMessagesFilter] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryScheduledMessagesOptions] = None,
+    ) -> StreamResponse:
+        data: Dict[str, Any] = {"user_id": user_id}
+        if filter is not None:
+            data["filter"] = cast(dict, filter)
+        if sort is not None:
+            data["sort"] = sort
+        if options is not None:
+            data.update(cast(dict, options))
+        return await self.post("scheduled_messages/query", data=data)
 
     async def get_user_locations(self, user_id: str, **options: Any) -> StreamResponse:
         params = {"user_id": user_id, **options}

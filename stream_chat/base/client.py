@@ -10,6 +10,10 @@ from typing import Any, Awaitable, Dict, Iterable, List, Optional, TypeVar, Unio
 from stream_chat.types.base import SortParam
 from stream_chat.types.campaign import CampaignData, QueryCampaignsOptions
 from stream_chat.types.draft import QueryDraftsFilter, QueryDraftsOptions
+from stream_chat.types.scheduled_messages import (
+    QueryScheduledMessagesFilter,
+    QueryScheduledMessagesOptions,
+)
 from stream_chat.types.segment import (
     QuerySegmentsOptions,
     QuerySegmentTargetsOptions,
@@ -1586,6 +1590,69 @@ class StreamChatInterface(abc.ABC):
         :param sort: Sort parameters (default: [{ field: 'remind_at', direction: 1 }])
         :param options: Additional query options like limit, offset
         :return: API response with reminders
+        """
+        pass
+
+    @abc.abstractmethod
+    def update_scheduled_message(
+        self,
+        scheduled_message_id: str,
+        message: Optional[Dict] = None,
+        scheduled_at: Optional[Union[str, datetime.datetime]] = None,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Replaces the message and/or the send time of a scheduled message.
+        At least one of message and scheduled_at must be set.
+
+        :param scheduled_message_id: The ID of the scheduled message
+        :param message: Replaces the scheduled message as a whole. The sender stays
+            the user who scheduled it
+        :param scheduled_at: The new send time. A naive datetime is taken to be in UTC
+        :return: API response with the scheduled message
+        """
+        pass
+
+    @abc.abstractmethod
+    def delete_scheduled_message(
+        self, scheduled_message_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Cancels a scheduled message so it is never sent, or removes a failed one.
+
+        :param scheduled_message_id: The ID of the scheduled message
+        :return: API response with the scheduled message
+        """
+        pass
+
+    @abc.abstractmethod
+    def send_scheduled_message_now(
+        self, scheduled_message_id: str
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Moves the send time of a scheduled message to now and queues the send.
+
+        :param scheduled_message_id: The ID of the scheduled message
+        :return: API response with the scheduled message
+        """
+        pass
+
+    @abc.abstractmethod
+    def query_scheduled_messages(
+        self,
+        user_id: str,
+        filter: Optional[QueryScheduledMessagesFilter] = None,
+        sort: Optional[List[SortParam]] = None,
+        options: Optional[QueryScheduledMessagesOptions] = None,
+    ) -> Union[StreamResponse, Awaitable[StreamResponse]]:
+        """
+        Lists the scheduled and failed messages of one user across channels:
+        pending ones first, then failed ones, each by scheduled_at.
+
+        :param user_id: The ID of the user whose scheduled messages to list
+        :param filter: Narrows the result by channel (cid) and status
+        :param sort: Only scheduled_at ascending is supported
+        :param options: Pagination: limit (1 to 100, default 20) and next
+        :return: API response with scheduled_messages and next
         """
         pass
 
