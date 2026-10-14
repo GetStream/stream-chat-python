@@ -4,6 +4,7 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 from stream_chat.base.channel import ChannelInterface, add_user_id
 from stream_chat.base.exceptions import StreamChannelException
+from stream_chat.types.scheduled_messages import format_scheduled_at
 from stream_chat.types.stream_response import StreamResponse
 
 
@@ -11,6 +12,8 @@ class Channel(ChannelInterface):
     async def send_message(
         self, message: Dict, user_id: str, **options: Any
     ) -> StreamResponse:
+        if options.get("scheduled_at") is not None:
+            options["scheduled_at"] = format_scheduled_at(options["scheduled_at"])
         payload = {"message": add_user_id(message, user_id), **options}
         return await self.client.post(f"{self.url}/message", data=payload)
 
