@@ -302,10 +302,16 @@ class TestChannel:
         assert len(response["channels"]) == 0
         # send message
         channel.send_message({"text": "hi"}, random_users[1]["id"])
-        # channel should be listed now
-        response = client.query_channels(
-            {"id": channel.id}, user_id=random_users[0]["id"]
-        )
+        # channel should be listed now. The backend unhides it in a background
+        # task after the message is sent, which can take a while on a busy
+        # shared test app, so poll for up to 30s.
+        for _ in range(60):
+            response = client.query_channels(
+                {"id": channel.id}, user_id=random_users[0]["id"]
+            )
+            if len(response["channels"]) == 1:
+                break
+            time.sleep(0.5)
         assert len(response["channels"]) == 1
 
     def test_invites(self, client: StreamChat, random_users: List[Dict]):
