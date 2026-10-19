@@ -1,15 +1,18 @@
-> [!WARNING]
-> **`stream-chat-python` is deprecated.** New projects should use [`stream-py`](https://github.com/GetStream/stream-py) (PyPI `getstream`), which covers Chat, Video, Moderation and Feeds. To move existing code, see the [migration guide](https://github.com/GetStream/stream-py/tree/main/docs/migration-from-stream-chat-python).
+> [!CAUTION]
+> ## ⚠️ This is a legacy SDK. It is deprecated.
+>
+> 🚫 **Do not start new projects with `stream-chat-python`.**
+>
+> ✅ **Use [`stream-py`](https://github.com/GetStream/stream-py) (PyPI `getstream`) instead.** It covers Chat, Video, Moderation and Feeds in one SDK.
+>
+> 🔁 **Already using `stream-chat-python`?** Follow the [migration guide](https://github.com/GetStream/stream-py/tree/main/docs/migration-from-stream-chat-python) to move your code.
 
-# Official Python SDK for [Stream Chat](https://getstream.io/chat/)
+# Legacy Python SDK for [Stream Chat](https://getstream.io/chat/)
 
 [![build](https://github.com/GetStream/stream-chat-python/workflows/build/badge.svg)](https://github.com/GetStream/stream-chat-python/actions) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stream-chat.svg) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 <p align="center">
-    <img src="./assets/logo.svg" width="50%" height="50%">
-</p>
-<p align="center">
-    Official Python API client for Stream Chat, a service for building chat applications.
+    Legacy Python API client for Stream Chat, a service for building chat applications.
     <br />
     <a href="https://getstream.io/chat/docs/"><strong>Explore the docs »</strong></a>
     <br />
