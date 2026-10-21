@@ -31,10 +31,13 @@ class StreamResponse(dict):
         self.__headers = headers
         self.__status_code = status_code
         self.__rate_limit: Optional[RateLimitInfo] = None
+        # Header names are case-insensitive. The async client passes a plain
+        # dict, which keeps the case the server sent (e.g. X-Ratelimit-Limit).
+        lowered = {k.lower(): v for k, v in headers.items()}
         limit, remaining, reset = (
-            headers.get("x-ratelimit-limit"),
-            headers.get("x-ratelimit-remaining"),
-            headers.get("x-ratelimit-reset"),
+            lowered.get("x-ratelimit-limit"),
+            lowered.get("x-ratelimit-remaining"),
+            lowered.get("x-ratelimit-reset"),
         )
         if limit and remaining and reset:
             self.__rate_limit = RateLimitInfo(
