@@ -4,27 +4,20 @@ from typing import Dict
 import pytest
 
 from stream_chat.async_chat import StreamChatAsync
-from stream_chat.base.exceptions import StreamAPIException
 
 
 async def schedule_message(channel, user_id: str) -> Dict:
-    """Schedules a message, skipping the test when the app cannot schedule.
+    """Schedules a message an hour ahead.
 
-    Scheduled messages are enabled per app by Stream, not through the app
-    settings API, so the CI app cannot be baselined into having them.
+    The CI app has scheduled messages enabled, so a disabled feature or a
+    response without ``scheduled_message`` is a failure, not a skip.
     """
-    try:
-        response = await channel.send_message(
-            {"text": "scheduled hello"},
-            user_id,
-            scheduled_at=datetime.now(timezone.utc) + timedelta(hours=1),
-        )
-    except StreamAPIException as e:
-        if "scheduled_messages_disabled" in e.response_text:
-            pytest.skip("scheduled messages are not enabled for this app")
-        raise
-    if "scheduled_message" not in response:
-        pytest.skip("the API does not support scheduled messages yet")
+    response = await channel.send_message(
+        {"text": "scheduled hello"},
+        user_id,
+        scheduled_at=datetime.now(timezone.utc) + timedelta(hours=1),
+    )
+    assert "scheduled_message" in response, response
     return response["scheduled_message"]
 
 
