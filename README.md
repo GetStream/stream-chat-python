@@ -1,18 +1,18 @@
-> **Note:** [`getstream`](https://github.com/GetStream/stream-py) is the new full-product SDK for Stream, covering Chat, Video, Moderation, and Feeds with long-term support.
+> [!CAUTION]
+> ## ⚠️ This is a legacy SDK. It is deprecated.
 >
-> **`stream-chat` is now in maintenance mode.** It will continue to receive critical fixes and requested features, so it is safe to keep using. However, we encourage existing users to migrate when convenient and strongly recommend that new projects start with `getstream`.
+> 🚫 **Do not start new projects with `stream-chat-python`.**
 >
-> Check out the [Migration Guide](https://github.com/GetStream/stream-py/blob/221d9f15bd5f93ce2a83bb54ecd5a62e6c563da6/docs/migration-from-stream-chat-python/README.md) for side-by-side examples covering common use cases.
+> ✅ **Use [`stream-py`](https://github.com/GetStream/stream-py) (PyPI `getstream`) instead.** It covers Chat, Video, Moderation and Feeds in one SDK.
+>
+> 🔁 **Already using `stream-chat-python`?** Follow the [migration guide](https://github.com/GetStream/stream-py/tree/main/docs/migration-from-stream-chat-python) to move your code.
 
-# Official Python SDK for [Stream Chat](https://getstream.io/chat/)
+# Legacy Python SDK for [Stream Chat](https://getstream.io/chat/)
 
 [![build](https://github.com/GetStream/stream-chat-python/workflows/build/badge.svg)](https://github.com/GetStream/stream-chat-python/actions) [![PyPI version](https://badge.fury.io/py/stream-chat.svg)](http://badge.fury.io/py/stream-chat) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/stream-chat.svg) [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 <p align="center">
-    <img src="./assets/logo.svg" width="50%" height="50%">
-</p>
-<p align="center">
-    Official Python API client for Stream Chat, a service for building chat applications.
+    Legacy Python API client for Stream Chat, a service for building chat applications.
     <br />
     <a href="https://getstream.io/chat/docs/"><strong>Explore the docs »</strong></a>
     <br />
