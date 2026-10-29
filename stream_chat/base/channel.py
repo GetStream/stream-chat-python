@@ -40,6 +40,10 @@ class ChannelInterface(abc.ABC):
 
         :param message: the Message object
         :param user_id: the ID of the user that created the message
+        :param options: additional request fields, e.g. skip_push. Pass
+            scheduled_at (a datetime, naive taken as UTC, or an ISO 8601 string)
+            to store the message and send it at that time instead of now; the
+            response then carries scheduled_message
         :return: the Server Response
         """
         pass
