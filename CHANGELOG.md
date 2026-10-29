@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [4.34.0](https://github.com/GetStream/stream-chat-python/compare/v4.33.0...v4.34.0) (2026-10-29)
 
+
+### Features
+
+* add scheduled messages (CHA-5933) ([#242](https://github.com/GetStream/stream-chat-python/issues/242)) ([c2f4500](https://github.com/GetStream/stream-chat-python/commit/c2f45001ee11e05e4b96bcded8e9755c774d973e))
+
+
+### Bug Fixes
+
+* read rate limit headers case-insensitively ([#243](https://github.com/GetStream/stream-chat-python/issues/243)) ([24c93b2](https://github.com/GetStream/stream-chat-python/commit/24c93b2da80d9261047c8bf8bb19b46d34db612f))
+
 ## [4.33.0](https://github.com/GetStream/stream-chat-python/compare/v4.32.0...v4.33.0) (2026-09-10)
 
 
