@@ -98,6 +98,15 @@ class TestGunzipPayload:
             gunzip_payload(bad)
         assert str(exc_info.value) == INVALID_WEBHOOK_GZIP_FAILED
 
+    def test_corrupt_deflate_stream_raises(self):
+        # A valid gzip header followed by a damaged deflate stream makes
+        # gzip.decompress raise zlib.error, which is not an OSError.
+        corrupt = bytearray(_gzip(JSON_BODY))
+        corrupt[10] = 0xFF
+        with pytest.raises(InvalidWebhookError) as exc_info:
+            gunzip_payload(bytes(corrupt))
+        assert str(exc_info.value) == INVALID_WEBHOOK_GZIP_FAILED
+
 
 class TestDecodeSqsPayload:
     def test_base64_only_no_compression(self):
