@@ -17,7 +17,9 @@ import base64
 import gzip
 import hashlib
 import hmac
+import io
 import json
+import zlib
 from typing import Any, Dict, Optional, Union
 
 from stream_chat.base.exceptions import (
@@ -29,6 +31,11 @@ from stream_chat.base.exceptions import (
 )
 
 GZIP_MAGIC = b"\x1f\x8b"
+
+# Caps the decompressed size of a gzip webhook body. gunzip_payload runs before
+# the signature check, so without a cap an unsigned gzip bomb could exhaust
+# memory. Raise it if your events are larger.
+MAX_WEBHOOK_PAYLOAD_BYTES = 10 * 1024 * 1024
 
 _BytesLike = Union[bytes, bytearray, memoryview, str]
 
@@ -48,14 +55,24 @@ def gunzip_payload(body: _BytesLike) -> bytes:
     Magic-byte detection (rather than relying on a header) means the same
     handler stays correct when middleware - Rails, Django, Laravel, Phoenix -
     auto-decompresses the request before your code sees it.
+
+    Raises :class:`InvalidWebhookError` when the gzip stream is malformed or
+    decompresses to more than :data:`MAX_WEBHOOK_PAYLOAD_BYTES`.
     """
     raw = _to_bytes(body)
     if raw[:2] != GZIP_MAGIC:
         return raw
+    limit = MAX_WEBHOOK_PAYLOAD_BYTES
     try:
-        return gzip.decompress(raw)
-    except (gzip.BadGzipFile, OSError, EOFError) as exc:
+        with gzip.GzipFile(fileobj=io.BytesIO(raw)) as f:
+            out = f.read(limit + 1)
+    except (OSError, EOFError, zlib.error) as exc:
         raise InvalidWebhookError(INVALID_WEBHOOK_GZIP_FAILED) from exc
+    if len(out) > limit:
+        raise InvalidWebhookError(
+            f"{INVALID_WEBHOOK_GZIP_FAILED}: payload exceeds {limit} bytes"
+        )
+    return out
 
 
 def decode_sqs_payload(body: _BytesLike) -> bytes:
