@@ -40,7 +40,7 @@ jobs:
 
       - name: Test with ${{ matrix.python }}
         env:
-          STREAM_KEY: ${{ secrets.STREAM_KEY }}
+          STREAM_KEY: ${{ vars.STREAM_KEY }}
           STREAM_SECRET: ${{ secrets.STREAM_SECRET }}
           PYTHONPATH: ${{ github.workspace }}
         run: make test
