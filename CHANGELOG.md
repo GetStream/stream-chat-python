@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.34.1](https://github.com/GetStream/stream-chat-python/compare/v4.34.0...v4.34.1) (2026-11-16)
+
+
+### Bug Fixes
+
+* limit decompressed webhook payloads to 10 MiB ([#246](https://github.com/GetStream/stream-chat-python/issues/246)) ([7ba4932](https://github.com/GetStream/stream-chat-python/commit/7ba49326a41d8137e015d9c2a1fa88c2e03141f0))
+
 ## [4.34.0](https://github.com/GetStream/stream-chat-python/compare/v4.33.0...v4.34.0) (2026-10-29)
 
 
