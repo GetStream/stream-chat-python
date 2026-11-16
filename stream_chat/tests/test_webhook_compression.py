@@ -26,7 +26,7 @@ import json
 
 import pytest
 
-from stream_chat import StreamChat, StreamChatAsync
+from stream_chat import StreamChat, StreamChatAsync, webhook
 from stream_chat.base.exceptions import (
     INVALID_WEBHOOK_GZIP_FAILED,
     INVALID_WEBHOOK_INVALID_BASE64,
@@ -97,6 +97,40 @@ class TestGunzipPayload:
         with pytest.raises(InvalidWebhookError) as exc_info:
             gunzip_payload(bad)
         assert str(exc_info.value) == INVALID_WEBHOOK_GZIP_FAILED
+
+    def test_corrupt_deflate_data_raises(self):
+        bad = bytearray(_gzip(JSON_BODY))
+        bad[10:14] = b"\xff\xff\xff\xff"
+        with pytest.raises(InvalidWebhookError) as exc_info:
+            gunzip_payload(bytes(bad))
+        assert str(exc_info.value) == INVALID_WEBHOOK_GZIP_FAILED
+
+    def test_inflates_multiple_members(self):
+        assert gunzip_payload(_gzip(b"ab") + _gzip(b"cd")) == b"abcd"
+
+    def test_inflates_body_at_limit(self):
+        limit = webhook.MAX_WEBHOOK_PAYLOAD_BYTES
+        assert limit == 10 * 1024 * 1024
+        assert len(gunzip_payload(_gzip(b"\x00" * limit))) == limit
+
+    def test_gzip_bomb_raises_before_signature_check(self):
+        limit = webhook.MAX_WEBHOOK_PAYLOAD_BYTES
+        bomb = _gzip(b"\x00" * (limit + 1))
+        expected = f"{INVALID_WEBHOOK_GZIP_FAILED}: payload exceeds {limit} bytes"
+        with pytest.raises(InvalidWebhookError) as exc_info:
+            verify_and_parse_webhook(bomb, "deadbeef", API_SECRET)
+        assert str(exc_info.value) == expected
+        with pytest.raises(InvalidWebhookError, match="payload exceeds"):
+            parse_sqs(_b64(bomb))
+
+    def test_custom_limit(self, monkeypatch):
+        monkeypatch.setattr(webhook, "MAX_WEBHOOK_PAYLOAD_BYTES", len(JSON_BODY) - 1)
+        with pytest.raises(InvalidWebhookError, match="payload exceeds"):
+            gunzip_payload(_gzip(JSON_BODY))
+        monkeypatch.setattr(webhook, "MAX_WEBHOOK_PAYLOAD_BYTES", len(JSON_BODY))
+        assert gunzip_payload(_gzip(JSON_BODY)) == JSON_BODY
+        monkeypatch.setattr(webhook, "MAX_WEBHOOK_PAYLOAD_BYTES", 1)
+        assert gunzip_payload(JSON_BODY) == JSON_BODY
 
 
 class TestDecodeSqsPayload:
