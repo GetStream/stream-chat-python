@@ -25,7 +25,7 @@ jobs:
 
       - name: Test
         env:
-          STREAM_KEY: ${{ secrets.STREAM_KEY }}
+          STREAM_KEY: ${{ vars.STREAM_KEY }}
           STREAM_SECRET: ${{ secrets.STREAM_SECRET }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
