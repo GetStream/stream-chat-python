@@ -7,8 +7,13 @@ on:
 
 permissions: {}
 
+# One release run at a time, so overlapping pushes cannot build the same version twice.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
-  # A merged release PR bumps __version__, so a version missing on PyPI is a release to finish.
+  # A merged release PR bumps __version__, so a version without both files on PyPI is a release to finish.
   # Once tagged, the tagged commit is rebuilt, so a rerun or a later push publishes the same code.
   check:
     name: 🔎 Check for a new version
@@ -28,7 +33,8 @@ jobs:
         run: |
           version="v$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' stream_chat/__pkg__.py)"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          if curl -sf --retry 3 -o /dev/null "https://pypi.org/pypi/stream-chat/${version#v}/json"; then
+          if curl -sf --retry 3 "https://pypi.org/pypi/stream-chat/${version#v}/json" |
+            jq -e '[.urls[].packagetype] | index("sdist") and index("bdist_wheel")' >/dev/null; then
             echo "release=false" >> "$GITHUB_OUTPUT"
           else
             echo "release=true" >> "$GITHUB_OUTPUT"
