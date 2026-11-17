@@ -80,8 +80,11 @@ jobs:
           name: dist
           path: dist/
 
+      # Skipping uploaded files lets a rerun finish a release whose GitHub release step failed.
       - name: Publish to PyPI (Trusted Publishing)
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+        with:
+          skip-existing: true
 
   release:
     name: 🚀 Release
