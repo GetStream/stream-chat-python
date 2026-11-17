@@ -1,36 +1,55 @@
 name: Release
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - master
 
-permissions:
-  contents: write
-  pull-requests: read
-  id-token: write
+permissions: {}
 
 jobs:
-  Release:
-    name: 🚀 Release
-    if: github.event.pull_request.merged && startsWith(github.head_ref, 'release-')
+  # A merged release PR bumps __version__, so a version without its tag is a new release.
+  check:
+    name: 🔎 Check for a new version
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      release: ${{ steps.version.outputs.release }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: actions/github-script@v5
+      - id: version
+        run: |
+          version="v$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' stream_chat/__pkg__.py)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    name: 🏗️ Build
+    needs: check
+    if: needs.check.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: changelog
+        uses: actions/github-script@v5
         with:
           script: |
             const get_change_log_diff = require('./scripts/get_changelog_diff.js')
-            core.exportVariable('CHANGELOG', get_change_log_diff())
-
-            // Getting the release version from the PR source branch
-            // Source branch looks like this: release-1.0.0
-            const version = context.payload.pull_request.head.ref.split('-')[1]
-            core.exportVariable('VERSION', version)
+            core.setOutput('changelog', get_change_log_diff())
 
       - uses: actions/setup-python@v3
         with:
@@ -41,12 +60,40 @@ jobs:
           pip install -q wheel==0.37.1
           python setup.py sdist bdist_wheel
 
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
+
+  # The only job that can mint a PyPI token, so it runs no project code. The PyPI trusted
+  # publisher requires the pypi environment, which only master can deploy to.
+  publish:
+    name: 📦 Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist/
+
       - name: Publish to PyPI (Trusted Publishing)
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
 
+  release:
+    name: 🚀 Release
+    needs: [check, build, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
       - name: Create release on GitHub
         uses: ncipollo/release-action@v1
         with:
-          body: ${{ env.CHANGELOG }}
-          tag: ${{ env.VERSION }}
+          body: ${{ needs.build.outputs.changelog }}
+          tag: ${{ needs.check.outputs.version }}
+          commit: ${{ github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
