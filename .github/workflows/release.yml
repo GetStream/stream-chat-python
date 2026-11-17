@@ -8,13 +8,15 @@ on:
 permissions: {}
 
 jobs:
-  # A merged release PR bumps __version__, so a version without its tag is a new release.
+  # A merged release PR bumps __version__, so a version missing on PyPI is a release to finish.
+  # Once tagged, the tagged commit is rebuilt, so a rerun or a later push publishes the same code.
   check:
     name: 🔎 Check for a new version
     runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
+      ref: ${{ steps.version.outputs.ref }}
       release: ${{ steps.version.outputs.release }}
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -26,10 +28,11 @@ jobs:
         run: |
           version="v$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' stream_chat/__pkg__.py)"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          if git rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+          if curl -sf --retry 3 -o /dev/null "https://pypi.org/pypi/stream-chat/${version#v}/json"; then
             echo "release=false" >> "$GITHUB_OUTPUT"
           else
             echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "ref=$(git rev-parse -q --verify "refs/tags/$version^{commit}" || echo "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
           fi
 
   build:
@@ -43,6 +46,8 @@ jobs:
       changelog: ${{ steps.changelog.outputs.changelog }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.check.outputs.ref }}
 
       - id: changelog
         uses: actions/github-script@v5
@@ -65,7 +70,7 @@ jobs:
           name: dist
           path: dist/
 
-  # Tags the release commit before the upload, so a later push to master never rebuilds this version.
+  # Tags the release commit before the upload. A rerun keeps the existing release.
   release:
     name: 🚀 Release
     needs: [check, build]
@@ -78,7 +83,8 @@ jobs:
         with:
           body: ${{ needs.build.outputs.changelog }}
           tag: ${{ needs.check.outputs.version }}
-          commit: ${{ github.sha }}
+          commit: ${{ needs.check.outputs.ref }}
+          skipIfReleaseExists: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   # The only job that can mint a PyPI token, so it runs no project code. The PyPI trusted
@@ -96,7 +102,7 @@ jobs:
           name: dist
           path: dist/
 
-      # Rerunning this job after a partial upload skips the files PyPI already has.
+      # A rerun after a partial upload skips the files PyPI already has.
       - name: Publish to PyPI (Trusted Publishing)
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
