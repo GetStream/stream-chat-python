@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   pull-requests: read
+  id-token: write
 
 jobs:
   Release:
@@ -35,14 +36,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Publish to PyPi
-        env:
-          TWINE_USERNAME: "__token__"
-          TWINE_PASSWORD: "${{ secrets.PYPI_TOKEN }}"
+      - name: Build
         run: |
-          pip install -q twine==3.7.1 wheel==0.37.1
+          pip install -q wheel==0.37.1
           python setup.py sdist bdist_wheel
-          twine upload --non-interactive dist/*
+
+      - name: Publish to PyPI (Trusted Publishing)
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
 
       - name: Create release on GitHub
         uses: ncipollo/release-action@v1
