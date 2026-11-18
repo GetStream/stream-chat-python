@@ -14,7 +14,8 @@ concurrency:
 
 jobs:
   # A merged release PR bumps __version__, so a version without both files on PyPI is a release to finish.
-  # Once tagged, the tagged commit is rebuilt, so a rerun or a later push publishes the same code.
+  # The release is always the commit that set __version__, so a rerun or a later push publishes the
+  # reviewed release PR and nothing merged after it.
   check:
     name: 🔎 Check for a new version
     runs-on: ubuntu-latest
@@ -25,20 +26,27 @@ jobs:
       release: ${{ steps.version.outputs.release }}
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
         with:
           fetch-depth: 0
 
       - id: version
         run: |
           version="v$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' stream_chat/__pkg__.py)"
+          test "$version" != v
           echo "version=$version" >> "$GITHUB_OUTPUT"
           if curl -sf --retry 3 "https://pypi.org/pypi/stream-chat/${version#v}/json" |
             jq -e '[.urls[].packagetype] | index("sdist") and index("bdist_wheel")' >/dev/null; then
             echo "release=false" >> "$GITHUB_OUTPUT"
           else
+            ref=$(git log -1 --format=%H -S"__version__ = \"${version#v}\"" -- stream_chat/__pkg__.py)
+            tag=$(git rev-parse -q --verify "refs/tags/$version^{commit}" || true)
+            if [ -n "$tag" ] && [ "$tag" != "$ref" ]; then
+              echo "::error::$version is tagged at $tag, but __version__ was set in $ref"
+              exit 1
+            fi
             echo "release=true" >> "$GITHUB_OUTPUT"
-            echo "ref=$(git rev-parse -q --verify "refs/tags/$version^{commit}" || echo "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+            echo "ref=$ref" >> "$GITHUB_OUTPUT"
           fi
 
   build:
@@ -51,18 +59,18 @@ jobs:
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
         with:
           ref: ${{ needs.check.outputs.ref }}
 
       - id: changelog
-        uses: actions/github-script@v5
+        uses: actions/github-script@211cb3fefb35a799baa5156f9321bb774fe56294 # v5.2.0
         with:
           script: |
             const get_change_log_diff = require('./scripts/get_changelog_diff.js')
             core.setOutput('changelog', get_change_log_diff())
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@3542bca2639a428e1796aaa6a2ffef0c0f575566 # v3.1.4
         with:
           python-version: "3.10"
 
@@ -85,7 +93,7 @@ jobs:
       contents: write
     steps:
       - name: Create release on GitHub
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           body: ${{ needs.build.outputs.changelog }}
           tag: ${{ needs.check.outputs.version }}
