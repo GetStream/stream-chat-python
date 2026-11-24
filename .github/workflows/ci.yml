@@ -16,7 +16,7 @@ jobs:
   build:
     name: 🧪 Test & lint
     # Python 3.8 and 3.9 need the group's ubuntu-24.04 image, since ubuntu-26.04 has no builds for them.
-    runs-on: { group: github-public-ubuntu-static }
+    runs-on: { group: github-public-amd64 }
     strategy:
       fail-fast: false
       max-parallel: 1
